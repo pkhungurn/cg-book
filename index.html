@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="css/bootstrap.min.css" rel="stylesheet">
-  <link href="css/theme.css" rel="stylesheet">  
+  <link href="css/theme.css" rel="stylesheet">
   <!-- MathJax -->
   <script type="text/javascript">
     MathJax = {
@@ -14,61 +15,350 @@
       svg: {
         fontCache: 'global'
       }
-	  };
+    };
   </script>
   <script type="text/javascript" id="MathJax-script" src="mathjax/tex-mml-chtml.js"></script>
   <title>CG Book</title>
 </head>
+
 <body>
-<div class="container" style="max-width: 640px;"> 
-  <span style="visibility: hidden;">
-    \(
-    \def\sc#1{\dosc#1\csod}
-    \def\dosc#1#2\csod{{\rm #1{\small #2}}}
+  <div class="container" style="max-width: 640px;">
+    <span style="visibility: hidden;">
+      \(
+      \def\sc#1{\dosc#1\csod}
+      \def\dosc#1#2\csod{{\rm #1{\small #2}}}
 
-    \newcommand{\dee}{\mathrm{d}}
-    \newcommand{\Dee}{\mathrm{D}}
-    \newcommand{\In}{\mathrm{in}}
-    \newcommand{\Out}{\mathrm{out}}
-    \newcommand{\pdf}{\mathrm{pdf}}
-    \newcommand{\Cov}{\mathrm{Cov}}
-    \newcommand{\Var}{\mathrm{Var}}
+      \newcommand{\dee}{\mathrm{d}}
+      \newcommand{\Dee}{\mathrm{D}}
+      \newcommand{\In}{\mathrm{in}}
+      \newcommand{\Out}{\mathrm{out}}
+      \newcommand{\pdf}{\mathrm{pdf}}
+      \newcommand{\Cov}{\mathrm{Cov}}
+      \newcommand{\Var}{\mathrm{Var}}
 
-    \newcommand{\ve}[1]{\mathbf{#1}}
-    \newcommand{\mrm}[1]{\mathrm{#1}}
-    \newcommand{\ves}[1]{\boldsymbol{#1}}
-    \newcommand{\etal}{{et~al.}}
-    \newcommand{\sphere}{\mathbb{S}^2}
-    \newcommand{\modeint}{\mathcal{M}}
-    \newcommand{\azimint}{\mathcal{N}}
-    \newcommand{\ra}{\rightarrow}
-    \newcommand{\mcal}[1]{\mathcal{#1}}
-    \newcommand{\X}{\mathcal{X}}
-    \newcommand{\Y}{\mathcal{Y}}
-    \newcommand{\Z}{\mathcal{Z}}
-    \newcommand{\x}{\mathbf{x}}
-    \newcommand{\y}{\mathbf{y}}
-    \newcommand{\z}{\mathbf{z}}
-    \newcommand{\tr}{\mathrm{tr}}
-    \newcommand{\sgn}{\mathrm{sgn}}
-    \newcommand{\diag}{\mathrm{diag}}
-    \newcommand{\Real}{\mathbb{R}}
-    \newcommand{\sseq}{\subseteq}
-    \newcommand{\ov}[1]{\overline{#1}}
-    \DeclareMathOperator*{\argmax}{arg\,max}
-    \DeclareMathOperator*{\argmin}{arg\,min}        
-    \)
-  </span>
-  
-  <h1>Test</h1>
-  <p>
-    Test.
-  </p>  
-</div>
-<script src="js/bootstrap.bundle.min.js"></script>
-<script src="js/littlefoot.js" type="application/javascript"></script>
-<script type="application/javascript">
-  littlefoot.littlefoot();
-</script>
+      \newcommand{\ve}[1]{\mathbf{#1}}
+      \newcommand{\mrm}[1]{\mathrm{#1}}
+      \newcommand{\ves}[1]{\boldsymbol{#1}}
+      \newcommand{\etal}{{et~al.}}
+      \newcommand{\sphere}{\mathbb{S}^2}
+      \newcommand{\modeint}{\mathcal{M}}
+      \newcommand{\azimint}{\mathcal{N}}
+      \newcommand{\ra}{\rightarrow}
+      \newcommand{\mcal}[1]{\mathcal{#1}}
+      \newcommand{\X}{\mathcal{X}}
+      \newcommand{\Y}{\mathcal{Y}}
+      \newcommand{\Z}{\mathcal{Z}}
+      \newcommand{\x}{\mathbf{x}}
+      \newcommand{\y}{\mathbf{y}}
+      \newcommand{\z}{\mathbf{z}}
+      \newcommand{\tr}{\mathrm{tr}}
+      \newcommand{\sgn}{\mathrm{sgn}}
+      \newcommand{\diag}{\mathrm{diag}}
+      \newcommand{\Real}{\mathbb{R}}
+      \newcommand{\sseq}{\subseteq}
+      \newcommand{\ov}[1]{\overline{#1}}
+      \DeclareMathOperator*{\argmax}{arg\,max}
+      \DeclareMathOperator*{\argmin}{arg\,min}
+      \)
+    </span>
+
+    <h1>CG Book</h1>
+    <p>
+      This is the draft of a book on real-time computer graphics by <a href="http://pkhungurn.github.io">Pramook
+        Khungurn</a>.
+    </p>
+    <hr>
+
+    <h1>Contents</h1>
+
+    <ul>
+      <li>Chapter 1: What is computer graphics?</li>
+      <ul>
+        <li>Definition</li>
+        <li>The three big problems of computer graphics</li>
+        <li>Application of computer graphics</li>
+      </ul>
+      <li>Chapter 2: Images and their representations<ul>
+          <li>Color</li>
+          <li>Trichomatic theory and RGB</li>
+          <li>Linear Color Space and the sRGB Color Space</li>
+          <li>Image and digital image</li>
+          <li>Alpha channel and RGBA</li>
+        </ul>
+      </li>
+      <li>Chapter 3: Spaces, points, and vectors<ul>
+          <li>Euclidean space</li>
+          <li>Scalar and vector</li>
+          <li>Vector arithematic<ul>
+              <li>Addition</li>
+              <li>Multiplication with scalar</li>
+              <li>Dot product</li>
+              <li>Cross product</li>
+            </ul>
+          </li>
+          <li>Vector vs point</li>
+        </ul>
+      </li>
+      <li>Chapter 4: Coordinate systems<ul>
+          <li>Cartesian coordinate system</li>
+          <li>Vector arithematic in a Cartesian coordiate system </li>
+          <li>Affine coordinate system</li>
+          <li>Other coordinate system<ul>
+              <li>Polar coordinate system</li>
+              <li>Cylindrical coordiate system</li>
+              <li>Spherical coordinate system</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Chapter 5: Modeling with triangle meshes<ul>
+          <li>Vertices and primitives</li>
+          <li>Meshes</li>
+          <li>Vertex attributes<ul>
+              <li>Position</li>
+              <li>Color</li>
+              <li>Normal vector</li>
+              <li>Texture coordinates</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Chapter 6: Graphics pipeline and OpenGL<ul>
+          <li>Image-order rendering and object-order rendering</li>
+          <li>The graphics pipeline</li>
+          <li>OpenGL</li>
+          <li>Steps of the graphics pipeline<ul>
+              <li>Step 1: Vertex processing</li>
+              <li>Step 2: Primitive assembly</li>
+              <li>Step 3: Clipping</li>
+              <li>Step 4: Rasterization </li>
+              <li>Step 5: Fragment processing</li>
+              <li>Step 6: Raster operations</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Chapter 7: OpenGL programming basics<ul>
+          <li>Program 1: Your first OpenGL program</li>
+          <li>Program 2: Displaying information about the OpenGL context</li>
+          <li>Program 3: Clearing the screen</li>
+          <li>Program 4: Continuous updates</li>
+          <li>Program 5: Creating a GLSL program</li>
+          <li>Program 6: Displaying point primitives</li>
+          <li>Program 7: Displaying line primitives</li>
+          <li>Program 8: Displaying triangle primitives </li>
+          <li>Program 9: Using an array index buffer</li>
+          <li>Program 10: Setting the viewport</li>
+        </ul>
+      </li>
+      <li>Chapter 8: GLSL programming basics<ul>
+          <li>GLSL data types</li>
+          <li>Conversion between datat types</li>
+          <li>Swizzling</li>
+        </ul>
+      </li>
+      <li>Chapter 9: Vertex shaders<ul>
+          <li>Program 1: Displaying information about a vertex shader&#39;s inputs</li>
+          <li>Program 2: Displaying a sine wave</li>
+          <li>Program 3: Displaying a cardioid</li>
+          <li>Program 4: Displaying a Morton code curve</li>
+        </ul>
+      </li>
+      <li>Chapter 10: Uniform variables<ul>
+          <li>Program 1: Using uniform variables</li>
+          <li>Program 2: Using uniform arrays</li>
+          <li>Program 3: Displaying information about uniform variables.</li>
+        </ul>
+      </li>
+      <li>Chapter 11: Fragment shaders<ul>
+          <li>Program 1: Varying variables</li>
+          <li>Program 2: The full screen quad</li>
+          <li>Program 3: Displaying a 2D function</li>
+          <li>Program 4: Displaying a fractal</li>
+        </ul>
+      </li>
+      <li>Chapter 12: Abstracting OpenGL<ul>
+          <li>Program 1: Abstracting GLSL programs</li>
+          <li>Program 2: Abstrating colored meshes</li>
+        </ul>
+      </li>
+      <li>Chapter 13: 2D transformations<ul>
+          <li>General 2d transformations</li>
+          <li>Scaling</li>
+          <li>Rotation</li>
+          <li>Linear transformations</li>
+          <li>Translation</li>
+          <li>Affine transformations</li>
+          <li>Homogeneous coordinates</li>
+          <li>Matrix representation of affine transformations</li>
+          <li>How to read an affine transformation&#39;s matrix</li>
+        </ul>
+      </li>
+      <li>Chapter 14: Transformation and scene modeling<ul>
+          <li>Interpretations of a sequence of transformations</li>
+          <li>Hierarchical modeling</li>
+          <li>Program 1: Example of hierarchical modeling</li>
+        </ul>
+      </li>
+      <li>Chapter 15: User interaction<ul>
+          <li>Program 1: Processing keyboard events</li>
+          <li>Program 2: Breakout #1</li>
+          <li>Program 3: Processing mouse events</li>
+          <li>Program 4: Breakout #2</li>
+        </ul>
+      </li>
+      <li>Chapter 16: Hidden surface removal<ul>
+          <li>OpenGL&#39;s depth buffer</li>
+          <li>Program 1: Using the depth buffer</li>
+        </ul>
+      </li>
+      <li>Chapther 17: Texture mapping<ul>
+          <li>Program 1: Using a texture</li>
+          <li>Program 2: Texture parameters</li>
+          <li>Program 3: Abstracting the texture units</li>
+        </ul>
+      </li>
+      <li>Chapter 18: Introduction to signal processing<ul>
+          <li>Sampling and reconstruction</li>
+          <li>Aliasing</li>
+          <li>Convolution</li>
+          <li>Impulses and impulse trains</li>
+          <li>Sampling as a convolution with impulse train</li>
+          <li>Reconstruction kernel</li>
+          <li>Reconstruction as a convolution with a kernel</li>
+          <li>Fourier analysis and the frequency domain</li>
+          <li>Convolution as multiplication in the frequency doamin</li>
+          <li>The frequency domain and aliasing</li>
+          <li>The sampling theorem</li>
+          <li>How to deal with aliasing</li>
+        </ul>
+      </li>
+      <li>Chapter 19: Mipmapping<ul>
+          <li>The theory of mipmapping</li>
+          <li>Program 1: Using mipmapping</li>
+        </ul>
+      </li>
+      <li>Chapter 20: Blending<ul>
+          <li>Blending in OpenGL</li>
+          <li>Program 1: Using blending</li>
+          <li>Program 2: Dealing with transparency in textures</li>
+        </ul>
+      </li>
+      <li>Chapter 21: Frame buffer objects (FBO)<ul>
+          <li>Program 1: Using an FBO</li>
+          <li>Double buffering</li>
+          <li>Image processing with OpenGL</li>
+          <li>Program 2: sRGBへの変換</li>
+          <li>Program 3: Gaussian blur</li>
+        </ul>
+      </li>
+      <li>Chapter 22: 3D transformations<ul>
+          <li>3D homogeneous coordinates</li>
+          <li>3D translation</li>
+          <li>3D scaling</li>
+          <li>3D rotation</li>
+        </ul>
+      </li>
+      <li>Chapter 23: Projection<ul>
+          <li>Perspective divide</li>
+          <li>Orthographic projection</li>
+          <li>Perspective projection</li>
+        </ul>
+      </li>
+      <li>Chapter 24: 3D rendering<ul>
+          <li>Program 1: Displaying a simple 3D shape</li>
+          <li>Program 2: Orthographic projection demo</li>
+          <li>Program 3: Perspective projection demo</li>
+          <li>Program 4: LookAt transformation</li>
+          <li>Program 5: Controlling the camera with mouse</li>
+          <li>Program 6: Reading glTF model and display its wireframe</li>
+          <li>Program 7: Depth buffer and FBO</li>
+        </ul>
+      </li>
+      <li>Chapter 25: Shading<ul>
+          <li>Normal vectors and transformations</li>
+          <li>Light sources<ul>
+              <li>Directional light sources</li>
+              <li>Point light sources</li>
+            </ul>
+          </li>
+          <li>Phong shading model</li>
+          <li>Porgram 1: Implementing the Phong shading model</li>
+          <li>Cel shading</li>
+          <li>Program 2: Implementing cel shading</li>
+        </ul>
+      </li>
+      <li>Chapter 26: Normal mapping<ul>
+          <li>The theory of normal mapping</li>
+          <li>Tangent spaces</li>
+          <li>How to compute tangent spaces of meshes</li>
+          <li>Program 1: Implementing normal mapping</li>
+        </ul>
+      </li>
+      <li>Chapter 27: Physically-based shading<ul>
+          <li>Radiometric quantities<ul>
+              <li>Flax</li>
+              <li>Irradiance</li>
+              <li>Radiance</li>
+            </ul>
+          </li>
+          <li>Bidirectional reflectance distribution functions (BRDF)</li>
+          <li>Rendering equation</li>
+          <li>Shading with directional and point light</li>
+          <li>Well-known BRDFs<ul>
+              <li>Lambertian BRDF</li>
+              <li>Program 1: Implementing the Lambertian BRDF</li>
+              <li>Dielectric BRDF</li>
+              <li>Program 2: Implementing the dielectric BRDF</li>
+              <li>Metalic BRDF</li>
+              <li>Program 3: Implementing the metalic BRDF</li>
+            </ul>
+          </li>
+          <li>glTF&#39;s metalic-roughness material</li>
+          <li>Program 4: Implementing the metalic-roughness material</li>
+        </ul>
+      </li>
+      <li>Character 28: Character modeling<ul>
+          <li>Skeleton</li>
+          <li>Forward kinematics</li>
+          <li>Program 1: Visualing the skeleton of a glTF character model</li>
+        </ul>
+      </li>
+      <li>Chapter 29: Skinning<ul>
+          <li>Linear blend skinning</li>
+          <li>Program 1: Implementing linear blend skinning</li>
+        </ul>
+      </li>
+      <li>Chapter 30: Animation<ul>
+          <li>What is a pose?</li>
+          <li>Animation as a sequence of pose</li>
+          <li>Keyframes and interpolations</li>
+          <li>Representing rotations<ul>
+              <li>Rotation matrices </li>
+              <li>Euler angles </li>
+              <li>Quaternions<ul>
+                  <li>Quaternion arithematic</li>
+                  <li>Uniform quaternions</li>
+                  <li>Quaternion interpolations</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Chapter 31: Animating a glTF character</li>
+      <li>Chapter 32: Conclusion and where to go from here</li>
+    </ul>
+    <hr>
+    <p>
+      Last updated: 2023/06/10
+    </p>    
+  </div>
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="js/littlefoot.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    littlefoot.littlefoot();
+  </script>
 </body>
+
 </html>
