@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script type="text/javascript">
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
+  
+  <title>Chapter 1</title>
+</head>
+
+<body>
+  <div class="container" style="max-width: 640px;">
+    <span style="visibility: hidden;">
+      \(
+      \def\sc#1{\dosc#1\csod}
+      \def\dosc#1#2\csod{{\rm #1{\small #2}}}
+
+      \newcommand{\dee}{\mathrm{d}}
+      \newcommand{\Dee}{\mathrm{D}}
+      \newcommand{\In}{\mathrm{in}}
+      \newcommand{\Out}{\mathrm{out}}
+      \newcommand{\pdf}{\mathrm{pdf}}
+      \newcommand{\Cov}{\mathrm{Cov}}
+      \newcommand{\Var}{\mathrm{Var}}
+
+      \newcommand{\ve}[1]{\mathbf{#1}}
+      \newcommand{\mrm}[1]{\mathrm{#1}}
+      \newcommand{\ves}[1]{\boldsymbol{#1}}
+      \newcommand{\etal}{{et~al.}}
+      \newcommand{\sphere}{\mathbb{S}^2}
+      \newcommand{\modeint}{\mathcal{M}}
+      \newcommand{\azimint}{\mathcal{N}}
+      \newcommand{\ra}{\rightarrow}
+      \newcommand{\mcal}[1]{\mathcal{#1}}
+      \newcommand{\X}{\mathcal{X}}
+      \newcommand{\Y}{\mathcal{Y}}
+      \newcommand{\Z}{\mathcal{Z}}
+      \newcommand{\x}{\mathbf{x}}
+      \newcommand{\y}{\mathbf{y}}
+      \newcommand{\z}{\mathbf{z}}
+      \newcommand{\tr}{\mathrm{tr}}
+      \newcommand{\sgn}{\mathrm{sgn}}
+      \newcommand{\diag}{\mathrm{diag}}
+      \newcommand{\Real}{\mathbb{R}}
+      \newcommand{\sseq}{\subseteq}
+      \newcommand{\ov}[1]{\overline{#1}}
+      \DeclareMathOperator*{\argmax}{arg\,max}
+      \DeclareMathOperator*{\argmin}{arg\,min}
+      \)
+    </span>
+
+    <h1 id="introduction">Introduction</h1>
+    <hr>
+
+    <p><strong>Computer graphics</strong> is the body of knowledge on how to use computers to create visual media. These
+      include images, videos, and computer applications that show such media to users. By this definition, you already
+      benefit from computer graphics technology when you read an email from your computer&#39;s monitor or play a video
+      game on your mobile phone. It thus goes without saying that computer graphics is a very importance piece of
+      technology that shapes our modern lives.</p>
+    <p>This book focuses on a part of computer graphics called <strong>3D computer graphics</strong> (3DCG). Its goal is
+      to create images that look three-dimensional. In general, the process is pretty much like photography. We use a
+      computer to create virtual 3D objects that only live in computers and combine them to form a virtual scene. We
+      then use the computer as a virtual camera to take pictures of the scene to create our images. To do so, we must be
+      able to solve three fundamental problems.</p>
+
+    <ol>
+      <li>
+        <p><strong>Modeling.</strong> A model is a piece of computer data is that used to represent something else.
+          Because our goal is to generate images of 3D objects, we must create models for their shapes (are they round
+          or rectangular?) and appearances (what color do they have?). The modeling problem deals with how to use data
+          to represent such properties. </p>
+      </li>
+      <li>
+        <p><strong>Rendering.</strong> Once we have models of all the objects we are interested in, our next step is to
+          create images from them. The rendering problem deals specially with this process. To solve it, we need to
+          figure out exactly what our virtual camera is and how it would take pictures of our models.</p>
+      </li>
+      <li>
+        <p><strong>Animation.</strong> In many cases, we might want to create moving images. The animation problem deals
+          with how to specify movement of virtual 3D objects through time so that we can take multiple pictures to
+          create a movie.</p>
+      </li>
+    </ol>
+
+    <h2 id="applications-of-3d-computer-graphics">Applications of 3D computer graphics</h2>
+    <p>The rewards of being able to solve the above problems are tremendous. </p>
+    <ul>
+      <li>
+        <p><strong>Animation.</strong> 3D computer graphics gives us animated feature films such as <a href="https://www.imdb.com/title/tt0114709/">Toy Story </a> (1995) and <a href="https://www.imdb.com/title/tt2294629/">Frozen</a> (2013) that feature truly 3D-looking characters moving in convincing 3D environments. 3DCG has thus given us a new film genre.</p>
+      </li>
+      <li>
+        <p><strong>Special effects.</strong> 3DCG has become so advanced lately that it has become possible to create images that are hard to distinguish from real photographs. The film industry has used this capability to great effect by blending footage shot with real camera with 3DCG images. This allows imaginary characters such as the <a href="https://www.marvel.com/characters/hulk-bruce-banner">Hulk</a> (<a href="https://www.imdb.com/title/tt0848228/">The Avengers</a>; 2012) or the dragon <a href="https://en.wikipedia.org/wiki/Smaug">Smaug</a> (<a href="https://www.imdb.com/title/tt1170358/">The Hobbit: The Desolation of Smaug</a>; 2013) to appear in the same space as real actors. It also allows real actors to appear in photorealistic, but physically impossible
+        environments such as the "mirror dimension" in <a href="https://www.imdb.com/title/tt1211837/">Doctor Strange</a> (2016) or the bending city in <a href="https://www.imdb.com/title/tt1375666/">Inception</a> (2010).</p>
+      </li>
+      <li>
+        <p><strong>Video games.</strong> Game developers have used 3DCG since the 1980s.<sup id="fnref:1"><a href="#fn:1">1</a></sup> Moreover, many best selling video games such as <a href="https://www.minecraft.net/en-us">Minecraft</a>, <a href="https://www.rockstargames.com/gta-v">Grand Theft Auto V</a>, and <a href="https://www.nintendo.co.jp/wii/rspj/">Wii Sports</a> feature 3D graphics.</p>
+      </li>
+      <li>
+        <p><strong>Simulation.</strong> The 3DCG technology used to create video games can also be used to simulate
+          real-life situations that are hard or costly to bring about such as flying an airplane or performing surgery
+          on a live patient. As a result, 3DCG has been used extensively to train pilots, surgeons, and other
+          professionals.</p>
+      </li>
+      <li>
+        <p><strong>Virtual reality (VR).</strong> Using 3DCG to render images and displaying them through a head-mounted
+          display (HMD) creates an illusion that the viewer is in a three-dimensional space separated from the real
+          world. This &quot;virtual reality&quot; can make video games and simulations more compelling and intuitive.
+        </p>
+      </li>
+      <li>
+        <p><strong>Visualization.</strong> 3DCG can also be used to render real data that are hard or impossible to see
+          with the naked eyes. For example, we can use 3DCG to visualize a computed tomography (CT) scan or a magnetic resonance imaging (MRI) scan of a human subject, and this would allow us to see the subject's internal organs in 3D without having to resort to surgery. As a result, 3DCG has had impact on medical diagnostics.</p>
+      </li>
+      <li>
+        <p><strong>Design.</strong> 3DCG allows a designer to create a model of an object and then render it to see how
+          it would look like without having to actually create a real-life prototype. This allows for much faster and
+          cheaper design iterations. 3DCG is thus now used extensively in many types of designs from small machine parts
+          to big buildings.</p>
+      </li>
+    </ul>    
+    <h2 id="an-overview-of-the-book-s-content">An overview of the book&#39;s content</h2>
+    <p>I hope that I have convinced you that 3D computer graphics is a discipline that has many interesting applications
+      and, therefore, is worthy of study in itself. Nevertheless, 3DCG&#39;s body of knowledge is vast, and it is
+      impossible to cover it all in one book. I thus want to discuss the types of 3DCG knowledge the rest of this book
+      will try to impart.</p>
+    <p>The book has two overarching goals:</p>
+    <ol>
+      <li>
+        <p>To give the reader enough programming knowledge so that the reader can write simple interactive computer
+          graphics applications on their own.</p>
+      </li>
+      <li>
+        <p>To give the reader enough theoretical knowledge on computer graphics to understand the programs they write.
+        </p>
+      </li>
+    </ol>
+    <p>A more concrete version of the first goal is to teach the reader so that they can write computer programs that
+      can display 3D character models in real-time. I think the ability to do so is exciting because it is fundamental
+      to creating 3D games and other interactive applications. Through further study and practice, the reader might be
+      able to create games on their own and have a lot of fun while doing it.</p>
+    <p>Of course, I choose what to cover based on whether it serves the goals or not.</p>
+    <h3 id="content-on-computer-graphics">Content on computer graphics</h3>
+    <p>I will only cover particular solutions to the three fundamental problems of 3DCG that directly serve the goals
+      and not others.</p>
+    <ul>
+      <li>
+        <p><strong>Modeling.</strong> I will only discuss modeling 3D shapes by triangle meshes (Chapter 5?), which has
+          become a standard in video games. As a result of choosing triangle meshes, I will have to discuss models for
+          appearances that work well with them. For this, I will cover surface shading models (Chapter 25? and 27?),
+          texture mapping (Chapter 17?), and normal mapping (Chapter 26?).</p>
+      </li>
+      <li>
+        <p><strong>Rendering.</strong> Because the goal is to write real-time applications, the rendering technique we
+          use must be able to create images very fast, and a typical standard is at least 30 images per second or
+          better. (The unit for how fast a system can render images is typically called &quot;frames per second&quot; or
+          &quot;FPS.&quot; So we will use FPS instead of &quot;images per second&quot; from now on.) I will exclusively
+          cover a rendering algorithm called &quot;the graphics pipeline&quot; (Chapter 6?), which is implemented in
+          almost all graphics processing units (GPUs). The fact that we can enjoy smoothly moving images in games
+          nowadays is largely due to this particular algorithm and the way GPUs accelerate it to meet the stringent
+          demand of 30 FPS or more.</p>
+      </li>
+      <li>
+        <p><strong>Animation.</strong> Since the goal is to write programs that display character models, I will cover
+          techniques for character animation. This includes skeletal animation (Chapter 28?) and linear blend skinning
+          (Chapter 29?). There are techniques for animating non-character entities such as water, fire, and other
+          natural phenomena as well. However, these are out of scope of this book.</p>
+      </li>
+    </ul>
+    <h3 id="content-on-programming">Content on programming</h3>
+    <p>To write a program means to commit to a programming language and also a set of libraries. For the programming
+      language, I choose Javascript because (1) it can be used to create real-time computer graphics applications, and
+      (2) it is available without having to do any installation on any computers that can run modern web browsers such
+      as Chrome, Firefox, and Edge. Note, however, that this book is not about Javascript programming, so I assume that
+      the reader would already have some experience with web programming.</p>
+    <p>As mentioned earlier, we will use the graphics pipeline, running it on a GPU, to do real-time computer graphics.
+      However, because implementing the algorithm on a GPU can be very complicated, we will rely on a well-known
+      graphics pipeline library called WebGL 2.0 instead. According to <a
+        href="https://caniuse.com/?search=webgl%202.0">icanuse.com</a>, WebGL 2.0 is available to at least 92.54% of web
+      users. The reader should be able to run examples programs as long as their computer has a GPU, and they use an
+      up-to-date web browser. I assume that the reader has had no experience with WebGL, and, there are chapters (7? to
+      11?, 15? to 17?, 19? to 21?, and 24?) that cover how to use WebGL commands in details.</p>
+    <p>All knowledge on computer graphics and programming would come together and culminate in Chapter 31?, where I will
+      discuss a program that displays animatable character models.</p>
+    <h3 id="content-on-mathematics">Content on Mathematics</h3>
+    <p>3DCG makes heavy uses of mathematics, and one must understand the relavent mathematics to understand the programs
+      that one writes.</p>
+    <ul>
+      <li>
+        <p>To understand modeling by triangle meshes, one must understand geometric concepts such as vectors (Chapter
+          4?), coordinate systems (Chapter 5?), and transformations (Chapter 13? and 22?).</p>
+      </li>
+      <li>
+        <p>To understand rendering, one must understand projects, which are transformations that turn 3D coordinates to
+          2D ones (Chapter 23?).</p>
+      </li>
+      <li>
+        <p>To understand the &quot;aliasing&quot; problem that shows up when one uses texture mapping, one must
+          understand basic signal processing concepts (Chapter 18?)</p>
+      </li>
+      <li>
+        <p>Lastly, to understand character animation, one must learn how to represent rotations with data (Chapter 30?).
+        </p>
+      </li>
+    </ul>
+    <h3 id="what-this-book-will-not-cover">What this book will not cover</h3>
+    <p>If you are a beginner in 3DCG, the topics mentioned in the last couple of sections might just be meaningless word
+      soups to you. My hope is, of course, that you would read the book and become more familiar with them. However, as
+      you read the book, please keep in mind that the topics were chosen because they are necessary to understand
+      real-time computer graphics programs for character animation. They are only a small part of all the 3DCG
+      knowledge. There are ways to model shapes other than triangle meshes. There are rendering algorithms other than
+      the graphics pipeline. There are ways to animating things other than the one covered in this book. In Chapter 32?,
+      I will discuss in more details what this book does not cover and suggest resources for further study.</p>
+    <p>Now that the content of the book has been outlined, let us start our study of 3D computer graphics. The first
+      thing to understand is images, the output of all computer graphics systems, and it is the subject of the next
+      chapter.</p>
+
+    <hr>
+    <div class="footnotes">
+      <ol>
+        <li class="footnote" id="fn:1">
+          <p>Battlezone, released in 1980, was the first commercially successful 3D video game according to <a
+            href="https://www.techradar.com/news/gaming/the-evolution-of-3d-games-700995">this TechRadar article</a>. <a href="#fnref:1" title="return to article"> ↩</a></p>
+        </li>
+      </ol>
+    </div>
+  </div>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/littlefoot.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    const { littlefoot } = require('littlefoot')
+
+    const lf = littlefoot({
+      activateOnHover: true,
+      hoverDelay: 250,
+    });
+  </script>
+</body>
+
+</html>
