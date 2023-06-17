@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script type="text/javascript">
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
+  
+  <title>Chapter 3</title>
+</head>
+
+<body>
+  <div class="container" style="max-width: 640px;">
+    <span style="visibility: hidden;">
+      \(
+      \def\sc#1{\dosc#1\csod}
+      \def\dosc#1#2\csod{{\rm #1{\small #2}}}
+
+      \newcommand{\dee}{\mathrm{d}}
+      \newcommand{\Dee}{\mathrm{D}}
+      \newcommand{\In}{\mathrm{in}}
+      \newcommand{\Out}{\mathrm{out}}
+      \newcommand{\pdf}{\mathrm{pdf}}
+      \newcommand{\Cov}{\mathrm{Cov}}
+      \newcommand{\Var}{\mathrm{Var}}
+
+      \newcommand{\ve}[1]{\mathbf{#1}}
+      \newcommand{\mrm}[1]{\mathrm{#1}}
+      \newcommand{\ves}[1]{\boldsymbol{#1}}
+      \newcommand{\etal}{{et~al.}}
+      \newcommand{\sphere}{\mathbb{S}^2}
+      \newcommand{\modeint}{\mathcal{M}}
+      \newcommand{\azimint}{\mathcal{N}}
+      \newcommand{\ra}{\rightarrow}
+      \newcommand{\mcal}[1]{\mathcal{#1}}
+      \newcommand{\X}{\mathcal{X}}
+      \newcommand{\Y}{\mathcal{Y}}
+      \newcommand{\Z}{\mathcal{Z}}
+      \newcommand{\x}{\mathbf{x}}
+      \newcommand{\y}{\mathbf{y}}
+      \newcommand{\z}{\mathbf{z}}
+      \newcommand{\tr}{\mathrm{tr}}
+      \newcommand{\sgn}{\mathrm{sgn}}
+      \newcommand{\diag}{\mathrm{diag}}
+      \newcommand{\Real}{\mathbb{R}}
+      \newcommand{\sseq}{\subseteq}
+      \newcommand{\ov}[1]{\overline{#1}}
+      \DeclareMathOperator*{\argmax}{arg\,max}
+      \DeclareMathOperator*{\argmin}{arg\,min}
+      \)
+    </span>
+
+    <h1>3 &nbsp; Space, points, and vectors</h1>
+    <hr>    
+   
+    <p>In the last chapter, we studied images, which are most of the time the final output of CG programs. In this chapter, we turn to the input. Recall that 3DCG produces images by taking photographs of virtual scenes by a virtual camera. The knowledge in this and several more chapters to come will allow us to specify both of them.</p>
+
+    <p>Specifying a virual scene requires us to specify shapes and where they are located. So, we need knowledge about geometry, which is precisely the branch of mathematics that deals with concepts such as shapes, positions, distances, and sizes. There are multiple ways to study geometry. In Euclidean geometry, we study concepts such as points, lines, angles, triangles, and circles through <strong>drawing figures</strong>, assigning to some of their parts, and reasoning about their properties. In analytic geometry, we assign to each point a tuple of numbers called <strong>coordinates</strong> and do computation on the coordinates directly. In linear algebra, we work with abstract notions such as vectors, matrices, and linear transformations and use them to make sense of other geometrical knowledge.</p>
+
+    <p>In this chapter, we will study geometry through the lens of Euclidean geometry and linear algebra. We will defer numerical representations of points and vectors until Chapter 4? where we will discuss coordinates systems in great details. The reason for doing this is to let ourselves see that geometrical concepts such as points, vectors, angles, etc. are independent of coordinate systems. In this way, I think it will become less confusing when we learn how to change one coordinate system to another.</p>
+
+    <h2>3.1 &nbsp; Basic geometrical concepts</h2>
+
+    <p>The starting point for our discussion is the <strong>Euclidean space,</strong> which should represent the 3D space that all of us inhabit. We shall refer to the <strong>Euclidean plane</strong> when we talk about geometry in two dimensions. We assume that that distance in these spaces is measured with a unit which we shall not name. It can be the meter, the centimeter, the foot, the shaku, the Planck length, or anything.</p>
+
+    <p>The spaces can be though of as a set of points, and a point is something that has a position but has no width, height, or depth. When thought of as sets of points, the Euclidean space is denoted by $\mathbb{R}^3$ and the Euclidean plane by $\mathbb{R}^2$.</p>
+
+    <p>We shall be concerned with objects such as straight lines (that extends to indefinitely in both directions), rays (that starts at a point and extends indefinitely in one direction), segments (that starts from a point and ends at another), triangles, quadrileterals, and circles. We will not define these terms and assume that the reader is already familiar with them.</p>
+
+    <figure class="figure">
+      <a href="images/basic-geometrical-concepts.png">
+      <img src="images/basic-geometrical-concepts.png" width="600" alt="Figure 3.1">
+      </a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.1</strong> Basic geometrical concepts.</figurecaption>
+    </figure>
+
+    <h2>3.2 &nbsp; Angles</h2>
+
+    <p>
+    An important concept that we shall define a litte more carefully is the <strong>angle.</strong> Consider three points $A$, $B$, and $C$ such that $A \neq B$ and $A \neq C$. With them, we can form two rays $\overrightarrow{AB}$ and $\overrightarrow{AC}$. Take a compass and arrange it so that the needle point and the pencil tip are separated by some $r &gt; 0$ unit of length. Put the needle point on $A$ and the pencil tip on the ray $\overrightarrow{AB}$. Draw a circular arc by moving the pencil tip from $\overrightarrow{AB}$ to $\overrightarrow{AC}$ while keeping the needle point at $A$. Let $\ell$ be the (non-negative) length of the drawn circular arc. Let $\theta$ be the ratio between the arc length $\ell$ and the radius $r$:
+    $$\theta = \frac{\ell}{r}.$$
+    The <strong>(signed) angle from $\overrightarrow{AB}$ to $\overrightarrow{AC}$</strong>, measured in <strong>radians</strong>, is defined as follows.</p>
+    
+    <ul>
+      <li>If the motion of the compass was counterclockwise, the angle is $\theta$ radians.</li>
+      <li>If the motion of the compass was clockwise, the angle is $-\theta$ radians.</li>
+    </ul>
+
+    <p>Symbolically, we write $$ \angle(\overrightarrow{AB}, \overrightarrow{AC}) = \theta.$$</p>
+
+    <!--Note to publisher: The compass image is from https://nureyon.com/compass-1?pattern=1. Their term of use is available here: https://nureyon.com/about. !-->
+
+    <figure class="figure">
+      <a href="images/angle-definition.png"><img src="images/angle-definition.png" width="600" border="1" alt=""></a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.2</strong> The process used to define angle.</figurecaption>
+    </figure>
+    
+    <p>If we do not care about the direction that the compass moved, we may say that the angle <strong>between</strong> $\overrightarrow{AB}$ to $\overrightarrow{AC}$ is $\theta$ radians. Here, $\theta$ is always non-negative.</p>
+
+    <h3>3.2.1 &nbsp; Units of angles</h3>
+
+    <p>Because $\theta$ is a ratio between length and length, the unit of an angle should be <em>nothing</em> because the length units cancel out. As a result, the word &quot;radians&quot; effectively stands for &quot;no unit&quot; and so it is called a <strong>dimensionless unit.</strong> However, it is not OK to drop the word altogether because there's another popular unit for angles: the <strong>degree.</strong> The relationship between them is:
+    $$ \mathrm{degree} = 180 \times \frac{\mathrm{radian}}{\pi}. $$
+    The angle of $d$ degrees is often denoted by $d^\circ$.</p>
+
+    <figure>
+      <a href="images/well-known-angles-in-degrees.png"><img src="images/well-known-angles-in-degrees.png" width="600" alt="" border="1"></a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.3</strong> In degrees, $0^\circ$ is the angle between two rays that point in the same direction, $90^\circ$ is the right angle, $180^\circ$ is the straight angle, and $270^\circ$ is a reflex angle that is a right angle away from a full rotation. We are familiar with the notation that a full rotation is $360^\circ$, but the angle is not shown here because it is equivalent to $0^\circ$.</figurecaption>
+    </figure>
+
+    <h3>3.2.2 &nbsp; Equivalence between angles</h3>
+
+    <p>The definition we have discussed so far implies that we start from $\overrightarrow{AB}$ and stop turning the compass as soon as we reach $\overrightarrow{AC}$. As a result, the arc length would the shortest. So, any angle would be in the range $(-2\pi, 2\pi)$ because the ratio between the circumference of a circle to the radius is $2\pi$. However, we typically allow angles to be arbitrary large and small. As long as the pencip tip reaches a point on $\overrightarrow{AC}$ in the end, it is fine to turn the compass in any way that we want. We would now define the angle to be the signed distance traveled by the pencil tip divided by the radius. Counterclockwise movement yields positive distance, and clockwise movement yields negative distance.</p>
+
+    <p>For example, consider the corner formed by $\overrightarrow{AB}$ and $\overrightarrow{AC}$ below. Let $\theta$ be the angle corresponding to the shortest arc between them. If, after reaching $\overrightarrow{AC}$ for the first time, we turn the compass in the counterclockwise direction for one full rotation to get back at $\overrightarrow{AC}$ again, the angle would become $\theta +  2\pi$ radians. If we do 2 full counterclockwise rotations, it would become $\theta + 4\pi$ radians. On the other hand, if we instead do a full rotations in the clockwise direction, the angle would be $\theta - 2\pi$ radians.</p>
+
+    <figure>
+      <a href="images/equivalent-angles.png"><img src="images/equivalent-angles.png" width="600" alt="" border="1">
+      </a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.4</strong> Angles that differ by multiples of $2\pi$ are equivalent to each other.</figurecaption>
+    </figure>
+    <hr>
+
+    <p>We see that the angle $\theta$ is equivalent to any angles of the form $\theta + 2\pi k$ where $k$ in an arbitrary integer, positive or negative. Symbolically,
+
+    $$ \theta \equiv \theta + 2\pi k,\quad k = 0, \pm 1, \pm 2, \dotsc.$$
+      
+    This is in the sense that, despite the different amount of turning one has to do, the pencil tip would end up at the same place.
+    </p>
+
+    <h2>3.3 &nbsp; Trigonometric functions</h2>
+
+    <p>We will encounter trigonometric functions so many times later in this book because they are indispensible in doing calculation about shapes and manipulating them. We will use only three functions sine, cosine, and tangent. Let us recall what they mean.</p>
+
+    <h3>3.3.1 &nbsp; Definitions based on the unit circle</h3>
+
+    <p>Trigonometric functions are functions of an angle $\theta$, which is given to us by the functions' user. To define them, we will construct a geometric figure that depends on $\theta$ and read some information from it. The steps to construct such a figure goes as follows.</p>
+
+    <ul>
+      <li>Let $O$, $X$, and $Y$ be points such that the length of the segment $\overline{OX}$ and $\overline{OY}$ are $1$, and the signed angle $\angle(\overrightarrow{OX}, \overrightarrow{OY})$ is the positive right angle ($\pi/2$ radians or, equivalently, $90^\circ$).</li>
+      <li>Take a compass and adjust it so that the needle point and the pencel tip are exactly 1 unit apart.</li>
+      <li>Place the needle point on $O$ and the pencil tip on $X$.</li>
+      <li>Turn the compass by exactly $\theta$ radians, taking the sign into account. After this is done, let the pencip tip be at point $A$.</li>
+      <li>Draw the line segment $\overline{OA}$.</li>
+      <li>From point $A$, draw a line segment to a point $A_X$ on the line $\overleftrightarrow{OX}$ such that $\overline{OA_X}$ is perpendicular to the line $\overleftrightarrow{OX}$. (In other words, the $\angle(\overrightarrow{OA_Y}, \overrightarrow{A_Y A})$ is $\pm 90^\circ$.)</li>
+      <li>From point $A$, draw a line segment to a point $A_Y$ on the line $\overleftrightarrow{OY}$ such that the $\overline{OA_Y}$ is perpendicular to $\overleftrightarrow{OY}$.</li>
+    </ul>
+    
+    <figure>
+      <a href="images/defining-trig-functions.png"><img src="images/defining-trig-functions.png" width="600" alt="" border="1">
+      </a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.5</strong> The process of definining the values of $\sin\theta$ and $\cos\theta$.</figurecaption>
+    </figure>
+
+    <p>We typically call the line $\overleftrightarrow{OX}$ the <strong>$x$-axis</strong> and the line $\overleftrightarrow{OY}$ the <strong>$y$-axis</strong>. The segment $\overline{OA_X}$ and $\overline{OA_Y}$ are called the <strong>projections</strong> of $\overline{OA}$ onto the line $\overleftrightarrow{OX}$ and $\overleftrightarrow{OY}$, respectively. Let $OA_X$ and $OA_Y$ (without the lines over them) denote the length of $\overline{OA_X}$ and $\overline{OA_Y}$. We define the trigonometric functions as follows.
+      $$
+      \begin{align*}
+      \sin \theta &= \begin{cases}
+      OA_Y, & A_Y\ \mathrm{is\ above\ } \overleftrightarrow{OX}\\
+      0, & A_Y\ \mathrm{is\ on}\ \overleftrightarrow{OX}\\
+      -OA_Y, & A_Y\ \mathrm{is\ below\ } \overleftrightarrow{OX} 
+      \end{cases} \\
+      \cos \theta &= \begin{cases}
+      OA_X, & A_X\ \mathrm{is\ to\ the\ right\ of\ } \overleftrightarrow{OY}\\
+      0, & A_X \mathrm{is\ on}\ \overleftrightarrow{OY} \\
+      -OA_X, & A_X\ \mathrm{is\ to\ the\ left\ of\ } \overleftrightarrow{OY} 
+      \end{cases} \\
+      \tan\theta &= \frac{\sin \theta}{\cos \theta}.
+      \end{align*}
+      $$      
+    </p>
+
+    <p>In other words, given $\theta$, we construct a line segment of length $1$ by turning a compass starting from the $x$-axis by $\theta$ radians. After this is done, we define $\sin\theta$ to be the *signed length* of the projection of the segment onto the $y$-axis, $\cos \theta$ to be the signed length of the projection onto the $x$-axis. Lastly, $\tan \theta$ is the ratio of "$y$-projection" to the "$x$-projection." Note that $\tan \theta$ is undefined when $\cos \theta = 0$.</p>
+
+    <h3>3.3.2 &nbsp; Definitions based on right triangles</h3>
+
+    <p>The definitions above are very general and allow us to deal with negative angles and those that are outside the $[0,2\pi)$ range. However, the reader might already be familiar with the definitions that use right triangles, which goes as follows. Let $A$ be a right triangle where the angle at $A$ is $\theta$ radians, and the angle at $B$ is a right angle. The side $\overline{AB}$ is called the <strong>adjacent side</strong> to $A$, the side $\overline{BC}$ is called the <strong>opposite side</strong> to $A$, and the side $\overline{AC}$ is called the <strong>hypothenuse</strong>. Then, the triangometric functions on $\theta$ can be the defined as the following ratios of lengths.</p>
+
+    <p>
+      $$
+      \begin{align*}
+      \sin\theta &= \frac{BC}{AC} = \frac{\mathrm{opposite}}{\mathrm{hypothenuse}}, \\
+      \cos\theta &= \frac{BC}{AC} = \frac{\mathrm{adjacent}}{\mathrm{hypothenuse}}, \\
+      \tan\theta &= \frac{BC}{AB} = \frac{\mathrm{opposite}}{\mathrm{adjacent}}. \\
+      \end{align*}
+      $$
+    </p>
+
+    <figure>
+      <a href="images/trig-triangle.png"><img src="images/trig-triangle.png" alt="" border="1">
+      </a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.6</strong> A right traingle with the sides named.</figurecaption>
+    </figure>
+
+    <p>These definitions are equivalent to the ones we discussed before, but they only work when the angle at $A$ is acute (i.e., $0 \leq \theta \leq \pi/2$). This is because, without a coordinate system, we do not have a notion of negative length.</p>
+
+    <h3>3.3.3 &nbsp; Example values</h3>
+
+    <p>Let us see the values of the trigonometric functions at some well-known angles.
+
+      $$
+      \begin{align*}
+      \sin 0 &= 0, & \cos 0 &= 1, & \tan 0 &= 0, \\
+      \sin \frac{\pi}{2} &= 1, & \cos \frac{\pi}{2} &= 0, & \tan \frac{\pi}{2} &= \mathrm{undefined}, \\
+      \sin \pi &= 0, & \cos \pi &= -1, & \tan \pi &= 0, \\
+      \sin \frac{3\pi}{2} &= -1, & \cos \frac{3\pi}{2} &= 0, & \tan \frac{3\pi}{2} &= \mathrm{undefined}, \\
+      \sin \frac{\pi}{4} &= \frac{\sqrt{2}}{2}, & \cos \frac{\pi}{4} &= \frac{\sqrt{2}}{2}, & \tan \frac{\pi}{4} &= 1, \\
+      \sin \frac{\pi}{3} &= \frac{\sqrt{3}}{2}, & \cos \frac{\pi}{3} &= \frac{1}{2}, & \tan \frac{\pi}{3} &= \sqrt{3}, \\
+      \sin \frac{\pi}{6} &= \frac{1}{2}, & \cos \frac{\pi}{6} &= \frac{\sqrt{3}}{2}, & \tan \frac{\pi}{3} &= \frac{1}{\sqrt{3}}.
+      \end{align*}
+      $$
+    </p>
+
+    <figure>
+      <a href="images/famous-angle-triangles.png"><img src="images/famous-angle-triangles.png" width="600" alt="" border="1">
+      </a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.7</strong> A right traingles that give rise to the values of trigonometric functions of the angles $\frac{\pi}{6}$, $\frac{\pi}{4}$, and $\frac{\pi}{3}$.</figurecaption>
+    </figure>
+
+    <h3>3.3.4 &nbsp; Some properties of trigonometric functions</h3>
+
+    <p>We now mention some useful facts about trigonometric functions.</p>
+
+    <p><strong>Equivalent angles.</strong> Recall that the angle $\theta$ is equivalent to $\theta + 2\pi k$ where $k$ is any integer because the pencil tip of the compass (i.e., the point $A$) would end up at the same place after a rotation by $\theta$ radians and $\theta + 2\pi k$ radians. As a result,
+    $$
+    \begin{align*}
+    \sin \theta &amp;= \sin(\theta + 2\pi k),\\
+    \cos\theta &amp;= \cos(\theta + 2\pi k),\\
+    \tan \theta &amp;=\tan(\theta + 2\pi k).
+    \end{align*}
+    $$</p>
+
+    <p><strong>Length of projection.</strong> Next, consider two line segments $\overline{AB}$ and $\overline{AC}$ such that the angle $\angle(\overrightarrow{AB}, \overrightarrow{AC})$ is $\theta$ radians. Then, the signed length of the projection of $\overline{AC}$ onto the line $\overleftrightarrow{AB}$ is given by
+    $$
+    \mathrm{signed\ length\ of\ projection} = AC \times \cos \theta.
+    $$</p>
+    
+    <figure>
+      <a href="images/length-of-projection.png"><img src="images/length-of-projection.png" alt="" border="1">
+      </a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.9</strong> The length of projection of line segment $\overline{AC}$ onto line $\overleftrightarrow{AB}$.  </figurecaption>
+    </figure>
+
+    <p><strong>Height and area of a triangle.</strong>  When we want to calculate the area of the triangle $ABC$, we need to find the length of its base and its height. The length of the base is just $AB$. The height is the length of the perpendicular line from $C$ to the line $\overleftrightarrow{AB}$. We know from the definition of $\sin\theta$ That
+    
+      $$
+    \mathrm{signed\ length\ of\ perpendicular\ line} = AC \times \sin \theta.
+    $$
+    
+    As a result,
+    
+    $$
+    \mathrm{area\ of\ }ABC = \frac{1}{2} \times AB \times AC \times |\sin \theta|.
+    $$
+    
+    We take the absolute value of $\sin \theta$ because area cannot be negative. (Rest assured, though, we will talk about <em>signed</em> area later.)</p>
+
+    <p><strong>Negatives of angles.</strong> Lastly, by thinking about the relationship between points resulted from rotating the compass by $\theta$ and $-\theta$ radians, we can derive the following identities.
+    $$
+    \begin{align*}
+    \sin (-\theta) &= -\sin\theta, \\
+    \cos (-\theta) &= \cos\theta, \\
+    \tan (-\theta) &= -\tan\theta.
+    \end{align*}
+    $$</p>
+    
+    <figure>
+      <a href="images/sin-cos-negative-angles.png"><img src="images/sin-cos-negative-angles.png" alt="" border="1">
+      </a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.10</strong> The points resulted from rotating the compass by $\theta$ and $-\theta$ radians are symmetric around the horizontal axis. This implies that $\cos(-\theta) = \cos\theta$ and $\sin(-\theta) = -\sin \theta$.</figurecaption>
+    </figure>
+
+    <h2>3.4 &nbsp; Vectors </h2>
+
+    <p>3DCG relies on linear algebra, and a fundamental concept of linear algebra is the vector. A <strong>vector</strong> is an object that has a size and a direction. In contrast, a <strong>scalar</strong> is an object that only has a size. In this book, a scalar is always a real number, and a vector is line segment between two points with an arrow indicating which way it is pointing. The point where the arrow is pointing away from is called the <strong>initial point</strong>, and the point where the arrow is pointing to is called the <strong>terminal point</strong>. We often denote a vector with bold small letters such as $\mathbf{a}$, $\mathbf{b}$, $\mathbf{c}$, $\mathbf{u}$, $\mathbf{v}$, $\mathbf{w}$, $\mathbf{x}$, $\mathbf{y}$, $\mathbf{z}$. The size of the vector is the length of the line segment, and we will use the mostly use the word &quot;length&quot; and &quot;magnitude&quot; interchangably with &quot;size.&quot; The size (or length or magnitude) of vector $\mathbf{u}$ is denoted by $\| \mathbf{u} \|$.</p>
+
+    <figure>
+      <a href="images/vector-anatomy.png"><img src="images/vector-anatomy.png" alt="" border="1">
+      </a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.11</strong> A vector is represented by an arrow from an initial point to a terminal point and is notationally denoted by a boldface letter such as $\mathbf{u}$. The length of the vector represents its magnitude, which is denoted by $\| \mathbf{u} \|$.</figurecaption>
+    </figure>
+
+    <p><strong>Vector equality.</strong> Basic geometric concepts such as points and line segments have definite positions. We do not treat points or lines that are at difffent places in in Euclidean space as the same entities. However, we often think of vectors as free floating in space. Two vectors are consider equal if they have the same length and point in the same direction. It doesn't matter how where the endpoints of the vectors are located.</p>
+
+    <figure>
+      <a href="images/vector-equality.png"><img src="images/vector-equality.png" alt="" border="1">
+      </a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.12</strong> We consider two vectors to be equal if they have the same magnitude and they point in the exact same direction. As a result, we have that $\mathbf{a} = \mathbf{b}$. However, $\mathbf{a} \neq \mathbf{c}$ because, even though $\mathbf{a}$ and $\mathbf{c}$ have the same magnitude, $\mathbf{c}$ points in the exact opposide direction of $\mathbf{a}$. Lastly, $\mathbf{a} \neq \mathbf{d}$ because both their magnitude are direction are unequal.</figurecaption>
+    </figure>
+
+    <p><strong>Zero vector.</strong> There's a special vector where the initial vector and the terminal vector is the same point. This vector has length $0$ and so is called the <strong>zero vector.</strong> It is denoted by the symbol $\mathbf{0}$. Unlike other vectors, it is impossible to tell what direction the zero vector is pointing to, so its direction is <em>undefined.</em></p>
+
+    <h2>3.5 &nbsp; Vector arithmetic</h2>
+
+    <p>Like numbers, we can perform calculation on vectors. Vectors admit 4 main mathematical operations, and we will discuss them in turn.</p>
+
+    <h3>3.5.1 &nbsp; Scaling</h3>
+
+    <p>Scaling is the multiplication of a vector by a scalar, which is a real number in our case. The product of a non-zero vector $\mathbf{u}$ with a real number $a$ is denoted by $a\mathbf{u}$ is defined as follows:</p>
+
+    <ul>
+      <li>If $a = 0$, then $a\mathbf{u} = \mathbf{0}$.</li>
+      <li>If $a &gt; 0$, then $a\mathbf{u}$ is the vector that points in the same direction as $\mathbf{u}$ but has length $a \| \mathbf{u} \|$.</li>
+      <li>If $a &lt; 0$, then $a\mathbf{u}$ is the vector that points in the exact opposite direction as $\mathbf{u}$ but has length $a \| \mathbf{u} \|$.</li>
+    </ul>
+    
+    <p>For the zero vector, we define $a\mathbf{0} = \mathbf{0}$ for all real number $a$.</p>
+
+    <figure>
+      <a href="images/vector-scaling.png"><img src="images/vector-scaling.png" alt="" border="1">
+      </a>
+      <br>
+      <figurecaption class="figurecaption"><strong>Figure 3.13</strong> Scaling a vector by a scalar involves creating a new vector that whose length is the length of the old vector multipled by the scalar. If the constant is positive, the new vector points in the same direction as the old. If the scalar is negative, the new vector points in the exact opposite direction.</figurecaption>
+    </figure>
+
+    <p><strong>Scaling and length.</strong> Scaling is an operation that changes the vector's length. However, the direction is only gauranteed to be the same only when the scalar is positive. When the scalar is negative, the vector flips its direction. Moreover, when the scalar is zero, the direction becomes undefined. The relationship between the length of a scaled vector and the original one is given by $$ \| a\mathbf{u} \| = |a| \| \mathbf{u} \|. $$</p>
+   
+    <p><strong>Unit vectors.</strong> We will often work with vectors that have length $1$, and such a vector is called a <strong>unit vector.</strong> A unit vector is convenient because they can be used as yard sticks to measure distance along a direction. We sometimes signify that a vector is a unit vector by putting a hat on top of it; for examples, $\hat{\mathbf{u}}$, $\hat{\mathbf{v}}$, and $\hat{\mathbf{w}}$. Given a non-zero vector $\mathbf{u}$, we can turn it into a unit vector $\hat{\mathbf{u}}$ that points in the same direction by scaling $\mathbf{u}$ with $1/\|\mathbf{u}\|$. In other words,
+    $$ \hat{\mathbf{u}} = \frac{\mathbf{u}}{\| \mathbf{u} \|}. $$
+    The process of turning a vector into a unit vector is called <strong>normalization</strong>. We thus say that unit vectors are <strong>normalized</strong> vectors, and other vectors are <strong>unnormalized</strong>. Note that the zero vector cannot be normalized at all because doing so involves division by zero.</p>
+
+    <p><strong>Properties of scaling.</strong> Scaling has a number of useful properties, and we state them here without proof. First, for any real numbers $a$, $b$ and any vector $\mathbf{u}$, we have that
+    $$ (ab) \mathbf{u} = a(b\mathbf{u}).$$
+    Second,
+    $$ \mathrm{if\ }a\mathbf{u} = \mathbf{0}, \mathrm{\ then\ }a = 0\mathrm{\ or\ } \mathbf{u} = \mathbf{0}. $$
+    Note that the second property is very similar to a familiar property of real numbers. 
+    </p>
+
+    <p><strong>Negatives of vectors.</strong> Given any vector $\mathbf{u}$, the <strong>negative</strong> of $\mathbf{u}$, denoted by $-\mathbf{u}$, is the Vector
+    $$
+    -\mathbf{u} = (-1) \mathbf{u}.
+    $$
+    It is the vector with has the same length as $\mathbf{u}$ but points in the exact opposite direction of $\mathbf{u}$. It should be clear that $$-(-\mathbf{u}) = \mathbf{u}.$$</p>
+    
+       
+    <div class="footnotes">
+      <ol> 
+      </ol>
+    </div>
+
+    <hr>
+    <p>
+      <a href="../chapter-01/index.html"><<</a>
+      <a href="../index.html">Contents</a>      
+    </p>
+  </div>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/littlefoot.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    const { littlefoot } = require('littlefoot')
+
+    const lf = littlefoot({
+      activateOnHover: true,
+      hoverDelay: 250,
+    });
+  </script>
+</body>
+
+</html>
