@@ -18,7 +18,11 @@
     };
   </script>
   <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
-  
+  <link rel="stylesheet"
+      href="../highlight/styles/default.min.css">
+  <script src="../highlight/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+    
   <title>Chapter 5</title>
 </head>
 
@@ -63,7 +67,7 @@
       \)
     </span>
 
-    <h1>5 &nbsp; Modeling with Triangle Meshes</h1>
+    <h1>5 &nbsp; Modeling with meshes</h1>
     <hr>    
    
     <p>In the last chapter, we introduced a way to represent simple geometric concepts such as points, vectors, lines, and circles with numbers. In this chapters, we will discuss how these simple geometric concepts can be combined to build more complex shapes that can be used to build scenes in computer graphics applications.</p>
@@ -86,7 +90,7 @@
         
     <p>In computer graphics, a point used to defined a shape is called a <strong>vertex</strong>. A vertex can have one or more <strong>attributes</strong>, which is a fancy term for data associated with the point. Simply put, a vertex is a point that carries some data with it.</p>
 
-    <p>The most important and mandatory attribute of a vertex is its position in 3D space. We know from the previous chapter that a position can be represented by 3 numbers.</p>
+    <p>The most important and mandatory attribute of a vertex is its position in 3D space. We know from the previous chapter that a position can be represented by 3 floating-point numbers.</p>
 
     <p>Other widely used attributes include:</p>
 
@@ -96,7 +100,176 @@
         <li>texture coordinates.</li>
     </ul>
 
-    <p>We know from Chapter 2 that a color can be represented by three numbers: $R$, $G$, and $B$. We will discuss what a normal vector is later in the chapter. Texture coordinates will be discussed in Chapter 17.</p>
+    <p>We know from Chapter 2 that a color can be represented by three numbers: $R$, $G$, and $B$. We will discuss what a normal vector is later in the chapter, but, since it is a vector in 3D space, it can be represented by their coordinates, which are 3 numbers. Texture coordinates will be discussed in Chapter 17, but they can be represented by 2 numbers most of the time.</p>
+
+    <p>More concretely, we can discuss a vertex in terms of the Javascript language, which we will be programming with. A vertex can be thought of as a Javascript object. Its attributes can be thought of the object's (Javascript) properties. As an example, here is a vertex written in the JSON format.</p>
+
+<pre><code class="language-json">
+{
+    "position": [1.0, 2.0, 3.0],
+    "normal": [0.0, 1.0, 0.0],
+    "color": [1.0, 0.0, 1.0],
+    "texCoord": [0.5, 0.5]
+}
+
+</code></pre>
+
+    <h2>5.2 &nbsp; Point clouds</h2>
+
+    <p>We said that complex shapes can be made from simple shapes, and simple shapes can be constructed from vertices. So, a shape to be rendered by a graphics pipeline must be made from a collection of vertices. A collection of related vertices is often called a <strong>point cloud</strong>.</p>
+
+    <figure class="figure">
+        TODO: Add picture.
+        <br>
+        <figcaption class="figure-caption"><strong>Figure 5.1</strong> A point cloud making a torus shape.</figcaption>
+    </figure>
+
+    <p>Typically, all data of a point cloud is stored in one or more arrays of numbers, where each such array is called a <strong>buffer</strong>. In general, there are two ways to organize vertex data into buffers.</p>
+
+    <ol>
+        <li><strong>Interleaved buffer.</strong> Use a single buffer to store all vertex attributes together, grouping attributes of the same vertex together.</li>
+        <li><strong>Separate buffers.</strong> Put each attribute into its own separate buffer. In this way, a point cloud is a collection of buffers, which can include the <i>position buffer</i>, <i>color buffer</i>, <i>normal buffer</i>, <i>texture coordinate buffer</i>, and so on.</li>
+    </ol>
+
+    <p>To illustrate the above data layouts, let us consider a small point cloud with 3 vertices, each having a position attribute, and a texture coordinate attribute.</p>
+
+    <table class="table table-bordered" style="border-color: black">
+        <tr>
+            <td class="bg-light"><strong>Vertex Number</strong></td>
+            <td style="background-color: #ffdddd" align="right"><strong>#0</strong></td>
+            <td style="background-color: #ddffdd" align="right"><strong>#1</strong></td>
+            <td style="background-color: #ddddff" align="right"><strong>#2</strong></td>
+        </tr>
+        <tr>
+            <td class="bg-light"><strong>Position</strong></td>
+            <td style="background-color: #ffdddd; color: black" align="right">$(0.0, 0.1, 0.2)$</td>
+            <td style="background-color: #ddffdd; color: black" align="right">$(1.0, 1.1, 1.2)$</td>
+            <td style="background-color: #ddddff; color: black" align="right">$(2.0, 2.1, 2.2)$</td>
+        </tr>
+        <tr>
+            <td class="bg-light"><strong>Texture coordinate</strong></td>
+            <td style="background-color: #ffdddd; color: #de970b" align="right">$(0.50, 0.51)$</td>
+            <td style="background-color: #ddffdd; color: #de970b" align="right">$(0.60, 0.61)$</td>
+            <td style="background-color: #ddddff; color: #de970b" align="right">$(0.70, 0.71)$</td>
+        </tr>
+    </table>
+
+    <p>If we were to construct an interleaved buffer of the above point cloud, the buffer look like the following.</p>
+
+    <table class="table table-bordered" style="border-color: black">
+        <tr>
+            <td style="background-color: #ffdddd; color: black">0.0</td>
+            <td style="background-color: #ffdddd; color: black">0.1</td>
+            <td style="background-color: #ffdddd; color: black">0.1</td>
+            <td style="background-color: #ffdddd; color: #de970b">0.51</td>
+            <td style="background-color: #ffdddd; color: #de970b">0.52</td>
+            <td style="background-color: #ddffdd; color: black">1.0</td>
+            <td style="background-color: #ddffdd; color: black">1.1</td>
+            <td style="background-color: #ddffdd; color: black">1.1</td>
+            <td style="background-color: #ddffdd; color: #de970b">0.61</td>
+            <td style="background-color: #ddffdd; color: #de970b">0.62</td>
+            <td style="background-color: #ddddff; color: black">2.0</td>
+            <td style="background-color: #ddddff; color: black">2.1</td>
+            <td style="background-color: #ddddff; color: black">2.2</td>
+            <td style="background-color: #ddddff; color: #de970b">0.71</td>
+            <td style="background-color: #ddddff; color: #de970b">0.72</td>
+        </tr>
+    </table>
+
+    <p>In the Javascript language, this would be equivalent to specifying the following array.</p>
+
+<pre><code class="language-javascript">
+const interleavedBuffer = [
+    0.0, 0.1, 0.2,  // Vertex #0's position
+    0.50, 0.51,     // Vertex #0's texture coordinate 
+    1.0, 1.1, 1.2,  // Vertex #1's position
+    0.60, 0.61,     // Vertex #1's texture coordinate 
+    2.0, 2.1, 2.2,  // Vertex #2's position
+    0.70, 0.71      // Vertex #2's texture coordinate 
+];
+
+</code></pre>
+    
+    <p>On the other hand, if we were to create separate buffers for the point cloud. We would have the following two buffers.</p>
+
+    <p><table>
+        <tr>
+            <td style="padding: 10px" align="right"><strong>Position:</strong></td>
+            <td>
+                <table class="table-bordered" style="border-color: black">
+                    <tr>
+                        <td style="padding: 10px; background-color: #ffdddd; color: black">0.0</td>
+                        <td style="padding: 10px; background-color: #ffdddd; color: black">0.1</td>
+                        <td style="padding: 10px; background-color: #ffdddd; color: black">0.1</td>
+                        <td style="padding: 10px; background-color: #ddffdd; color: black">1.0</td>
+                        <td style="padding: 10px; background-color: #ddffdd; color: black">1.1</td>
+                        <td style="padding: 10px; background-color: #ddffdd; color: black">1.1</td>
+                        <td style="padding: 10px; background-color: #ddddff; color: black">2.0</td>
+                        <td style="padding: 10px; background-color: #ddddff; color: black">2.1</td>
+                        <td style="padding: 10px; background-color: #ddddff; color: black">2.2</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px" align="right"><strong>Texture coordinate:</strong></td>
+            <td>
+                <table class="table-bordered" style="border-color: black">
+                    <tr>
+                        <td style="padding: 10px; background-color: #ffdddd; color: #de970b">0.51</td>
+                        <td style="padding: 10px; background-color: #ffdddd; color: #de970b">0.52</td>
+                        <td style="padding: 10px; background-color: #ddffdd; color: #de970b">0.61</td>
+                        <td style="padding: 10px; background-color: #ddffdd; color: #de970b">0.62</td>
+                        <td style="padding: 10px; background-color: #ddddff; color: #de970b">0.71</td>
+                        <td style="padding: 10px; background-color: #ddddff; color: #de970b">0.72</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    </p>
+    
+    <p>In the Javascript language, the above is equivalent to the following code.</p>
+
+<pre><code class="language-javascript">
+const positionBuffer = [
+    0.0, 0.1, 0.2,  // Vertex #0's position
+    1.0, 1.1, 1.2,  // Vertex #1's position
+    2.0, 2.1, 2.2,  // Vertex #2's position
+];
+
+const texCoordBuffer = [
+    0.50, 0.51,     // Vertex #0's texture coordinate 
+    0.60, 0.61,     // Vertex #1's texture coordinate 
+    0.70, 0.71      // Vertex #2's texture coordinate 
+];
+
+</code></pre>
+
+    <h2>5.3 &nbsp; Primitives</h2>
+
+    <p>We said earlier that we may specify shapes by specifying connections between vertices. The shape specified in this way is called a <strong>primitive</strong>.</p>
+
+    <p>Different implementations of the graphics pipeline have different primitives that they support. WebGL, the implementation that we will use, supports the following primitives.</p>
+
+    <ul>
+        <li><b>Point.</b> Specified by a single vertex.</li>
+        <li><b>Line segment.</b> Specified by two vertices, which serve as its endpoints.</li>
+        <li><b>Line strip.</b> Specified by an arbitrary number of vertices in a list. The primitive is a collection of line segments connecting consecutive vertices.</li>
+        <li><b>Line loop.</b> Also specified by an arbitrary number of vertices in a list. This primitive is just a line strip primitive with an extra line segment connecting the first and the last vertex together.</li>
+        <li><b>Triangle.</b> Specified by three vertices, which serve as its corners.</li>
+        <li><b>Traingle strip.</b> Specified by an arbitrary number of vertices in a list. This primitive is a set of connected triangles. The first three vertices from the first triangle. For each new vertex in the list, a new triangle is formed between itself and the two vertices that come before it.</li>
+        <li><b>Triangle fan.</b> Specified by an arbitrary number of vertices in a list. Again, this primitive is a collection of connected triangles, and the first triangle is formed from the first three vertices. For each new vertex, a new triangle is formed between itself, the vertex that comes before it, and the first vertex. The primitive can thus be thought of as a "fan" that emanates from the first vertex.</li>
+    </ul>
+
+    <h2>5.4 &nbsp; Meshes</h2>
+
+    <h2>5.5 &nbsp; Normal vector</h2>
+
+
 
     <hr>
     <p>
