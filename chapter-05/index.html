@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script type="text/javascript">
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
+  
+  <title>Chapter 5</title>
+</head>
+
+<body>
+  <div class="container" style="max-width: 640px;">
+    <span style="visibility: hidden;">
+      \(
+      \def\sc#1{\dosc#1\csod}
+      \def\dosc#1#2\csod{{\rm #1{\small #2}}}
+
+      \newcommand{\dee}{\mathrm{d}}
+      \newcommand{\Dee}{\mathrm{D}}
+      \newcommand{\In}{\mathrm{in}}
+      \newcommand{\Out}{\mathrm{out}}
+      \newcommand{\pdf}{\mathrm{pdf}}
+      \newcommand{\Cov}{\mathrm{Cov}}
+      \newcommand{\Var}{\mathrm{Var}}
+
+      \newcommand{\ve}[1]{\mathbf{#1}}
+      \newcommand{\mrm}[1]{\mathrm{#1}}
+      \newcommand{\ves}[1]{\boldsymbol{#1}}
+      \newcommand{\etal}{{et~al.}}
+      \newcommand{\sphere}{\mathbb{S}^2}
+      \newcommand{\modeint}{\mathcal{M}}
+      \newcommand{\azimint}{\mathcal{N}}
+      \newcommand{\ra}{\rightarrow}
+      \newcommand{\mcal}[1]{\mathcal{#1}}
+      \newcommand{\X}{\mathcal{X}}
+      \newcommand{\Y}{\mathcal{Y}}
+      \newcommand{\Z}{\mathcal{Z}}
+      \newcommand{\x}{\mathbf{x}}
+      \newcommand{\y}{\mathbf{y}}
+      \newcommand{\z}{\mathbf{z}}
+      \newcommand{\tr}{\mathrm{tr}}
+      \newcommand{\sgn}{\mathrm{sgn}}
+      \newcommand{\diag}{\mathrm{diag}}
+      \newcommand{\Real}{\mathbb{R}}
+      \newcommand{\sseq}{\subseteq}
+      \newcommand{\ov}[1]{\overline{#1}}
+      \DeclareMathOperator*{\argmax}{arg\,max}
+      \DeclareMathOperator*{\argmin}{arg\,min}
+      \)
+    </span>
+
+    <h1>5 &nbsp; Modeling with Triangle Meshes</h1>
+    <hr>    
+   
+    <p>In the last chapter, we introduced a way to represent simple geometric concepts such as points, vectors, lines, and circles with numbers. In this chapters, we will discuss how these simple geometric concepts can be combined to build more complex shapes that can be used to build scenes in computer graphics applications.</p>
+
+    <p>We note first that there are many ways to represent shapes with numbers, but we shall focus one particular method: modeling with triangle meshes. This is the method used by the graphics pipeline, the rendering algorithm implemented in modern GPUs. We choose the method because this book is mainly about teaching you how use OpenGL, a software library that control GPUs to draw 3D shapes in real time.</p>
+
+    <p>To drop a few names, other methods include point clouds, splines, distance fields, and volumetric data. We will not be covering them in this book, but curious readers can consult other computer graphics textbooks to learn more about them.</p>
+
+    <h2>5.1 &nbsp; Vertices</h2>
+
+    <p>The graphics pipeline is designed to render three types of simple geometric concepts: points, line segments, and triangles. More complex shapes such as circles, ellipses, chairs, human figures, and so on must be built from these objects in order to be rendered by the graphics pipeline.</p>
+
+    <p>The three geometric concepts have one thing in common: they can be specified by points.</p>
+
+    <ul>
+        <li>A point is already a point.</li>
+        <li>A line segment can be specified by its two endpoints.</li>
+        <li>A triangle can be specified by its three corners, all of which are points.</li>
+    </ul>
+        
+    <p>In computer graphics, a point used to defined a shape is called a <strong>vertex</strong>. A vertex can have one or more <strong>attributes</strong>, which is a fancy term for data associated with the point. Simply put, a vertex is a point that carries some data with it.</p>
+
+    <p>The most important and mandatory attribute of a vertex is its position in 3D space. We know from the previous chapter that a position can be represented by 3 numbers.</p>
+
+    <p>Other widely used attributes include:</p>
+
+    <ul>
+        <li>color,</li>
+        <li>normal vector, and</li>
+        <li>texture coordinates.</li>
+    </ul>
+
+    <p>We know from Chapter 2 that a color can be represented by three numbers: $R$, $G$, and $B$. We will discuss what a normal vector is later in the chapter. Texture coordinates will be discussed in Chapter 17.</p>
+
+    <hr>
+    <p>
+      <a href="../chapter-04/index.html"><<</a>
+      <a href="../index.html">Contents</a>      
+    </p>
+  </div>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/littlefoot.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    const { littlefoot } = require('littlefoot')
+
+    const lf = littlefoot({
+      activateOnHover: true,
+      hoverDelay: 250,
+    });
+  </script>
+</body>
+
+</html>
