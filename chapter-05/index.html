@@ -265,11 +265,72 @@ const texCoordBuffer = [
         <li><b>Triangle fan.</b> Specified by an arbitrary number of vertices in a list. Again, this primitive is a collection of connected triangles, and the first triangle is formed from the first three vertices. For each new vertex, a new triangle is formed between itself, the vertex that comes before it, and the first vertex. The primitive can thus be thought of as a "fan" that emanates from the first vertex.</li>
     </ul>
 
+    <figure class="figure">
+        TODO: Add picture.
+        <br>
+        <figcaption class="figure-caption"><strong>Figure 5.2</strong> Primitives supported by WebGL.</figcaption>
+    </figure>
+
+    <p>While a primitive may be specified by a collection of vertices, it is in general different from a point cloud because a primitive also includes other points that make up the shape. For example, a line segment is a primitive that can be defined by two vertices, its endpoints. It is different from a point cloud containing those two points because a line segment is also made up of all the points between the two segments. Similarly, a triangle is more than the vertices that make their corners because it contains other points between those vertices. While a point cloud is jus a collection of discrete points with no connections between them, all primitives (except the point primitive) contain a continuous group of points that can from curves and surfaces. It is from these curves and surfaces that we model shapes in scenes.</p>
+
     <h2>5.4 &nbsp; Meshes</h2>
 
+    <p>In WebGL, shapes are modeled by meshes. A <b>mesh</b> is a point cloud together with information about connections between the vertices in it and also information about the primitives those connections should be interpreted as. A mesh can have many primitives, and in general all the primitives wpuld be of the same type. So, we may have a <b>triangle mesh</b> or a <b>wireframe</b>, which is a mesh of line segments. Meshes of other primitives are possible, but they are not as frequently used as the two we just mentioned.</p>
+
+    <figure class="figure">
+        TODO: Add picture.
+        <br>
+        <figcaption class="figure-caption"><strong>Figure 5.3</strong> A triangle mesh and a wireframe.</figcaption>
+    </figure>
+
+    <p>If we were to represent a mesh as a Javascript object, the object would contain three important pieces of data.
+    <ol>
+        <li>The type of primitives in the mesh.</li>
+        <li>A buffer or multiple buffers containing attributes of vertices in the point cloud.</li>
+        <li>Another buffer called the <b>index buffers</b> that contains the indices of vertices in the point cloud that should be connected to form primitives.</li>
+    </ol>
+    </p>
+
+    <h3>5.4.1 &nbsp; An example triangle mesh</h3>
+
+    <p>Below is a mesh representing a $1 \times 1$ square in the $xy$-plane whose lower-left endpoint is the origin $(0,0,0)$.</p>
+
+<pre><code class="language-javascript">
+const GL_TRIANGLES  = 4;
+
+const mesh = {
+    "primitive": GL_TRIANGLES,
+    "positions": [
+        0.0, 0.0, 0.0,  // Vertex #0's position
+        1.0, 0.0, 0.0,  // Vertex #1's position
+        1.0, 1.0, 0.0,  // Vertex #2's position
+        0.0, 1.0, 0.0   // Vertex #3's position
+    ],
+    "colors": [
+        1.0, 1.0, 1.0,  // Vertex #0's color (white)
+        1.0, 1.0, 0.0,  // Vertex #1's color (yellow)
+        1.0, 0.0, 1.0,  // Vertex #2's color (magenta)
+        0.0, 1.0, 1.0   // Vertex #3's color (cyan)
+    ],
+    "indices": [
+        0, 1, 2,  // Triangle #1
+        0, 2, 3   // Triangle #2
+    ]
+};
+
+</code></pre>
+
+    <figure class="figure">
+        TODO: Add picture.
+        <br>
+        <figcaption class="figure-caption"><strong>Figure 5.3</strong> A triangle mesh.</figcaption>
+    </figure>
+
+    <p>We see that there are 4 vertices in the mesh. Each vertex has two attributes, its position and color. The vertices are used to form two triangles, and a triangle is represented by 3 indices in the index buffer, resulting in 6 numbers in total. An advantage of this representation is that the data of a vertex can be used multiple times (Vertex 1 and Vertex 2 are used 2 times), saving a lot of space.</p>
+
+    <h3>5.4.2 &nbsp; An example wireframe</h3>
+
     <h2>5.5 &nbsp; Normal vector</h2>
-
-
 
     <hr>
     <p>
