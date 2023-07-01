@@ -72,9 +72,9 @@
    
     <p>In the last chapter, we introduced a way to represent simple geometric concepts such as points, vectors, lines, and circles with numbers. In this chapters, we will discuss how these simple geometric concepts can be combined to build more complex shapes that can be used to build scenes in computer graphics applications.</p>
 
-    <p>We note first that there are many ways to represent shapes with numbers, but we shall focus one particular method: modeling with triangle meshes. This is the method used by the graphics pipeline, the rendering algorithm implemented in modern GPUs. We choose the method because this book is mainly about teaching you how use OpenGL, a software library that control GPUs to draw 3D shapes in real time.</p>
+    <p>We note first that there are many ways to represent shapes with numbers, but we shall focus one particular method: modeling with meshes. This is the method used by the graphics pipeline, the rendering algorithm implemented in modern GPUs. We choose the method because this book is mainly about teaching you how use WebGL, a software library that control GPUs to draw 3D shapes in real time.</p>
 
-    <p>To drop a few names, other methods include point clouds, splines, distance fields, and volumetric data. We will not be covering them in this book, but curious readers can consult other computer graphics textbooks to learn more about them.</p>
+    <p>To drop a few names, other methods include point clouds, splines, distance fields, and volumetric data. We will not cover them in this book, but curious readers can consult other computer graphics textbooks to learn more about them.</p>
 
     <h2>5.1 &nbsp; Vertices</h2>
 
@@ -116,10 +116,10 @@
 
     <h2>5.2 &nbsp; Point clouds</h2>
 
-    <p>We said that complex shapes can be made from simple shapes, and simple shapes can be constructed from vertices. So, a shape to be rendered by a graphics pipeline must be made from a collection of vertices. A collection of related vertices is often called a <strong>point cloud</strong>.</p>
+    <p>We said that, in order to use the graphics pipeline to render complex shapes, we must model them with simple shapes, which in turn can be constructed from vertices. So, a shape to be rendered by the graphics pipeline must be made from a collection of vertices. A collection of related vertices is often called a <strong>point cloud</strong>.</p>
 
     <figure class="figure">
-        TODO: Add picture.
+        <a href="images/point-cloud-torus.png"><img src="images/point-cloud-torus.png" width="300"></a>
         <br>
         <figcaption class="figure-caption"><strong>Figure 5.1</strong> A point cloud making a torus shape.</figcaption>
     </figure>
@@ -249,15 +249,17 @@ const texCoordBuffer = [
 
 </code></pre>
 
+    <p>In the context of the graphics pipeline, a point cloud alone is not enough to represent shapes. However, we also said earlier that a point cloud can represent shape on its own. This approach is not at all trivial because we immediately see a problem: a point cloud has no contiguous surface or volume that we typically associate with real world objects. In other words, the space between the points are empty, and the empty space would manifest if we look at the object from a distance close enough. As a result, any method that uses point clouds alone to represent shapes must come up with a way to fill these "holes." In any case, this is not our problem because we will use point clouds with extra information.</p>
+
     <h2>5.3 &nbsp; Primitives</h2>
 
-    <p>We said earlier that we may specify shapes by specifying connections between vertices. The shape specified in this way is called a <strong>primitive</strong>.</p>
+    <p>We said earlier that we may specify shapes by specifying connections between vertices. These connections are the extra information that allows us to fill the empty space between them. A shape specified by connecting vertices is called a <strong>primitive</strong>.</p>
 
-    <p>Different implementations of the graphics pipeline have different primitives that they support. WebGL, the implementation that we will use, supports the following primitives.</p>
+    <p>Different implementations of the graphics pipeline have different primitives they support. In general, though, the primitives are some forms of points, lines, or triangles. WebGL, the implementation that we will use, supports the following primitives.</p>
 
     <ul>
         <li><b>Point.</b> Specified by a single vertex.</li>
-        <li><b>Line segment.</b> Specified by two vertices, which serve as its endpoints.</li>
+        <li><b>Line.</b> Specified by two vertices, which serve as its endpoints.</li>
         <li><b>Line strip.</b> Specified by an arbitrary number of vertices in a list. The primitive is a collection of line segments connecting consecutive vertices.</li>
         <li><b>Line loop.</b> Also specified by an arbitrary number of vertices in a list. This primitive is just a line strip primitive with an extra line segment connecting the first and the last vertex together.</li>
         <li><b>Triangle.</b> Specified by three vertices, which serve as its corners.</li>
@@ -266,16 +268,91 @@ const texCoordBuffer = [
     </ul>
 
     <figure class="figure">
-        TODO: Add picture.
+        <table>
+            <tr>
+                <td><img src="images/primtiive-points.png" width="180"></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td align="center">Points</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><img src="images/primitive-lines.png" width="180"></td>
+                <td><img src="images/primitive-line-strip.png" width="180"></td>
+                <td><img src="images/primitive-line-loop.png" width="180"></td>
+            </tr>
+            <tr>
+                <td align="center">Lines</td>
+                <td align="center">Line strip</td>
+                <td align="center">Line loop</td>
+            </tr>
+            <tr>
+                <td><img src="images/primitive-triangles.png" width="180"></td>
+                <td><img src="images/primitive-triangle-strip.png" width="180"></td>
+                <td><img src="images/primitive-triangle-fan.png" width="180"></td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td align="center">Triangles</td>
+                <td align="center">Triangle strip</td>
+                <td align="center">Triangle fan</td>
+            </tr>
+        </table>
         <br>
         <figcaption class="figure-caption"><strong>Figure 5.2</strong> Primitives supported by WebGL.</figcaption>
     </figure>
 
-    <p>While a primitive may be specified by a collection of vertices, it is in general different from a point cloud because a primitive also includes other points that make up the shape. For example, a line segment is a primitive that can be defined by two vertices, its endpoints. It is different from a point cloud containing those two points because a line segment is also made up of all the points between the two segments. Similarly, a triangle is more than the vertices that make their corners because it contains other points between those vertices. While a point cloud is jus a collection of discrete points with no connections between them, all primitives (except the point primitive) contain a continuous group of points that can from curves and surfaces. It is from these curves and surfaces that we model shapes in scenes.</p>
+    <p>Internally, WebGL uses integer constants to indicate primitive types. Each constant also has a namethat can be used to retrieve them more conveniently in Javascript programs, and we will make use of these names extensively in later chapters. The constants and their names are given in the table below.</p>
+
+    <table class="table table-bordered">
+        <tr>
+            <td><b>Primitive</b></td>
+            <td><b>Constant Value</b></td>
+            <td><b>Constant Name</b></td>
+        </tr>
+        <tr>
+            <td>Points</td>
+            <td align="center">0</td>
+            <td><tt>POINTS</tt></td>
+        </tr>
+        <tr>
+            <td>Lines</td>
+            <td align="center">1</td>
+            <td><tt>LINES</tt></td>
+        </tr>
+        <tr>
+            <td>Line loop</td>
+            <td align="center">2</td>
+            <td><tt>LINE_LOOP</tt></td>
+        </tr>
+        <tr>
+            <td>Line strip</td>
+            <td align="center">3</td>
+            <td><tt>LINE_STRIP</tt></td>
+        </tr>
+        <tr>
+            <td>Triangles</td>
+            <td align="center">4</td>
+            <td><tt>TRIANGLES</tt></td>
+        </tr>
+        <tr>
+            <td>Triangle strip</td>
+            <td align="center">5</td>
+            <td><tt>TRIANGLE_STRIP</tt></td>
+        </tr>
+        <tr>
+            <td>Triangle fan</td>
+            <td align="center">6</td>
+            <td><tt>TRIANGLE_FAN</tt></td>
+        </tr>
+    </table>
 
     <h2>5.4 &nbsp; Meshes</h2>
 
-    <p>In WebGL, shapes are modeled by meshes. A <b>mesh</b> is a point cloud together with information about connections between the vertices in it and also information about the primitives those connections should be interpreted as. A mesh can have many primitives, and in general all the primitives wpuld be of the same type. So, we may have a <b>triangle mesh</b> or a <b>wireframe</b>, which is a mesh of line segments. Meshes of other primitives are possible, but they are not as frequently used as the two we just mentioned.</p>
+    <p>In WebGL, shapes are modeled by meshes. A <b>mesh</b> is a point cloud together with information about how to connect the vertices to form primitives. A mesh can contain many primitives, but in general all the primitives would be of the same type. So, we may have a <b>triangle mesh</b> or a <b>wireframe</b> (a mesh of line segments). Meshes of other primitives are possible, but they are not as frequently used as the two we just mentioned.</p>
 
     <figure class="figure">
         TODO: Add picture.
@@ -296,10 +373,10 @@ const texCoordBuffer = [
     <p>Below is a mesh representing a $1 \times 1$ square in the $xy$-plane whose lower-left endpoint is the origin $(0,0,0)$.</p>
 
 <pre><code class="language-javascript">
-const GL_TRIANGLES  = 4;
+const TRIANGLES  = 4;
 
 const mesh = {
-    "primitive": GL_TRIANGLES,
+    "primitive": TRIANGLES,
     "positions": [
         0.0, 0.0, 0.0,  // Vertex #0's position
         1.0, 0.0, 0.0,  // Vertex #1's position
@@ -323,7 +400,7 @@ const mesh = {
     <figure class="figure">
         TODO: Add picture.
         <br>
-        <figcaption class="figure-caption"><strong>Figure 5.3</strong> A triangle mesh.</figcaption>
+        <figcaption class="figure-caption"><strong>Figure 5.4</strong> A triangle mesh.</figcaption>
     </figure>
 
     <p>We see that there are 4 vertices in the mesh. Each vertex has two attributes, its position and color. The vertices are used to form two triangles, and a triangle is represented by 3 indices in the index buffer, resulting in 6 numbers in total. An advantage of this representation is that the data of a vertex can be used multiple times (Vertex 1 and Vertex 2 are used 2 times), saving a lot of space.</p>
