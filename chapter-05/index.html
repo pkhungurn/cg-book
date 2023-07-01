@@ -355,9 +355,9 @@ const texCoordBuffer = [
     <p>In WebGL, shapes are modeled by meshes. A <b>mesh</b> is a point cloud together with information about how to connect the vertices to form primitives. A mesh can contain many primitives, but in general all the primitives would be of the same type. So, we may have a <b>triangle mesh</b> or a <b>wireframe</b> (a mesh of line segments). Meshes of other primitives are possible, but they are not as frequently used as the two we just mentioned.</p>
 
     <figure class="figure">
-        TODO: Add picture.
+        <a href="images/triangle-mesh-and-wireframe.png"><img src="images/triangle-mesh-and-wireframe.png" width="600" alt=""></a>
         <br>
-        <figcaption class="figure-caption"><strong>Figure 5.3</strong> A triangle mesh and a wireframe.</figcaption>
+        <figcaption class="figure-caption"><strong>Figure 5.3</strong> A triangle mesh (left) and a wireframe (right). We see that a triangle mesh is an opaque surface, and we see only the front side of the torus. On the other hand, the wireframe is a collection of line segments, and so we can see the lines that make up the back size of the torus too.</figcaption>
     </figure>
 
     <p>If we were to represent a mesh as a Javascript object, the object would contain three important pieces of data.
@@ -390,22 +390,73 @@ const mesh = {
         0.0, 1.0, 1.0   // Vertex #3's color (cyan)
     ],
     "indices": [
-        0, 1, 2,  // Triangle #1
-        0, 2, 3   // Triangle #2
+        0, 1, 2,  // Triangle #0
+        0, 2, 3   // Triangle #1
     ]
 };
 
 </code></pre>
 
     <figure class="figure">
-        TODO: Add picture.
+        <table>
+            <tr>
+                <td><img src="images/example-triangle-mesh-schematics.png" width="300" alt=""></td>
+                <td><img src="images/example-triangle-mesh-render.png" width="300" alt=""></td>
+            </tr>
+        </table>
         <br>
-        <figcaption class="figure-caption"><strong>Figure 5.4</strong> A triangle mesh.</figcaption>
+        <figcaption class="figure-caption"><strong>Figure 5.4</strong> An example triangle mesh. The vertices and their connections are depicted in the diagram to the left, and what the mesh looks like after being rendered can be seen in the picture to the right.</figcaption>
     </figure>
 
-    <p>We see that there are 4 vertices in the mesh. Each vertex has two attributes, its position and color. The vertices are used to form two triangles, and a triangle is represented by 3 indices in the index buffer, resulting in 6 numbers in total. An advantage of this representation is that the data of a vertex can be used multiple times (Vertex 1 and Vertex 2 are used 2 times), saving a lot of space.</p>
+    <p>We see that there are 4 vertices in the mesh. Each vertex has two attributes, its position and color. The vertices are used to form two triangles, and a triangle is represented by 3 consecutive indices in the index buffer, resulting in 6 numbers in total. An advantage of this representation is that the data of a vertex can be used multiple times (Vertex 1 and Vertex 2 are used 2 times), saving space.</p>
+
+    <p>When rendering a mesh, we, the programmer, can control how WebGL deals with the vertex attributes by writing small programs called "shaders," and we will talk about them in details in later chapters. The program that generated the rendering in Figure 5.4 did the most basic processing: simply outputting the specified colors. Note that we only specified 4 colors (white, yellow, magneta, and cyan) at the corners, but we see many more colors (or shades of them) in the rendering. This is because, when WebGL renders a triangle, it must decide what colors the pixels that are between the vertices should have, and the typical behavior is to <b>interpolate</b> between the colors of the corner vertices. As a result, the colors of pixels that belong to Triangle #0 (the bottom right one) are combinations of white (Vertex #0's color), yellow (Vertex #1's color) and magneta (Vertex #2's color). On the other hand, the colors of Triangle #1's pixels are combinations of white, magenta, and cyan.</p>
 
     <h3>5.4.2 &nbsp; An example wireframe</h3>
+
+    <p>The following is a wireframe created from the same point cloud as the triangle mesh in the last section.</p>
+
+<pre><code class="language-javascript">
+const LINES = 1;
+
+const mesh = {
+    "primitive": LINES,
+    "positions": [
+        0.0, 0.0, 0.0,  // Vertex #0's position
+        1.0, 0.0, 0.0,  // Vertex #1's position
+        1.0, 1.0, 0.0,  // Vertex #2's position
+        0.0, 1.0, 0.0   // Vertex #3's position
+    ],
+    "colors": [
+        1.0, 1.0, 1.0,  // Vertex #0's color (white)
+        1.0, 1.0, 0.0,  // Vertex #1's color (yellow)
+        1.0, 0.0, 1.0,  // Vertex #2's color (magenta)
+        0.0, 1.0, 1.0   // Vertex #3's color (cyan)
+    ],
+    "indices": [
+        0, 1,  // Line #0
+        1, 2,  // Line #1
+        2, 3,  // Line #2
+        3, 0,  // Line #3
+    ]
+};
+
+</code></pre>
+
+    <figure class="figure">
+        <table>
+            <tr>
+                <td><img src="images/example-wireframe-schematics.png" width="300" alt=""></td>
+                <td><img src="images/example-wireframe-render.png" width="300" alt=""></td>
+            </tr>
+        </table>
+        <br>
+        <figcaption class="figure-caption"><strong>Figure 5.5</strong> An example wireframe and its rendering.</figcaption>
+    </figure>
+
+
+    <p>The differences between the wireframe and the triangle mesh are (1) the primitive type and (2) the index buffer. Here, a line primitive is defined by two consecutive indices. Because the index buffer has 4 numbers, it defines 4 lines in total. Like what we saw with the traingle mesh earlier, the pixels between the vertices have colors that are interpolations of the vertex colors.</p>
+        
 
     <h2>5.5 &nbsp; Normal vector</h2>
 
