@@ -253,7 +253,7 @@ const texCoordBuffer = [
 
     <h2>5.3 &nbsp; Primitives</h2>
 
-    <p>We said earlier that we may specify shapes by specifying connections between vertices. These connections are the extra information that allows us to fill the empty space between them. A shape specified by connecting vertices is called a <strong>primitive</strong>.</p>
+    <p>These extra information that helps us fill the empty space between vertices are how to "group" or "connect" vertices so that they form simple geometric shapes. A shape specified by connecting vertices is called a <strong>primitive</strong>.</p>
 
     <p>Different implementations of the graphics pipeline have different primitives they support. In general, though, the primitives are some forms of points, lines, or triangles. WebGL, the implementation that we will use, supports the following primitives.</p>
 
@@ -458,7 +458,17 @@ const mesh = {
     <p>The differences between the wireframe and the triangle mesh are (1) the primitive type and (2) the index buffer. Here, a line primitive is defined by two consecutive indices. Because the index buffer has 4 numbers, it defines 4 lines in total. Like what we saw with the traingle mesh earlier, the pixels between the vertices have colors that are interpolations of the vertex colors.</p>
         
 
-    <h2>5.5 &nbsp; Normal vector</h2>
+    <h2>5.5 &nbsp; Surface Modeling with Triangle Meshes</h2>
+
+    <p>Now that we understand what a mesh is, it is a good time to step back and see what it can do for us. Recall that, in order to create 3D-looking images with computer graphics, we must create a scene that is populated with objects. Meshes allow us to model these objects. However, what actually are we modeling with meshes?</p>
+
+    <p>A physical object has volume that is filled with matter. Nevertheless, unless the constituent matter is translucent, we wouldn not see what lies inside the object and would only see the material on the object's surface. For example, a human is made of flesh, blood, and bones and has many complicated internal organs. However, in normal circumstances, we only see his/her skin and other externals features such as hair, eyes, nose, and so on. As a result, for most physical objects, it is wasteful to model their internal structures. Modeling only their surfaces are often enough to convey the shapes.</p>
+
+    <p>Accordingly, most 3D models are just surfaces: contiguous sets of points in 3D that are intrinsically two-dimensional in the sense that they have no thickness. Such a surface and be <b>closed</b>, meaning that they partition the space into two regions: the ``inside'' and ''outside.'' Because the inside of a real-world object is often invisible, the inside of most 3D models are just hollow to save memory and modeling efforts. Most solid objects&mdash;an apple, a chair, a rock, etc.&mdash;can be modeled with as closed surfaces. If a surface is not closed, we say that it is <b>open</b>. We often model thin objects such as a piece of paper or a ribbon with open surfaces.</p> 
+
+    <p>In most real-time computer graphics applications, surfaces are modeled by triangle meshes. A triangle on its own is a very simple surface, but a triangle mesh&mdash;effectively a collection of multiple triangles&mdash;can represent much more complex surfaces. A triangle has only 3 corners and 3 edges. However, by arranging triangles so that their edges coincide, we can make polygons with more sides and corners like the square in Figure 5.4. A triangle is always flat and open, but multiple triangles can be connected to form a closed surface that looks curved like the torus in Figure 5.3. In fact, any complex surfaces can be approximated to a high degree of accuracy by using enough small triangles.</p>
+
+    <p></p>
 
     <hr>
     <p>
