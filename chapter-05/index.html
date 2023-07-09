@@ -510,22 +510,13 @@ const mesh = {
 
     <p>While the graphics pipeline can only deal with triangle meshes, other 3DCG software (especiallying modeling software such as <a href="https://www.blender.org/">Blender</a>, <a href="https://www.autodesk.com/products/3ds-max/overview?term=1-YEAR&tab=subscription">3ds Max</a>, or <a href="https://www.autodesk.com/products/maya/overview?term=1-YEAR&tab=subscription">Maya</a>) allows meshes where the primitives are general polygons: quadriliterals, pentagons, heptagons, and so on. Each polygon in a mesh is called a <b>face</b>. We will follow this nomenclature and call a triangle in a mesh a face too.</p> 
 
-    <h3>5.6.1 &nbsp; Normal vector to a flat surface</h3>
+    <h3>5.6.1 &nbsp; Normal vectors to a flat surface</h3>
 
-    <p>Recall from Section 3.7.5 that a 2D plane in 3D space can be defined by (1) a point on the plane and (2) a vector called the "normal vector." The normal vector has the property that it is perpendicular to the plane, meaning that it is perpendicular to any vectors that is in that plane.</p>
+    <p>A flat surface is a surface such that there is a 2D plane that contains it. Recall from Section 3.7.5 that a 2D plane in 3D space can be defined by (1) a point on the plane and (2) a vector called the "normal vector." The normal vector has the property that it is perpendicular to the plane, meaning that it is perpendicular to any vectors that is in that plane. Now, if a vector is perpendicalar to a plane, it is also perpendicular to any flat surface contained in that plane. So, we say that a normal vector to the plane is also a normal vector to the flat surface as well.</p>
 
-    <p>A flat surface is a surface such that there is a 2D plane that contains it. A triangle is, of course, a flat surface. Let $A$, $B$, and $C$ denote the corner points of the triangles, then the vector
-    \begin{align*}
-        \ve{n} = (B - A) \times (C - A)
-    \end{align*}
-    is a normal vector to the triangle. Note that $\ve{n}$ this is not the only normal vector there is because $2\ve{n}$, $3.14\ve{n}$, $-\ve{n}$, or $c\ve{n}$ for any real number $c \neq 0$ is also perpendicular to the triangle as well.</p>
+    <p>Let $\ve{n}$ be a normal vector to a flat surface. We know that it is not the only normal vector because because $2\ve{n}$, $3.14\ve{n}$, $-\ve{n}$, or any $c\ve{n}$ where $c \neq 0$ is also perpendicular to the flat surface. So, to avoid ambiguity about the length of normal vectors, we often require that normal vectors be unit vectors. In other words, we prefer only to talk about $\ve{n}$ such that $\ve{n} = 1$.</p>
 
-    <p>To avoid ambiguity about the length of normal vectors, we often require that normal vectors be unit vectors. That is, we rather talk about
-    \begin{align*}
-        \ve{n} = \frac{(B - A) \times (C - A)}{\| (B - A) \times (C - A) \|}
-    \end{align*}
-    so that $\| \ve{n} \| = 1$ rather than $\ve{n} = (B - A) \times (C - A)$, whose length is arbitrary.
-    </p>
+    <p>With the above restriction, we have that a flat surface has two distinct (unit) normal vectors, and they point in the exact opposite direction.</p>
 
     <h3>5.6.2 &nbsp; Orientation of a flat surface</h3>
 
