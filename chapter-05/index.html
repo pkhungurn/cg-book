@@ -253,7 +253,7 @@ const texCoordBuffer = [
 
     <h2>5.3 &nbsp; Primitives</h2>
 
-    <p>These extra information that helps us fill the empty space between vertices are how to "group" or "connect" vertices so that they form simple geometric shapes. A shape specified by connecting vertices is called a <strong>primitive</strong>.</p>
+    <p>The extra information that helps us fill the empty space between vertices are how to "group" or "connect" vertices so that they form simple geometric shapes. A shape specified by connecting vertices is called a <strong>primitive</strong>.</p>
 
     <p>Different implementations of the graphics pipeline have different primitives they support. In general, though, the primitives are some forms of points, lines, or triangles. WebGL, the implementation that we will use, supports the following primitives.</p>
 
@@ -458,15 +458,63 @@ const mesh = {
     <p>The differences between the wireframe and the triangle mesh are (1) the primitive type and (2) the index buffer. Here, a line primitive is defined by two consecutive indices. Because the index buffer has 4 numbers, it defines 4 lines in total. Like what we saw with the traingle mesh earlier, the pixels between the vertices have colors that are interpolations of the vertex colors.</p>
         
 
-    <h2>5.5 &nbsp; Surface Modeling with Triangle Meshes</h2>
+    <h2>5.5 &nbsp; Surface modeling with triangle meshes</h2>
 
     <p>Now that we understand what a mesh is, it is a good time to step back and see what it can do for us. Recall that, in order to create 3D-looking images with computer graphics, we must create a scene that is populated with objects. Meshes allow us to model these objects. However, what actually are we modeling with meshes?</p>
 
-    <p>A physical object has volume that is filled with matter. Nevertheless, unless the constituent matter is translucent, we wouldn not see what lies inside the object and would only see the material on the object's surface. For example, a human is made of flesh, blood, and bones and has many complicated internal organs. However, in normal circumstances, we only see his/her skin and other externals features such as hair, eyes, nose, and so on. As a result, for most physical objects, it is wasteful to model their internal structures. Modeling only their surfaces are often enough to convey the shapes.</p>
+    <p>A physical object has volume that is filled with matter. Nevertheless, unless the constituent matter is translucent, we would not see what lies inside the object and would only see the matter that makes the object's surface. For example, a human is made of flesh, blood, bones, and many complicated internal organs. In normal circumstances, we only see his/her skin and externals features such as hair, eyes, nose, and so on. As a result, for most physical objects, it is wasteful to model their internal structures. Modeling only their surfaces are often enough to convey the shapes.</p>
 
-    <p>Accordingly, most 3D models are just surfaces: contiguous sets of points in 3D that are intrinsically two-dimensional in the sense that they have no thickness. Such a surface and be <b>closed</b>, meaning that they partition the space into two regions: the ``inside'' and ''outside.'' Because the inside of a real-world object is often invisible, the inside of most 3D models are just hollow to save memory and modeling efforts. Most solid objects&mdash;an apple, a chair, a rock, etc.&mdash;can be modeled with as closed surfaces. If a surface is not closed, we say that it is <b>open</b>. We often model thin objects such as a piece of paper or a ribbon with open surfaces.</p> 
+    <p>Accordingly, most 3D models are just surfaces: contiguous sets of points in 3D that are intrinsically two-dimensional in the sense that they have no thickness. Such a surface and be <b>closed</b>, meaning that they partition the space into two regions: the "inside" and "outside." Because the inside of a real-world object is often invisible, the inside of most 3D models are just hollow to save memory and modeling efforts. (See Figure 5.6.) Most solid objects&mdash;an apple, a chair, a rock, etc.&mdash;can be modeled with as closed surfaces. If a surface is not closed, we say that it is <b>open</b>. We often model thin objects such as a piece of paper or a ribbon with open surfaces.</p>
+
+    <figure class="figure">
+        <table>
+            <tr>
+                <td><a href="images/dogue-model.png"><img src="images/dogue-model.png" height="150" alt="" style="border: 1px solid black"></a></td>
+                <td><a href="images:/douge-face-closeup"><img src="images/dogue-face-closeup.png" style="border: 1px solid black" alt="" height="150"></a></td>
+                <td><a href="images:/douge-face-inside"><img src="images/dogue-face-inside.png" style="border: 1px solid black" alt="" height="150"></a></td>
+            </tr>
+            <tr>
+                <td align="center">(a)</td>
+                <td align="center">(b)</td>
+                <td align="center">(c)</td>
+            </tr>            
+        </table>
+        <br>
+        <figcaption class="figure-caption"><strong>Figure 5.6</strong> A 3D model is often just the outer surface of an object. (a) A <a href="https://market.pmnd.rs/model/dogue">Dogue</a> model created by <a href="https://twitter.com/CGIxruubeenx">Ruben Sotomayor</a>. (b) A close-up view of the dog's face. (c) Moving the camera further until it can see inside the head, we learn that the inside is empty. We can see the surface that makes up the back of the head and two of the legs. The eyeballs are not even fully modeled. (The model is released with <a href="https://creativecommons.org/share-your-work/public-domain/cc0/">CC0</a> license.)</figcaption>
+    </figure>
 
     <p>In most real-time computer graphics applications, surfaces are modeled by triangle meshes. A triangle on its own is a very simple surface, but a triangle mesh&mdash;effectively a collection of multiple triangles&mdash;can represent much more complex surfaces. A triangle has only 3 corners and 3 edges. However, by arranging triangles so that their edges coincide, we can make polygons with more sides and corners like the square in Figure 5.4. A triangle is always flat and open, but multiple triangles can be connected to form a closed surface that looks curved like the torus in Figure 5.3. In fact, any complex surfaces can be approximated to a high degree of accuracy by using enough small triangles.</p>
+
+    <p>Representing surfaces with triangle meshes has an obvious limitation. Because a triangle is flat, a triangle mesh is also flat when looked at from a distance close enough. This means that a curved surface like a sphere or a torus cannot be represented absolutely correctly by triangle meshes.</p>
+
+    <h2>5.6 &nbsp; Face normal vectors</h2>
+
+    <p>In Section 5.1, we mentioned that the "normal vector" is a common vertex attribute. In order to explain it, however, we need to discuss a related concept of "face normal vectors" (or just "face normals") first.</p>
+
+    <p>While the graphics pipeline can only deal with triangle meshes, other 3DCG software (especiallying modeling software such as <a href="https://www.blender.org/">Blender</a>, <a href="https://www.autodesk.com/products/3ds-max/overview?term=1-YEAR&tab=subscription">3ds Max</a>, or <a href="https://www.autodesk.com/products/maya/overview?term=1-YEAR&tab=subscription">Maya</a>) allows meshes where the primitives are general polygons: quadriliterals, pentagons, heptagons, and so on. Each polygon in a mesh is called a <b>face</b>. We will follow this nomenclature and call a triangle in a mesh a face too.</p> 
+
+    <h3>5.6.1 &nbsp; Normal vector to a flat surface</h3>
+
+    <p>Recall from Section 3.7.5 that a 2D plane in 3D space can be defined by (1) a point on the plane and (2) a vector called the "normal vector." The normal vector has the property that it is perpendicular to the plane, meaning that it is perpendicular to any vectors that is in that plane.</p>
+
+    <p>A flat surface is a surface such that there is a 2D plane that contains it. A triangle is, of course, a flat surface. Let $A$, $B$, and $C$ denote the corner points of the triangles, then the vector
+    \begin{align*}
+        \ve{n} = (B - A) \times (C - A)
+    \end{align*}
+    is a normal vector to the triangle. Note that $\ve{n}$ this is not the only normal vector there is because $2\ve{n}$, $3.14\ve{n}$, $-\ve{n}$, or $c\ve{n}$ for any real number $c \neq 0$ is also perpendicular to the triangle as well.</p>
+
+    <p>To avoid ambiguity about the length of normal vectors, we often require that normal vectors be unit vectors. That is, we rather talk about
+    \begin{align*}
+        \ve{n} = \frac{(B - A) \times (C - A)}{\| (B - A) \times (C - A) \|}
+    \end{align*}
+    so that $\| \ve{n} \| = 1$ rather than $\ve{n} = (B - A) \times (C - A)$, whose length is arbitrary.
+    </p>
+
+    <h3>5.6.2 &nbsp; Orientation of a flat surface</h3>
+
+    <p>A flat surface has two sides. We may call one the "front" side and the other the "back" side. This choice is arbitrary. After we have picked the side to call "front," we have decided the flat surface's <b>orientation</b>. In effect, we have chosen the way the flat surface is "facing."</p>
+
+
 
     <p></p>
 
