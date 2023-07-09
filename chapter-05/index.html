@@ -471,7 +471,7 @@ const mesh = {
             <tr>
                 <td><a href="images/dogue-model.png"><img src="images/dogue-model.png" height="150" alt="" style="border: 1px solid black"></a></td>
                 <td><a href="images:/douge-face-closeup"><img src="images/dogue-face-closeup.png" style="border: 1px solid black" alt="" height="150"></a></td>
-                <td><a href="images:/douge-face-inside"><img src="images/dogue-face-inside.png" style="border: 1px solid black" alt="" height="150"></a></td>
+                <td><a href="images:/douge-face-inside.png"><img src="images/dogue-face-inside.png" style="border: 1px solid black" alt="" height="150"></a></td>
             </tr>
             <tr>
                 <td align="center">(a)</td>
@@ -486,6 +486,23 @@ const mesh = {
     <p>In most real-time computer graphics applications, surfaces are modeled by triangle meshes. A triangle on its own is a very simple surface, but a triangle mesh&mdash;effectively a collection of multiple triangles&mdash;can represent much more complex surfaces. A triangle has only 3 corners and 3 edges. However, by arranging triangles so that their edges coincide, we can make polygons with more sides and corners like the square in Figure 5.4. A triangle is always flat and open, but multiple triangles can be connected to form a closed surface that looks curved like the torus in Figure 5.3. In fact, any complex surfaces can be approximated to a high degree of accuracy by using enough small triangles.</p>
 
     <p>Representing surfaces with triangle meshes has an obvious limitation. Because a triangle is flat, a triangle mesh is also flat when looked at from a distance close enough. This means that a curved surface like a sphere or a torus cannot be represented absolutely correctly by triangle meshes.</p>
+
+    <figure class="figure">
+        <table>
+            <tr>
+                <td><a href="images/dogue-from-faraway.png"><img src="images/dogue-from-faraway.png" width="200" alt="" style="border: 1px solid black"></a></td>
+                <td><a href="images:/douge-eyes-closeup"><img src="images/dogue-eyes-closeup.png" style="border: 1px solid black" alt="" width="200"></a></td>
+                <td><a href="images:/douge-eyes-wireframe.png"><img src="images/dogue-eyes-wireframe.png" style="border: 1px solid black" alt="" width="200"></a></td>
+            </tr>
+            <tr>
+                <td align="center">(a)</td>
+                <td align="center">(b)</td>
+                <td align="center">(c)</td>
+            </tr>            
+        </table>
+        <br>
+        <figcaption class="figure-caption"><strong>Figure 5.7</strong> A limitation of triangle meshes is that they cannot absolutely correctly model curved surfaces. (a) When the Dogue model is viewed from afar, we get the impression that its eyes are round. (b) However, when we look at the eyes from a close distance, we see that they have straight edges. (c) Rendering the model's wireframe, we see that the straight edges come from the constituent triangles.</figcaption>
+    </figure>
 
     <h2>5.6 &nbsp; Face normal vectors</h2>
 
