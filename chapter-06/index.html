@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script type="text/javascript">
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
+  <link rel="stylesheet"
+      href="../highlight/styles/default.min.css">
+  <script src="../highlight/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+    
+  <title>Chapter 6</title>
+</head>
+
+<body>
+  <div class="container" style="max-width: 640px;">
+    <span style="visibility: hidden;">
+      \(
+      \def\sc#1{\dosc#1\csod}
+      \def\dosc#1#2\csod{{\rm #1{\small #2}}}
+
+      \newcommand{\dee}{\mathrm{d}}
+      \newcommand{\Dee}{\mathrm{D}}
+      \newcommand{\In}{\mathrm{in}}
+      \newcommand{\Out}{\mathrm{out}}
+      \newcommand{\pdf}{\mathrm{pdf}}
+      \newcommand{\Cov}{\mathrm{Cov}}
+      \newcommand{\Var}{\mathrm{Var}}
+
+      \newcommand{\ve}[1]{\mathbf{#1}}
+      \newcommand{\mrm}[1]{\mathrm{#1}}
+      \newcommand{\ves}[1]{\boldsymbol{#1}}
+      \newcommand{\etal}{{et~al.}}
+      \newcommand{\sphere}{\mathbb{S}^2}
+      \newcommand{\modeint}{\mathcal{M}}
+      \newcommand{\azimint}{\mathcal{N}}
+      \newcommand{\ra}{\rightarrow}
+      \newcommand{\mcal}[1]{\mathcal{#1}}
+      \newcommand{\X}{\mathcal{X}}
+      \newcommand{\Y}{\mathcal{Y}}
+      \newcommand{\Z}{\mathcal{Z}}
+      \newcommand{\x}{\mathbf{x}}
+      \newcommand{\y}{\mathbf{y}}
+      \newcommand{\z}{\mathbf{z}}
+      \newcommand{\tr}{\mathrm{tr}}
+      \newcommand{\sgn}{\mathrm{sgn}}
+      \newcommand{\diag}{\mathrm{diag}}
+      \newcommand{\Real}{\mathbb{R}}
+      \newcommand{\sseq}{\subseteq}
+      \newcommand{\ov}[1]{\overline{#1}}
+      \DeclareMathOperator*{\argmax}{arg\,max}
+      \DeclareMathOperator*{\argmin}{arg\,min}
+      \)
+    </span>
+
+    <h1>6 &nbsp; Normal Vectors</h1>
+    <hr>    
+       
+    <h2>6.1 &nbsp; Face normal vectors</h2>
+
+    <p>In Section 5.1, we mentioned that the "normal vector" is a common vertex attribute. In order to explain it, however, we need to discuss a related concept of "face normal vectors" (or just "face normals") first.</p>
+
+    <p>While the graphics pipeline can only deal with triangle meshes, other 3DCG software (especiallying modeling software such as <a href="https://www.blender.org/">Blender</a>, <a href="https://www.autodesk.com/products/3ds-max/overview?term=1-YEAR&tab=subscription">3ds Max</a>, or <a href="https://www.autodesk.com/products/maya/overview?term=1-YEAR&tab=subscription">Maya</a>) allows meshes where the primitives are general polygons: quadriliterals, pentagons, heptagons, and so on. Each polygon in a mesh is called a <b>face</b>. We will follow this nomenclature and call a triangle in a mesh a face too.</p> 
+
+    <h3>6.1.1 &nbsp; Normal vectors to a flat surface</h3>
+
+    <p>A flat surface is a surface such that there is a 2D plane that contains it. Recall from Section 3.7.5 that a 2D plane in 3D space can be defined by (1) a point on the plane and (2) a vector called the "normal vector." The normal vector has the property that it is perpendicular to the plane, meaning that it is perpendicular to any vectors that is in that plane. Now, if a vector is perpendicalar to a plane, it is also perpendicular to any flat surface contained in that plane. So, we say that a normal vector to the plane is also a normal vector to the flat surface as well.</p>
+
+    <p>Let $\ve{n}$ be a normal vector to a flat surface. We know that it is not the only normal vector because because $2\ve{n}$, $3.14\ve{n}$, $-\ve{n}$, or any $c\ve{n}$ where $c \neq 0$ is also perpendicular to the flat surface.</p>
+
+    <figure class="figure">
+        <a href="images/flat-surface-normals.png"><img src="images/flat-surface-normals.png" width="300" alt=""></a>
+        <br>
+        <figcaption class="figure-caption"><strong>Figure 6.1</strong> A flat surface (represented by the blue rectangle) inside a plane (represented by gray dashed lines) has many normal vectors. Each vector points either upward or downward, but there is no restriction on its length.</figcaption>
+    </figure>
+
+    <p>To avoid ambiguity about the length of normal vectors, we often require that normal vectors be unit vectors. In other words, we prefer only to talk about $\ve{n}$ such that $\ve{n} = 1$. With this restriction, we have that a flat surface has two distinct (unit) normal vectors, and they point in the exact opposite direction.</p>
+
+    <figure class="figure">
+        <a href="images/flat-surface-unit-normals.png"><img src="images/flat-surface-unit-normals.png" width="300" alt=""></a>
+        <br>
+        <figcaption class="figure-caption"><strong>Figure 6.2</strong> By restrict ourselves to only consider normals vectors that have unit length, we have that a flat surface has two distinct normal vectors. They point in the exact opposite directions.</figcaption>
+    </figure>
+
+    <h3>6.1.2 &nbsp; Orientation of a flat surface and "the" normal vector</h3>
+
+    <p>The fact that there are two distinct normal vectors to a flat surface corresponds to the fact that surface has two sides. Now, we may choose to call one side the "front" side and the other the "back" side. This choice is arbitrary. After we have picked the side to call "front," we have decided the flat surface's <b>orientation</b>. In effect, we have chosen the way the flat surface is "facing." Picking the side to call "front" is equivalent to pick one of the two normal vectors to serve as "the" (one and only one) normal vector of the surface over the other. <b>In this book, the normal vector is on the front side</b>. In other words, the front side is the side we see when we look in the opposite direction of the normal vector. As a result, <b>the choise of the normal vector reflects the orientation of a flat surface</b>.</p>
+
+    <figure class="figure">
+        <table>
+            <tr>
+                <td><a href="images/flat-surface-two-sides.png"><img src="images/flat-surface-two-sides.png" alt=""></a></td>
+                <td>&nbsp;</td>
+                <td><a href="images/flat-surface-after-normal-picked.png"><img src="images/flat-surface-after-normal-picked.png" alt=""></a></td>
+            </tr>
+            <tr>
+                <td align="center">(a)</td>
+                <td>&nbsp;</td>
+                <td align="center">(b)</td>
+            </tr>
+        </table>
+        <br>
+        <figcaption class="figure-caption"><strong>Figure 6.3</strong> (a) We take a side view of the flat surface in Figure 5.9. We see that the surface has two sides, agreeing with the face that it has two distinct (unit) normal vectors. (b) We can pick a side we call the "front" side. This is equivalent to picking one of the two normal vectors to serve as "the" normal vector of the surface. In this book, the normal vector always points away from the front side.</figcaption>
+    </figure>
+    
+    <p>So, from now on, the normal vector of a flat surface is the unit vetor that:</p>
+
+    <ol>
+        <li>is perpendicular to the surface, and</li>
+        <li>points away from the side we consider to be the front side.</li>
+    </ol>
+
+    <h3>6.1.3 &nbsp; The normal vector of a triangle</h3>
+
+    <p>When we specify a triangle, say $ABC$, we need to list its corner points in some order. $A$ thus denotes the first corner, $B$ the second, and $C$ the third.</p>
+
+    <p>
+    <div class="bg-light" style="padding: 20px">
+        <p>
+        <b>Example 6.1</b>
+        For example, in the triangle mesh of Section 5.4.1, the $ABC$s of the two triangles are as follows:
+        </p>
+        <ul>
+            <li>Triangle #1
+                <ul>
+                    <li>$A = $ Vertex #0 $= (0,0,0)$.</li>
+                    <li>$B = $ Vertex #1 $= (1,0,0)$.</li>
+                    <li>$C = $ Vertex #2 $= (1,1,0)$.</li>
+                </ul>
+            </li>
+            <li>Triangle #2
+                <ul>
+                    <li>$A = $ Vertex #0 $= (0,0,0)$.</li>
+                    <li>$B = $ Vertex #2 $= (1,1,0)$.</li>
+                    <li>$C = $ Vertex #3 $= (0,1,0)$.</li>
+                </ul>            
+            </li>
+        </ul>
+    </div>
+    </p>
+
+    <p>We know from Section 3.7.5 that the vector
+    \begin{align*}
+    \widetilde{\ve{n}} = (B - A) \times (C - A)
+    \end{align*}
+    is a vector that is perpendicalar to the triangle. Dividing the vector by its length, we have that
+    \begin{align*}
+    \widehat{\ve{n}} = \frac{\widetilde{\ve{n}}}{\| \widetilde{\ve{n}} \|} = \frac{(B - A) \times (C - A)}{ \| (B-A) \times (C-A) \|}
+    \end{align*}
+    is a unit vector that is perpendicular to the triangle. However, we also know that
+    \begin{align*}
+    -\widehat{\ve{n}} = -\frac{(B - A) \times (C - A)}{ \| (B-A) \times (C-A) \|} = \frac{(C - A) \times (B - A)}{ \| (C-A) \times (B-A) \|}  
+    \end{align*}
+    is another unit vector that is perpedicular to the triangle. Between $\widehat{n}$ and $-\widehat{n}$, which one we should pick as the normal vector of the triangle then?
+    </p>
+
+    <p>In this book, we shall follow the convention is that the normal vector of triangle $ABC$, denoted by $\ve{n}$, is given by
+    \begin{align*}
+    \ve{n} = \widehat{\ve{n}} = \frac{\widetilde{\ve{n}}}{\| \widetilde{\ve{n}} \|} = \frac{(B - A) \times (C - A)}{ \| (B-A) \times (C-A) \|}.
+    \end{align*}
+    </p>
+
+    <p>
+    <div class="bg-light" style="padding: 20px">
+        <p><b>Example 6.2</b> The normal vectors of the triangles of the mesh in Section 5.4.1 are as follows.
+        \begin{align*}
+        \mbox{Normal of Triangle #1}
+        &=  \frac{  \left( \begin{bmatrix}1 \\ 0 \\ 0\end{bmatrix} - \begin{bmatrix}0 \\ 0 \\ 0\end{bmatrix} \right) \times \left( \begin{bmatrix}1 \\ 1 \\ 0\end{bmatrix} - \begin{bmatrix}0 \\ 0 \\ 0\end{bmatrix} \right) }{\left\| \left( \begin{bmatrix}1 \\ 0 \\ 0\end{bmatrix} - \begin{bmatrix}0 \\ 0 \\ 0\end{bmatrix} \right) \times \left( \begin{bmatrix}1 \\ 1 \\ 0\end{bmatrix} - \begin{bmatrix}0 \\ 0 \\ 0\end{bmatrix} \right) \right\|} \\
+        &= \frac{  \begin{bmatrix}1 \\ 0 \\ 0\end{bmatrix}  \times \begin{bmatrix}1 \\ 1 \\ 0\end{bmatrix} }{\left\| \begin{bmatrix}1 \\ 0 \\ 0\end{bmatrix} \times \begin{bmatrix}1 \\ 1 \\ 0\end{bmatrix} \right\|} 
+        = \frac{  \begin{bmatrix}0 \\ 0 \\ 1\end{bmatrix}   }{\left\| \begin{bmatrix}0 \\ 0 \\ 1\end{bmatrix}   \right\|} 
+        = \begin{bmatrix}0 \\ 0 \\ 1\end{bmatrix}. \\
+        \mbox{Normal of Triangle #2}
+        &=  
+        \frac{  
+            \left( \begin{bmatrix}1 \\ 1 \\ 0\end{bmatrix} - \begin{bmatrix}0 \\ 0 \\ 0\end{bmatrix} \right) 
+            \times 
+            \left( \begin{bmatrix}0 \\ 1 \\ 0\end{bmatrix} - \begin{bmatrix}0 \\ 0 \\ 0\end{bmatrix} \right) 
+        }
+        {
+            \left\| \left( \begin{bmatrix}1 \\ 1 \\ 0\end{bmatrix} - \begin{bmatrix}0 \\ 0 \\ 0\end{bmatrix} \right) 
+            \times 
+            \left( \begin{bmatrix}0 \\ 1 \\ 0\end{bmatrix} - \begin{bmatrix}0 \\ 0 \\ 0\end{bmatrix} \right) \right\|
+        } \\
+        &= \frac{  
+            \begin{bmatrix}1 \\ 1 \\ 0\end{bmatrix}  
+            \times 
+            \begin{bmatrix}0 \\ 1 \\ 0\end{bmatrix} 
+        }
+        {
+            \left\| 
+            \begin{bmatrix}1 \\ 1 \\ 0\end{bmatrix} 
+            \times 
+            \begin{bmatrix}0 \\ 1 \\ 0\end{bmatrix}
+            \right\|
+        } 
+        = \frac{  
+            \begin{bmatrix}0 \\ 0 \\ 1\end{bmatrix}   
+        }{
+            \left\| \begin{bmatrix}0 \\ 0 \\ 1\end{bmatrix}   \right\|
+        } 
+        = \begin{bmatrix}0 \\ 0 \\ 1\end{bmatrix}.
+        \end{align*}
+        The normal vectors are the same. This is good because these two triangles are used to form a square, another flat surface. The square should have one normal vector rather than two. 
+        </p>1
+    </div>
+    </p>
+
+    <p>A consequence of basing the normal vector $\ve{n}$ on $(B-A) \times (C-A)$ rather than other calculation is that <b>one can determine the direction of the normal vector by looking at how the triangle's corners "swirl."</b></p>
+
+    <p>This is the because the direction of $(B - A) \times (C - A)$ is determined by the right-hand rule. Recall from Figure 3.19 that the direction of $(B - A) \times (C - A)$ depends on the rotation to get from $B-A$ to $C-A$. If the rotation is counterclockwise when we look at it, the cross production points towards us. If the rotation is clockwise, then the cross product points away from us.</p>
+
+    <p>Equivalently, we can trace the corners of the triangles in the specified order: from $A$ to $B$ to $C$ and then back to $A$ again. If the we see that the motion is a counterclockwise "swirling," then the triangle's normal vector would point towards us, and we are seeing the front side of the triangle. On the other hand, if the swirling is clockwise, the normal vector points away from us, and we are seeing the back side of the triangle.</p>
+
+    <h3>6.1.4 &nbsp; Consistency of face normals</h3>
+
+    <h3>6.1.5 &nbsp; Normal vectors of closed triangle meshes</h3>
+
+    <h3>6.1.6 &nbsp; Why do we care about face normals?</h3>
+
+    <h2>6.2 &nbsp; Surface normals</h2>
+
+    <h3>6.2.1 &nbsp; Manifolds</h3>
+
+    <h3>6.2.2 &nbsp; Normal vectors of a manifold</h3>
+
+    <h3>6.2.3 &nbsp; Orientability</h3>
+
+    <h2>6.3 &nbsp; Vertex normals</h2>
+    
+    <hr>
+    <p>
+      <a href="../chapter-05/index.html"><<</a>
+      <a href="../index.html">Contents</a>      
+    </p>
+  </div>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/littlefoot.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    const { littlefoot } = require('littlefoot')
+
+    const lf = littlefoot({
+      activateOnHover: true,
+      hoverDelay: 250,
+    });
+  </script>
+</body>
+
+</html>
