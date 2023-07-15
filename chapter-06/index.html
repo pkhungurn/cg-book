@@ -67,18 +67,18 @@
       \)
     </span>
 
-    <h1>6 &nbsp; Normal Vectors</h1>
+    <h1>6 &nbsp; Normal vectors</h1>
     <hr>
 
-    <p>We learned in the last chapter that we model shapes of objects by modeling their external surfaces. "Normal vectors" are common properties of surfaces that must be taken to account when creating any surface models.</p>
+    <p>We learned in the last chapter that we model shapes of objects by modeling their external surfaces. <b>Normal vectors</b> are common properties of surfaces that must be taken to account when creating any surface models.</p>
 
-    <p>When we model shapes with triangle meshes, we deal with two types of normal vectors: <b>face normal vectors</b> and <b>vertex normal vectors.</b> We will study them in details in this chapter.</p>
-       
-    <h2>6.1 &nbsp; Face normal vectors</h2>
+    <p>We have seen the term "normal vector" before in Section 3.7.5. A normal vector to a plane is a vector that is perpendicular to it. A normal vector to a surface is a vector that is "perpendicular" to that surface in some sense. However, we have to be careful about its definition because a general surface is not completely flat like a plane, and so we cannot conveniently measure the angle between a vector and a surface to decide whether they are perpedicular to each other or not. (There is a way to extend the definition, of course!)</p>
 
-    <p>In Section 5.1, we mentioned that the "normal vector" is a common vertex attribute. In order to explain it, however, we need to discuss a related concept of "face normal vectors" (or just "face normals") first.</p>
+    <p>We care about normal vectors because they tell us about the "directions" of the surface. These directions can be used to perform (1) hidden surface removal (Chapter XXX) and (2) shading (Chapter XXX). Shading is largely about calculating how light interacts with a surface, and this interaction depends on the surface's geometry. The surface's directions, conveyed by normal vectors, are geometric information that plays a central role in lighting calculation.</p>
 
-    <p>While the graphics pipeline can only deal with triangle meshes, other 3DCG software (especiallying modeling software such as <a href="https://www.blender.org/">Blender</a>, <a href="https://www.autodesk.com/products/3ds-max/overview?term=1-YEAR&tab=subscription">3ds Max</a>, or <a href="https://www.autodesk.com/products/maya/overview?term=1-YEAR&tab=subscription">Maya</a>) allows meshes where the primitives are general polygons: quadriliterals, pentagons, heptagons, and so on. Each polygon in a mesh is called a <b>face</b>. We will follow this nomenclature and call a triangle in a mesh a face too.</p> 
+    <p>Now, the confusing thing about normal vectors, at least in the field of computer graphics, is that there are multiple kinds of them. The normal vector we just talked about is called the <b>surface normal vector.</b> When we model shapes with triangle meshes, we deal with two more types: <b>face normal vector</b> and <b>vertex normal vector.</b> Let us now discuss them in turn.</p>
+
+    <h2>6.1 &nbsp; Surface normal vectors</h2>
 
     <h3>6.1.1 &nbsp; Normal vectors to a flat surface</h3>
 
@@ -128,6 +128,87 @@
         <li>points away from the side we consider to be the front side.</li>
     </ol>
 
+    <p>Let us stress that the normal vector to a flat surface is perpendicular to that surface as a whole. This means that we can place the normal vector anywhere on the surface, and the normal would be perpendicular to the surface at that point.</p>
+
+    <h3>6.1.3 &nbsp; Regular surfaces</h3>
+
+    <p>Curved surfaces such as spheres, tori, ellepsoids are used by artists approximate shapes of 3D objects. These surfaces belong to a class of surfaces called <b>regular surface</b> where the notion of normal vectors are well defined.</p>
+
+    <p>Intuitively, regular surfaces are surfaces that are "locally flat." This means that, when you pick a point on the surface and zoom in on it close enough, the surface in your vision should look flat. Another way to think about this is to imagine the surface to be very big and yourself to be a small creature standing on it. If the surface is a manifold, then it looks like you are standing on a flat plane. In fact, we all have this experience. The earth is round (i.e., its shape can be approximated quite well by a sphere or an ellipsoid), but we can hardly observe its curvature while standing at sea level. It took a long time for humanity to realize that the earth is not flat! (Sadly, some people believe it is even now.)</p>
+
+    <h4>6.1.3.1 &nbsp; Semi-formal definition</h4>
+
+    <p>Let us define regular surfaces more mathematically without getting too bogged down in the details.<sup><a href="#fn:regular-surface-definition">1</a></sup> To do so, we need to make the phrase "locally flat" more precise.</p>
+
+    <p>We view a surface as a set of points. Being "locally flat" is a property of each point that belongs to the surface. The mathematical definition that captures the notion of being "locally flat" is the notion of a "locally smooth parameterization" or a "chart." If all point in $S$ has a chart around it (meaning that they are locally flat), then $S$ is a regular surface.</p>
+
+    <p>Let $S$ be a surface in 3D, and let $P$ be a point in it. A <b>chart around $P$</b> is a mathematical object $(S^P, \ve{f}^P)$ specific to $P$ consisting of two parts. The first part is a subset $S^P \subseteq S$ that is a contiguous area that contains $P$. The second part is a function $\ve{f}^P: R^P \rightarrow S^P$ where $R_P$ is a continguous area of the Euclidean plane $\Real^2$. We require that $\ve{f}_P$ satisfy the following properties.</p>
+
+    <ol>
+      <li>It is bijective and continuous.</li>
+
+      <li>It is differentiable, meaning that its partial derivatives of all orders exist and and are continuous.</li>
+
+      <li>The directional derivatives functions $\ve{f}^P_u$ and $\ve{f}^P_v$, when evaluated on all points in $R^P$, result in non-zero vectors that are not parallel to each other.</li>
+    </ol>
+    
+    <p>There's a lot to unpack in the above definition. First, $\ve{f}^P$ is a function from $\Real^2$ to $S^P \subseteq \Real^3$. So, it is a function of the form
+    \begin{align*}
+      (x,y,z) = \ve{f}^P(u,v),
+    \end{align*}
+    or, equivalently in vector notation,
+    \begin{align*}
+      \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \ve{f}^P\bigg(\begin{bmatrix} u \\ v \end{bmatrix} \bigg)
+    \end{align*}
+    We can also write $\ve{f}_P$ as three separate scalar functions, one for each coordinates of the result:
+    \begin{align*}
+    \begin{bmatrix} x \\ y \\ z \end{bmatrix}
+    = \begin{bmatrix} f^P_1(u,v) \\ f^P_2(u,v) \\ f^P_3(u,v) \end{bmatrix}.
+    \end{align*}
+    </p>
+
+    <p>Second, we require that $\ve{f}_P$ must be bijective and continuous. This means that, for each point $(x,y,z)$ in $S^P$, we can assign to it a a unique 2D coordinates $(u,v)$ through the relationship $(x,y,z) = \ve{f}^P(u,v)$. Moreover, these $(u,v)$-coordinates vary continuously. There are no abrupt jumps in coordinate values as we move along points in $S^P$. This is where the term "locally flat" comes frome. The surface looks flat around a point because there are ways to assign 2D coordinates around that point.</p>
+
+    <p>Third, the partial derivatives of $\ve{f}_P$ are the functions
+    \begin{align*}
+    &\frac{\partial f_1}{\partial u}, \frac{\partial f_1}{\partial v}, \frac{\partial^2 f_1}{\partial u^2}, \frac{\partial^2 f_1}{\partial u \partial v}, \frac{\partial^2 f_1}{\partial u^2}, \frac{\partial^3 f_1}{\partial u^3}, \frac{\partial^3 f_1}{\partial u^2 \partial v}, \frac{\partial^3 f_1}{\partial u \partial v^2}, \frac{\partial^3 f_1}{\partial u^2} \dotsc \\
+    &\frac{\partial f_2}{\partial u}, \frac{\partial f_2}{\partial v}, \frac{\partial^2 f_2}{\partial u^2}, \frac{\partial^2 f_2}{\partial u \partial v}, \frac{\partial^2 f_2}{\partial u^2}, \frac{\partial^3 f_2}{\partial u^3}, \frac{\partial^3 f_2}{\partial u^2 \partial v}, \frac{\partial^3 f_2}{\partial u \partial v^2}, \frac{\partial^3 f_2}{\partial u^2} \dotsc\\ 
+    &\frac{\partial f_3}{\partial u}, \frac{\partial f_3}{\partial v}, \frac{\partial^2 f_3}{\partial u^2}, \frac{\partial^2 f_3}{\partial u \partial v}, \frac{\partial^2 f_3}{\partial u^2}, \frac{\partial^3 f_3}{\partial u^3}, \frac{\partial^3 f_3}{\partial u^2 \partial v}, \frac{\partial^3 f_3}{\partial u \partial v^2}, \frac{\partial^3 f_3}{\partial u^2} \dotsc
+    \end{align*}
+    We require that all these (infinitely many) functions exist and are continuous.
+    </p>
+
+    <p>Lastly, we mentioned two <b>direction derivative</b> functions $\ve{f}^P_u$ and $\ve{f}^P_v$.
+    \begin{align*}
+      \ve{f}^P_u
+      &= \begin{bmatrix}
+      \frac{\partial \ve{f}_1^P}{\partial u} \\
+      \frac{\partial \ve{f}_2^P}{\partial u} \\
+      \frac{\partial \ve{f}_3^P}{\partial u}
+      \end{bmatrix}, &
+      \ve{f}^P_v
+      &= \begin{bmatrix}
+      \frac{\partial \ve{f}_1^P}{\partial v} \\
+      \frac{\partial \ve{f}_2^P}{\partial v} \\
+      \frac{\partial \ve{f}_3^P}{\partial v}
+      \end{bmatrix}.
+    \end{align*}
+    When we feed a 2D point $A \in R^P$ to these funcions, we get two 3D vectors $\ve{f}^P_u(A)$ and $\ve{f}^P_v(A)$. The third requirement on $\ve{f}^P$ dictates two codntions. The first is that $\ve{f}^P_u(A) \neq \ve{0}$ and $\ve{f}^P_v(B) \neq \ve{0}$. Second, $\ve{f}^P_u(A) \neq c \ve{f}^P_v(A)$ for any real number $c$. 
+    </p>
+
+    <h3>6.1.4 &nbsp; Tangent vectors and tangent planes</h3>
+
+    <h3>6.1.5 &nbsp; Normal vectors of a regular surface</h3>
+
+    <h3>6.1.6 &nbsp; Orientability</h3>
+   
+    <h2>6.2 &nbsp; Face normal vectors</h2>
+
+    <p>In Section 5.1, we mentioned that the "normal vector" is a common vertex attribute. In order to explain it, however, we need to discuss a related concept of "face normal vectors" (or just "face normals") first.</p>
+
+    <p>While the graphics pipeline can only deal with triangle meshes, other 3DCG software (especiallying modeling software such as <a href="https://www.blender.org/">Blender</a>, <a href="https://www.autodesk.com/products/3ds-max/overview?term=1-YEAR&tab=subscription">3ds Max</a>, or <a href="https://www.autodesk.com/products/maya/overview?term=1-YEAR&tab=subscription">Maya</a>) allows meshes where the primitives are general polygons: quadriliterals, pentagons, heptagons, and so on. Each polygon in a mesh is called a <b>face</b>. We will follow this nomenclature and call a triangle in a mesh a face too.</p> 
+
+    
     <h3>6.1.3 &nbsp; The normal vector of a triangle</h3>
 
     <p>When we specify a triangle, say $ABC$, we need to list its corner points in some order. $A$ thus denotes the first corner, $B$ the second, and $C$ the third.</p>
@@ -219,7 +300,7 @@
         = \begin{bmatrix}0 \\ 0 \\ 1\end{bmatrix}.
         \end{align*}
         The normal vectors are the same. This is good because these two triangles are used to form a square, another flat surface. The square should have one normal vector rather than two. 
-        </p>1
+        </p>
     </div>
     </p>
 
@@ -235,15 +316,17 @@
 
     <h3>6.1.6 &nbsp; Why do we care about face normals?</h3>
 
-    <h2>6.2 &nbsp; Surface normals</h2>
-
-    <h3>6.2.1 &nbsp; Manifolds</h3>
-
-    <h3>6.2.2 &nbsp; Normal vectors of a manifold</h3>
-
-    <h3>6.2.3 &nbsp; Orientability</h3>
-
     <h2>6.3 &nbsp; Vertex normals</h2>
+
+    <hr>
+    <div class="footnotes">
+      <ol> 
+        <li class="footnote" id="fn:regular-surface-definition">
+          <p>A rigorous definition of the regular surface requires the notion of open sets, neighborhood, and several other mathematical concepts which we shall not discuss in this book. A mathematically inclined reader cana consult standard textbooks on differential geometry like do Carmo's "Differential Geometry of Curves and Surfaces."</p>
+        </li>               
+      </ol>
+    </div>
+
     
     <hr>
     <p>
