@@ -136,71 +136,25 @@
 
     <p>Intuitively, regular surfaces are surfaces that are "locally flat." This means that, when you pick a point on the surface and zoom in on it close enough, the surface in your vision should look flat. Another way to think about this is to imagine the surface to be very big and yourself to be a small creature standing on it. If the surface is a manifold, then it looks like you are standing on a flat plane. In fact, we all have this experience. The earth is round (i.e., its shape can be approximated quite well by a sphere or an ellipsoid), but we can hardly observe its curvature while standing at sea level. It took a long time for humanity to realize that the earth is not flat! (Sadly, some people believe it is even now.)</p>
 
-    <h4>6.1.3.1 &nbsp; Semi-formal definition</h4>
+    <p>We will not, however, define the regular surface mathematically because doing so requires much mathematical machinery that we will not use again in the rest of the book.<sup><a href="#fn:regular-surface-definition">1</a></sup></p>
 
-    <p>Let us define regular surfaces more mathematically without getting too bogged down in the details.<sup><a href="#fn:regular-surface-definition">1</a></sup> To do so, we need to make the phrase "locally flat" more precise.</p>
+    <h3>6.1.4 &nbsp; Tangent planes and surface normal vectors</h3>
 
-    <p>We view a surface as a set of points. Being "locally flat" is a property of each point that belongs to the surface. The mathematical definition that captures the notion of being "locally flat" is the notion of a "locally smooth parameterization" or a "chart." If all point in $S$ has a chart around it (meaning that they are locally flat), then $S$ is a regular surface.</p>
+    <p>A regular surface has a property that allows it to have normal vectors. Each point $P$ of the surface has a plane called the "tangent plane" that "touches" the surface at $P$. For other types of surfaces, the existence of tangent planes are not gauranteed.</p>
 
-    <p>Let $S$ be a surface in 3D, and let $P$ be a point in it. A <b>chart around $P$</b> is a mathematical object $(S^P, \ve{f}^P)$ specific to $P$ consisting of two parts. The first part is a subset $S^P \subseteq S$ that is a contiguous area that contains $P$. The second part is a function $\ve{f}^P: R^P \rightarrow S^P$ where $R_P$ is a continguous area of the Euclidean plane $\Real^2$. We require that $\ve{f}_P$ satisfy the following properties.</p>
+    <p>Formally, a <b>secant plane</b> to a surface is a plane that passes through three points of the surface. Let $P$ be a point on a surface $S$. We can force the three points to be closer and closer to $P$. Taking the limit of this process, the secant plane may approach a unique plane that contains $P$. This plane, if it exists, is called the <b>tangent plane at $P$</b>. It is the plane that best approximates the surface around $P$ among all the other planes. For a regular surface, a tangent plane exists for every point. As a result, a regular surface appears locally flat because the surface can be approximated locally by tangent planes.</p>
 
-    <ol>
-      <li>It is bijective and continuous.</li>
+    <p>We say that a vector $\ve{v}$ is <b>tangent</b> to a surface $S$ at point $P$ if $\ve{v}$ likes in the tangent plane at $P$. We call such a vector $\ve{v}$ a <b>tangent vector</b>.</p>
 
-      <li>It is differentiable, meaning that its partial derivatives of all orders exist and and are continuous.</li>
+    <p>We say that a vector $\ve{n}$ is <b>normal</b> to a surface $S$ at point $P$ if the vector is perpendicular to the tangent plane at $P$. Such a vector is called a <b>normal vector</b> or a <b>surface normal vector</b> of $S$.</p>
 
-      <li>The directional derivatives functions $\ve{f}^P_u$ and $\ve{f}^P_v$, when evaluated on all points in $R^P$, result in non-zero vectors that are not parallel to each other.</li>
-    </ol>
-    
-    <p>There's a lot to unpack in the above definition. First, $\ve{f}^P$ is a function from $\Real^2$ to $S^P \subseteq \Real^3$. So, it is a function of the form
-    \begin{align*}
-      (x,y,z) = \ve{f}^P(u,v),
-    \end{align*}
-    or, equivalently in vector notation,
-    \begin{align*}
-      \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \ve{f}^P\bigg(\begin{bmatrix} u \\ v \end{bmatrix} \bigg)
-    \end{align*}
-    We can also write $\ve{f}_P$ as three separate scalar functions, one for each coordinates of the result:
-    \begin{align*}
-    \begin{bmatrix} x \\ y \\ z \end{bmatrix}
-    = \begin{bmatrix} f^P_1(u,v) \\ f^P_2(u,v) \\ f^P_3(u,v) \end{bmatrix}.
-    \end{align*}
-    </p>
+    <p>If $S$ is a regular surface, then every point on it has a tangent plane and, consequentially, (infinitely many) normal vectors. Following the discussion in Section 6.1.1, we typically require that normal vectors be unit vectors. As a result, each point on $S$ has two normal vectors. One points away from the "front" side of the tangent plane, and the other from the "back" side.</p>
 
-    <p>Second, we require that $\ve{f}_P$ must be bijective and continuous. This means that, for each point $(x,y,z)$ in $S^P$, we can assign to it a a unique 2D coordinates $(u,v)$ through the relationship $(x,y,z) = \ve{f}^P(u,v)$. Moreover, these $(u,v)$-coordinates vary continuously. There are no abrupt jumps in coordinate values as we move along points in $S^P$. This is where the term "locally flat" comes frome. The surface looks flat around a point because there are ways to assign 2D coordinates around that point.</p>
+    <h3>6.1.6 &nbsp; Examples</h3>
 
-    <p>Third, the partial derivatives of $\ve{f}_P$ are the functions
-    \begin{align*}
-    &\frac{\partial f_1}{\partial u}, \frac{\partial f_1}{\partial v}, \frac{\partial^2 f_1}{\partial u^2}, \frac{\partial^2 f_1}{\partial u \partial v}, \frac{\partial^2 f_1}{\partial u^2}, \frac{\partial^3 f_1}{\partial u^3}, \frac{\partial^3 f_1}{\partial u^2 \partial v}, \frac{\partial^3 f_1}{\partial u \partial v^2}, \frac{\partial^3 f_1}{\partial u^2} \dotsc \\
-    &\frac{\partial f_2}{\partial u}, \frac{\partial f_2}{\partial v}, \frac{\partial^2 f_2}{\partial u^2}, \frac{\partial^2 f_2}{\partial u \partial v}, \frac{\partial^2 f_2}{\partial u^2}, \frac{\partial^3 f_2}{\partial u^3}, \frac{\partial^3 f_2}{\partial u^2 \partial v}, \frac{\partial^3 f_2}{\partial u \partial v^2}, \frac{\partial^3 f_2}{\partial u^2} \dotsc\\ 
-    &\frac{\partial f_3}{\partial u}, \frac{\partial f_3}{\partial v}, \frac{\partial^2 f_3}{\partial u^2}, \frac{\partial^2 f_3}{\partial u \partial v}, \frac{\partial^2 f_3}{\partial u^2}, \frac{\partial^3 f_3}{\partial u^3}, \frac{\partial^3 f_3}{\partial u^2 \partial v}, \frac{\partial^3 f_3}{\partial u \partial v^2}, \frac{\partial^3 f_3}{\partial u^2} \dotsc
-    \end{align*}
-    We require that all these (infinitely many) functions exist and are continuous.
-    </p>
+    <p>Let us consider two simple regular surfaces, the infinite cylinder and the sphere, and determine their tangent planes and normal vectors.</p>
 
-    <p>Lastly, we mentioned two <b>direction derivative</b> functions $\ve{f}^P_u$ and $\ve{f}^P_v$.
-    \begin{align*}
-      \ve{f}^P_u
-      &= \begin{bmatrix}
-      \frac{\partial \ve{f}_1^P}{\partial u} \\
-      \frac{\partial \ve{f}_2^P}{\partial u} \\
-      \frac{\partial \ve{f}_3^P}{\partial u}
-      \end{bmatrix}, &
-      \ve{f}^P_v
-      &= \begin{bmatrix}
-      \frac{\partial \ve{f}_1^P}{\partial v} \\
-      \frac{\partial \ve{f}_2^P}{\partial v} \\
-      \frac{\partial \ve{f}_3^P}{\partial v}
-      \end{bmatrix}.
-    \end{align*}
-    When we feed a 2D point $A \in R^P$ to these funcions, we get two 3D vectors $\ve{f}^P_u(A)$ and $\ve{f}^P_v(A)$. The third requirement on $\ve{f}^P$ dictates two codntions. The first is that $\ve{f}^P_u(A) \neq \ve{0}$ and $\ve{f}^P_v(B) \neq \ve{0}$. Second, $\ve{f}^P_u(A) \neq c \ve{f}^P_v(A)$ for any real number $c$. 
-    </p>
-
-    <h3>6.1.4 &nbsp; Tangent vectors and tangent planes</h3>
-
-    <h3>6.1.5 &nbsp; Normal vectors of a regular surface</h3>
-
-    <h3>6.1.6 &nbsp; Orientability</h3>
+    <h3>6.1.7 &nbsp; Orientation of regular surfaces</h3>
    
     <h2>6.2 &nbsp; Face normal vectors</h2>
 
@@ -322,7 +276,7 @@
     <div class="footnotes">
       <ol> 
         <li class="footnote" id="fn:regular-surface-definition">
-          <p>A rigorous definition of the regular surface requires the notion of open sets, neighborhood, and several other mathematical concepts which we shall not discuss in this book. A mathematically inclined reader cana consult standard textbooks on differential geometry like do Carmo's "Differential Geometry of Curves and Surfaces."</p>
+          <p>A mathematically inclined reader can consult standard textbooks on differential geometry such Manfredo P. do Carmo's <a href="https://www.amazon.co.jp/Differential-Geometry-Curves-Surfaces-Mathematics/dp/0486806995">Differential Geometry of Curves and Surfaces</a> for a rigorous definition of regular surfaces.</p>
         </li>               
       </ol>
     </div>
