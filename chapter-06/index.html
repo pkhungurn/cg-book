@@ -152,20 +152,81 @@
 
     <h3>6.1.6 &nbsp; Examples</h3>
 
-    <p>Let us consider two simple regular surfaces, the infinite cylinder and the sphere, and determine their tangent planes and normal vectors.</p>
+    <p>Let us consider three simple regular surfaces and learn what their normal vectors and tangent planes are.</p>
+
+    <h4>6.1.6.1 &nbsp; Plane</h4>
+
+    <p>It is important to recognize that a plane is a regular surface. The plane is locally flat because it is globally flat. The tangent plane of the plane is the plane itself. The two unit normal vectors at all points are the same ones.</p>
+
+    <h4>6.1.6.2 &nbsp; Infinite Cylinder</h4>
+
+    <p>Let us consider an infinitely long cylinder or radius $r$ whose axis is the $z$-axis. The set of points that constitute the cylinder is given by
+    $$ \{ (x,y,z) : x^2 + y^2 = r^2 \}.$$ 
+    Now, let $P = (p_x, p_y, p_z)$ be a point on the cylinder. It turns out that the vector $\ve{n} = (p_x,p_y,0)$ is a normal vector to the cylinder at $P$. So, the tangent plane at $P$ is given by:
+    \begin{align*}
+      &\{ (x,y,z) : ((x,y,z) - P) \cdot \ve{n} = 0 \} \\
+      &= \{ (x,y,z) : (x-p_x, y-p_y, z-p_x) \cdot (p_x, p_y, 0) = 0 \} \\
+      &= \{ (x,y,z) : (x - p_x)p_x + (y - p_y)p_y  = 0 \} \\
+      &= \{ (x,y,z) : p_x x + p_y y - p_x^2 - p_y^2 = 0 \} \\ 
+      &= \{ (x,y,z) : p_x x + p_y y - r^2 = 0 \}.
+    \end{align*}
+    The last line follows from the fact that $(p_x,p_y,p_z)$ is a point on the cylinder, so it must be the case that $p_x^2 + p_y^2 = r^2$.
+    </p>
+
+    <p>We can see a reason why the normal is $(p_x,p_y,0)$ by considering the cylinder's cross section. If we look at the intersection of the cylinder with the plane $z = p_z$, then we would see the cylinder's cross section as a circle of radius 1 whose center is the point $O = (0,0,p_z)$. The vector $(p_x, p_y, 0) = P - O$ is parallel to the line segment $\overline{OP}.$ Moreover, we know from Euclidean geometry that $\overline{OP}$ is perpendicular to the tangent line to the circle at $P$. So, $(p_x, p_y, 0)$ is perpendicular to the tangent line, which is a part of the tangent plane.</p>
+
+    <p>Remember that $(p_x, p_y, 0)$ is but one of the infinitely many normal vectors at $P$. If $r \neq 0$, it is not a unit vector. If we restrict ourselves to talk only about unit normal vectors, then they are
+    \begin{align*}
+    \frac{\ve{n}}{\| \ve{n} \|} 
+    &= \frac{(p_x, p_y, 0)}{\sqrt{ p_x^2 + p_y^2 }}
+    = \bigg( \frac{p_x}{r}, \frac{p_y}{r}, 0 \bigg), \\
+    -\frac{\ve{n}}{\| \ve{n} \|} 
+    &= \bigg( \frac{-p_x}{r}, \frac{-p_y}{r}, 0 \bigg).
+    \end{align*}
+    </p>
+
+    <h4>6.1.6.3 &nbsp; Sphere</h4>
+
+    <p>Consider the sphere whose radius is $r$ and whose center is the origin is the point $O = (o_x, o_y, o_z)$. The sphere is the set
+    \begin{align*}
+    \{ (x,y,y) : (x - o_x)^2 + (y - o_y)^2 + (z - o_z)^2 = r^2 \}.
+    \end{align*}
+    Let $P = (p_x, p_y, p_z)$ be a point on the sphere. The vector $$\ve{n} = P - O = (p_x - o_x, p_y - o_y, p_z - o_z)$$
+    is a normal vector to the sphere at $P$. As a result, the tangent plane at $P$ is given by
+    \begin{align*}
+      &\{ (x,y,z) : ((x,y,z) - P) \cdot \ve{n} = 0 \} \\
+      &= \{ (x,y,z) : (x-p_x, y-p_y, z-p_z) \cdot (p_x, p_y, p_z) = 0 \} \\
+      &= \{ (x,y,z) : p_x x + p_y y + p_z z - p_x^2 - p_y^2 - p_z^2= 0 \} \\
+      &= \{ (x,y,z) : p_x x + p_y y + p_z z - r^2 = 0 \}.
+    \end{align*}
+    </p>
+
+    <p>A reason why $\ve{n} = P-O$ is a normal vector at $P$ is quite similar to that of the cylinder's normals. There are infinitely many planes that pass through $O$ and $P$. Picking one, the intersection of the plane and the sphere yields a great circle. Euclidean geometry again tells us that $\overline{OP}$ (and also $\ve{n}$) is perpendicular to the tangent line at $P$, which is a part of the tangent plane.</p>
 
     <h3>6.1.7 &nbsp; Orientation of regular surfaces</h3>
+
+    <p>In Section 6.1.2, we learned that the two unit normal vectors to a plane correspond to the plane's two sides. Moreover, we often pick one unit normal vectors to serve as "the" normal vector of the plane and thereby pick which side of the plane is the front side.</p>
+
+    <p>We can do the same to a regular surface. However, instead of picking only one unit normal vector, we need to pick a unit normal vector at each point on the surface because the tangent planes of different points can be different.</p>
+
+    <p>Because a regular surface contains infinitely many points, there are infinitely many decisions to make and therefore infinitely many ways to assign a unit normal vector to each point on the surface. Nevertheless, the assignments are not equally good. We generally prefer assignments such that the normal vectors vary continuously across the surface. Such assignments are much easier to understand, and they avoid the problem of normal vectors dramatically switch direction as one move continuously from one point to another on the surface.</p>
+
+    <p>A consistent way to assign a unit normal vector at each point on the surface such that the normals vary continously is called an <b>orientation</b> of that surface. If such as an assignment exist for a surface, we say that the surface is <b>orientable</b>. Regular surfaces that we have discussed so far&mdash;planes, infinite cylinders, spheres, and tori&mdash;are all orientable. A property of orientable surfaces is that they have two sides. The sides the normal vectors are on is the front, and the other side is the back.</p>
+
+    <p>An interesting fact is that not all surfaces are orientable. The Möbius strip is such a surface. If we pick a normal vector, say $\ve{n}$, for a point $P$, we find a loop on the surface that starts at $P$ and goes back $P$ that also forces us to pick $-\ve{n}$ as the normal vector at $P$ as well. In a sense, the Möbius strip is not orientable because it has only one side. In this book, we will not deal with unorientable surfaces.</p>
+
+    <p>Now, consider an orienable surface that is also closed, like a sphere. The surface splits space into two regions: the inside and the outside. The surface also has two sides: the front and the back. In computer graphics, it is common to require that <b>the front side lies on the outside</b>, or, in other words, the <b>the normal vectors of a closed, orientable surface should point outward</b>. As a result, for the infinite cylinder in Section 6.1.6.2, we prefer $(p_x/r, p_x/r, 0)$ over $(-p_x/r, -p_x/r, 0)$ as the normal vector because $(p_x/r, p_x/r, 0)$ points outside. For the sphere in Section 6.1.6.3, we prepare $(p_x/r, p_y/r, p_z/r)$ over $(-p_x/r, -p_y/r, -p_z/r)$ for the same reason.</p>
+
+    <p>Before going to the next section, let us take stock. We care about surface normal vectors because they inform us about the surface's geometry: the normal vector at a point on the surface immediately tells us what the tangent plane at that point is, and the tangent plane can be used to approximate the surface near the point. The normal vector also allows us to distinguish between the front and back sides of the surface. The knowledge is used for hidden surface removal (Chapter XXX), and it also allows us to shade the front side and the back side differently (Chapter XXX). Moreover, when the surface is closed, it also tells us which part of space is the inside and which is the outside. This is important for lighting calculation that involves the use of Snell's law (Chapter XXX).</p>
    
     <h2>6.2 &nbsp; Face normal vectors</h2>
 
-    <p>In Section 5.1, we mentioned that the "normal vector" is a common vertex attribute. In order to explain it, however, we need to discuss a related concept of "face normal vectors" (or just "face normals") first.</p>
-
-    <p>While the graphics pipeline can only deal with triangle meshes, other 3DCG software (especiallying modeling software such as <a href="https://www.blender.org/">Blender</a>, <a href="https://www.autodesk.com/products/3ds-max/overview?term=1-YEAR&tab=subscription">3ds Max</a>, or <a href="https://www.autodesk.com/products/maya/overview?term=1-YEAR&tab=subscription">Maya</a>) allows meshes where the primitives are general polygons: quadriliterals, pentagons, heptagons, and so on. Each polygon in a mesh is called a <b>face</b>. We will follow this nomenclature and call a triangle in a mesh a face too.</p> 
+    <p>Face normal vectors are surface normal vectors when the surface is a mesh. While the graphics pipeline can only deal with triangle meshes, other 3DCG software (especiallying modeling software such as <a href="https://www.blender.org/">Blender</a>, <a href="https://www.autodesk.com/products/3ds-max/overview?term=1-YEAR&tab=subscription">3ds Max</a>, or <a href="https://www.autodesk.com/products/maya/overview?term=1-YEAR&tab=subscription">Maya</a>) allows meshes where the primitives are general polygons: quadriliterals, pentagons, heptagons, and so on. Each polygon in a mesh is called a <b>face</b>. We will follow this nomenclature and call a triangle in a mesh a face too. A <b>face normal vector</b> is just a normal vector to a face.</p> 
 
     
-    <h3>6.1.3 &nbsp; The normal vector of a triangle</h3>
+    <h3>6.2.1 &nbsp; The normal vector to a triangle</h3>
 
-    <p>When we specify a triangle, say $ABC$, we need to list its corner points in some order. $A$ thus denotes the first corner, $B$ the second, and $C$ the third.</p>
+    <p>When we specify a triangle, say $ABC$, we need to list its corner points in some order. Here, $A$ denotes the first corner, $B$ the second, and $C$ the third.</p>
 
     <p>
     <div class="bg-light" style="padding: 20px">
@@ -204,7 +265,7 @@
     \begin{align*}
     -\widehat{\ve{n}} = -\frac{(B - A) \times (C - A)}{ \| (B-A) \times (C-A) \|} = \frac{(C - A) \times (B - A)}{ \| (C-A) \times (B-A) \|}  
     \end{align*}
-    is another unit vector that is perpedicular to the triangle. Between $\widehat{n}$ and $-\widehat{n}$, which one we should pick as the normal vector of the triangle then?
+    is another unit vector that is perpedicular to the triangle. Between $\widehat{\ve{n}}$ and $-\widehat{\ve{n}}$, which one we should pick as the normal vector of the triangle then?
     </p>
 
     <p>In this book, we shall follow the convention is that the normal vector of triangle $ABC$, denoted by $\ve{n}$, is given by
@@ -264,11 +325,13 @@
 
     <p>Equivalently, we can trace the corners of the triangles in the specified order: from $A$ to $B$ to $C$ and then back to $A$ again. If the we see that the motion is a counterclockwise "swirling," then the triangle's normal vector would point towards us, and we are seeing the front side of the triangle. On the other hand, if the swirling is clockwise, the normal vector points away from us, and we are seeing the back side of the triangle.</p>
 
-    <h3>6.1.4 &nbsp; Consistency of face normals</h3>
+    <h3>6.2.2 &nbsp; Consistency of face normals</h3>
 
-    <h3>6.1.5 &nbsp; Normal vectors of closed triangle meshes</h3>
+    <p>In Section 6.2.1, we consider the normal vector of a single triangle, which is determined by the order in which its corners are specified. When a triangle is a part of a mesh, the order of corners is determined by the order of the vertex indices in the index buffer. So, <b>the order of vertex indices in the index buffer determines the direction of the normal vectors and the orientation of the faces</b>.</p>
 
-    <h3>6.1.6 &nbsp; Why do we care about face normals?</h3>
+    <p>There are as many normal vectors to a triangle mesh as there are faces. We want the face normals to be consistent to one another. The notion of consistency in question is inpired by the consitency of normal vectors in an orientation of a regular surface. It should be that, as we travel along the surface the normal vectors should not change abrubtly. To put it in another way, if we are a small creature standing on the front side of a mesh's face, we should not suddenly be on the back side if we walk to an adjacent face.</p>
+
+    <p>The above notion of consistency requires that the orders of vertex indices of the triangles be consistent with one another. More specifically, all triangles should swirl in the same way. If the vertices of a triangle swirl counterclockwisely, the vertices of all the other triangles should also do so.</p>    
 
     <h2>6.3 &nbsp; Vertex normals</h2>
 
