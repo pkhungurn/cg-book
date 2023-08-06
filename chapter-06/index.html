@@ -339,9 +339,7 @@
 
     <p>We can do the same to a regular surface. However, instead of picking only one unit normal vector, we need to pick a unit normal vector at each point on the surface because the tangent planes of different points can be different.</p>
 
-    <p>Because a regular surface contains infinitely many points, there are infinitely many decisions to make and therefore infinitely many ways to assign a unit normal vector to each point on the surface (Figure 6.9a).  Nevertheless, the assignments are not equally good. We generally prefer assignments such that the normal vectors vary continuously across the surface. Such assignments are much easier to understand, and they avoid the problem of normal vectors dramatically switch direction as one move continuously from one point to another on the surface (Figure 6.9b).</p>
-
-    <p>A consistent way to assign a unit normal vector at each point on the surface such that the normals vary continously is called an <b>orientation</b> of that surface (Figure 6.9c and 6.9d). If such as an assignment exist for a surface, we say that the surface is <b>orientable</b>. Regular surfaces that we have discussed so far&mdash;planes, infinite cylinders, spheres, and tori&mdash;are all orientable. A property of orientable surfaces is that they have two sides. The sides the normal vectors are on is the front, and the other side is the back.</p>
+    <p>Because a regular surface contains infinitely many points, there are infinitely many decisions to make and therefore infinitely many ways to assign a unit normal vector to each point on the surface (Figure 6.9a).  Nevertheless, the assignments are not equally good. We generally prefer assignments such that the normal vectors vary continuously across the surface. Such assignments are much easier to understand, and they avoid the problem of normal vectors dramatically switch direction as one move continuously from one point to another on the surface (Figure 6.9b). A consistent way to assign a unit normal vector at each point on the surface such that the normals vary continously is called an <b>orientation</b> of that surface (Figure 6.9c and 6.9d). If such as an assignment exist for a surface, we say that the surface is <b>orientable</b>.</p>
 
     <figure class="figure">
       <table>
@@ -382,10 +380,22 @@
           <td align="center">(d)</td>
         </tr>
       </table>
-      <figcaption class="figure-caption"><strong>Figure 6.9</strong> (a) Unlike a flat surface, the directions of normal vectors of a curve surface change as we move from one point to another. At each point, there are two candidante unit normal vectors that we can pick as "the" normal vector at each point. (b) Here we show a random way to pick the normal vector at each point. It is not so good because the normals can suddenly flip directions. A way to pick unit normal vectors so that they vary continuously across the surface is called an <i>orientation</i>. An orientation where the normals point outward from the surface is shown in (c), and another where the normals point inward is shown in (d).</figcaption>
+      <figcaption class="figure-caption"><strong>Figure 6.9</strong> (a) Unlike a flat surface, the directions of normal vectors of a curve surface change as we move from one point to another. At each point, there are two candidate unit normal vectors that we can pick as "the" normal vector at each point. (b) Here we show a random way to pick the normal vector at each point. It is not so good because the normals can suddenly flip directions. A way to pick unit normal vectors so that they vary continuously across the surface is called an <i>orientation</i>. An orientation where the normals point outward from the surface is shown in (c), and another where the normals point inward is shown in (d).</figcaption>
+    </figure> 
+
+    <p>Regular surfaces that we have discussed so far&mdash;planes, infinite cylinders, spheres, and tori&mdash;are all orientable. A property of orientable surfaces is that they have two sides (Figure 6.10). The sides the normal vectors are on is the front, and the other side is the back.</p>
+
+    <figure class="figure">
+      <a href="images/regular-surfaces-have-two-sides.png"><img src="images/regular-surfaces-have-two-sides.png" width="600"></a>
+      <figcaption class="figure-caption"><strong>Figure 6.10</strong> Regular surfaces in Figure 6.4 are all orientable. Each surface has two sides, and we show them by cutting open the surface and coloring the sides differently.</figcaption>
     </figure> 
 
     <p>An interesting fact is that not all surfaces are orientable. The Möbius strip is such a surface. If we pick a normal vector, say $\ve{n}$, for a point $P$, we find a loop on the surface that starts at $P$ and goes back $P$ that also forces us to pick $-\ve{n}$ as the normal vector at $P$ as well. In a sense, the Möbius strip is not orientable because it has only one side. In this book, we will not deal with unorientable surfaces.</p>
+
+    <figure class="figure">
+      <a href="images/moebius-strip.jpg"><img src="images/moebius-strip.jpg" width="600"></a>
+      <figcaption class="figure-caption"><strong>Figure 6.11</strong> A Möbius strip can be created by taking a flat strip of paper, twist an end by a half full turn, and then glue the ends together. In this way, the front side and the back side of the strip becomes the "same" side, making it impossible to orient the surface.</figcaption>
+    </figure> 
 
     <p>Now, consider an orienable surface that is also closed, like a sphere. The surface splits space into two regions: the inside and the outside. The surface also has two sides: the front and the back. In computer graphics, it is common to require that <b>the front side lies on the outside</b>, or, in other words, the <b>the normal vectors of a closed, orientable surface should point outward</b>. In other words, we prefer the orientation in Figure 6.9c over the one in Figure 6.9d. As a result, for the infinite cylinder in Section 6.1.6.2, we prefer $(p_x/r, p_x/r, 0)$ over $(-p_x/r, -p_x/r, 0)$ as the normal vector because $(p_x/r, p_x/r, 0)$ points outside. For the sphere in Section 6.1.6.3, we prepare $(p_x/r, p_y/r, p_z/r)$ over $(-p_x/r, -p_y/r, -p_z/r)$ for the same reason.</p>
 
@@ -395,7 +405,6 @@
 
     <p>Face normal vectors are surface normal vectors when the surface is a mesh. While the graphics pipeline can only deal with triangle meshes, other 3DCG software (especiallying modeling software such as <a href="https://www.blender.org/">Blender</a>, <a href="https://www.autodesk.com/products/3ds-max/overview?term=1-YEAR&tab=subscription">3ds Max</a>, or <a href="https://www.autodesk.com/products/maya/overview?term=1-YEAR&tab=subscription">Maya</a>) allows meshes where the primitives are general polygons: quadriliterals, pentagons, heptagons, and so on. Each polygon in a mesh is called a <b>face</b>. We will follow this nomenclature and call a triangle in a mesh a face too. A <b>face normal vector</b> is just a normal vector to a face.</p> 
 
-    
     <h3>6.2.1 &nbsp; The normal vector to a triangle</h3>
 
     <p>When we specify a triangle, say $ABC$, we need to list its corner points in some order. Here, $A$ denotes the first corner, $B$ the second, and $C$ the third.</p>
