@@ -557,13 +557,13 @@
     </figure> 
 
 
-    <h3>6.2.2 &nbsp; Consistency of face normals</h3>
+    <h3>6.2.2 &nbsp; Consistency of face normals in a mesh</h3>
 
-    <p>In Section 6.2.1, we consider the normal vector of a single triangle, which is determined by the order in which its corners are specified. When a triangle is a part of a mesh, the order of corners is determined by the order of the vertex indices in the index buffer. So, <b>the order of vertex indices in the index buffer determines the direction of the normal vectors and the orientation of the faces</b>.</p>
+    <p>When a triangle is a part of a mesh, the order of corners is determined by the order of the vertex indices in the index buffer. So, <b>the order of vertex indices in the index buffer determines the direction of the normal vectors and the orientation of the faces</b>.</p>
 
     <p>There are as many normal vectors to a triangle mesh as there are faces. We want the face normals to be consistent to one another. The notion of consistency in question is inpired by the consitency of normal vectors in an orientation of a regular surface. It should be that, as we travel along the surface the normal vectors should not change abrubtly. To put it in another way, if we are a small creature standing on the front side of a mesh's face, we should not suddenly be on the back side if we walk to an adjacent face.</p>
 
-    <p>The above notion of consistency requires that the orders of vertex indices of the triangles be consistent with one another. More specifically, all triangles should swirl in the same way. If the vertices of a triangle swirl counterclockwisely, the vertices of all the other triangles should also do so.</p>    
+    <p>The above notion of consistency requires that the orders of vertex indices of the triangles be consistent with one another. More specifically, the vertices should be listed so that nearby triangles swirl in the same way. It should not be the case that, when we go from a triangle to another that is adjacent to it, one triangle swirl counterclockwisely, and the other swirl clockwisely.</p>
 
     <h2>6.3 &nbsp; Vertex normals</h2>
 
