@@ -506,6 +506,57 @@
 
     <p>Equivalently, we can trace the corners of the triangles in the specified order: from $A$ to $B$ to $C$ and then back to $A$ again. If the we see that the motion is a counterclockwise "swirling," then the triangle's normal vector would point towards us, and we are seeing the front side of the triangle. On the other hand, if the swirling is clockwise, the normal vector points away from us, and we are seeing the back side of the triangle.</p>
 
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/triangle-normal-ccw-00.png"><img src="images/triangle-normal-ccw-00.png" width="200"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/triangle-normal-ccw-01.png"><img src="images/triangle-normal-ccw-01.png" width="200"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">      
+            <a href="images/triangle-normal-ccw-02.png"><img src="images/triangle-normal-ccw-02.png" width="200"></a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+          <td align="center">(c)</td>
+        </tr>
+        <tr>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/triangle-normal-cw-00.png"><img src="images/triangle-normal-cw-00.png" width="200"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/triangle-normal-cw-01.png"><img src="images/triangle-normal-cw-01.png" width="200"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">      
+            <a href="images/triangle-normal-cw-02.png"><img src="images/triangle-normal-cw-02.png" width="200"></a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td align="center">(d)</td>
+          <td align="center">(e)</td>
+          <td align="center">(f)</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 6.12</strong> When specifying a triangle, the order of the vertices determines the direction of the normal vector. In (a), the triangle $ABC$ lies in the $xy$-plane. We see that the vertices swirl in the counterclockwise direction as shown in (b). As a result, the normal vector points towards us, the viewer, along the $z$-axis as shown in (c). In (d), we have the same triangle, but the vertex $B$ swaps place with vertex $C$. Now, the vertices sway in the clockwise direction as shown in (e). Now, the normal vector points away from us in the $-z$ direction as shown in (f).</figcaption>
+    </figure> 
+
+
     <h3>6.2.2 &nbsp; Consistency of face normals</h3>
 
     <p>In Section 6.2.1, we consider the normal vector of a single triangle, which is determined by the order in which its corners are specified. When a triangle is a part of a mesh, the order of corners is determined by the order of the vertex indices in the index buffer. So, <b>the order of vertex indices in the index buffer determines the direction of the normal vectors and the orientation of the faces</b>.</p>
