@@ -400,6 +400,8 @@
     <p>Now, consider an orienable surface that is also closed, like a sphere. The surface splits space into two regions: the inside and the outside. The surface also has two sides: the front and the back. In computer graphics, it is common to require that <b>the front side lies on the outside</b>, or, in other words, the <b>the normal vectors of a closed, orientable surface should point outward</b>. In other words, we prefer the orientation in Figure 6.9c over the one in Figure 6.9d. As a result, for the infinite cylinder in Section 6.1.6.2, we prefer $(p_x/r, p_x/r, 0)$ over $(-p_x/r, -p_x/r, 0)$ as the normal vector because $(p_x/r, p_x/r, 0)$ points outside. For the sphere in Section 6.1.6.3, we prepare $(p_x/r, p_y/r, p_z/r)$ over $(-p_x/r, -p_y/r, -p_z/r)$ for the same reason.</p>
 
     <p>Before going to the next section, let us take stock. We care about surface normal vectors because they inform us about the surface's geometry: the normal vector at a point on the surface immediately tells us what the tangent plane at that point is, and the tangent plane can be used to approximate the surface near the point. The normal vector also allows us to distinguish between the front and back sides of the surface. The knowledge is used for hidden surface removal (Chapter XXX), and it also allows us to shade the front side and the back side differently (Chapter XXX). Moreover, when the surface is closed, it also tells us which part of space is the inside and which is the outside. This is important for lighting calculation that involves the use of Snell's law (Chapter XXX).</p>
+
+    <p>It is also important to note that surface normal, as we have discussed so far, is a mathematical concept. On the other hand, the two other types of normals that we will discuss momentarily can be thought of as being both a mathematical concepts and concrete pieces of data stored in computers.</p>
    
     <h2>6.2 &nbsp; Face normal vectors</h2>
 
@@ -564,6 +566,69 @@
     <p>There are as many normal vectors to a triangle mesh as there are faces. We want the face normals to be consistent to one another. The notion of consistency in question is inpired by the consitency of normal vectors in an orientation of a regular surface. It should be that, as we travel along the surface the normal vectors should not change abrubtly. To put it in another way, if we are a small creature standing on the front side of a mesh's face, we should not suddenly be on the back side if we walk to an adjacent face.</p>
 
     <p>The above notion of consistency requires that the orders of vertex indices of the triangles be consistent with one another. More specifically, the vertices should be listed so that nearby triangles swirl in the same way. It should not be the case that, when we go from a triangle to another that is adjacent to it, one triangle swirl counterclockwisely, and the other swirl clockwisely.</p>
+
+    <p>For example, in Figure 6.13 below, we have two triangles that togehter form quadriliteral. The two triangles are formed by 4 vertices: $(-1,-1,0)$, $(1, -1, 0)$, $(0, 1, 0)$, and $(2, 1, 0)$. These vertices are numbered with integers from 0 to 3, respectively. The first triangle is formed from Vertices 0, 1, and 2, and the second triangle is formed Vertices 1, 2, and 3. Consider the following two ways of listing the vertex numbers in the index buffer.</p>
+
+    <ul>
+      <li>Index Buffer #1: <code>[0, 1, 2, 1, 2, 3]</code></li>
+      <li>Index Buffer #2: <code>[0, 1, 2, 1, 3, 2]</code></li>
+    </ul>
+
+    <p>The index buffers differ only at only the last two numbers. The two triangles have the same shape. However, Index Buffer #1 is to be prefered over Index Buffer #2. The reason is that the triangles in Index Buffer #1 swirl the same way, and so the normals are pointing in the same direction. On the other hand, in Index Buffer #2, one triangle swirls counterclockwisely, and the other swirls clockwisely. As a result, the normals point in different directions.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/triangle-mesh-normals-00.png"><img src="images/triangle-mesh-normals-00.png" width="300"></a>
+            </div>
+          </td>
+          <td>
+            &nbsp;
+          </td>          
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">&nbsp;</td>          
+        </tr>
+        <tr>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/triangle-mesh-normals-01.png"><img src="images/triangle-mesh-normals-01.png" width="300"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">
+              <a href="images/triangle-mesh-normals-02.png"><img src="images/triangle-mesh-normals-02.png" width="300"></a>
+              </div>
+          </td>          
+        </tr>
+        <tr>
+          <td align="center">(b)</td>
+          <td align="center">(c)</td>          
+        </tr>
+        <tr>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/triangle-mesh-normals-03.png"><img src="images/triangle-mesh-normals-03.png" width="300"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">
+              <a href="images/triangle-mesh-normals-04.png"><img src="images/triangle-mesh-normals-04.png" width="300"></a>
+            </div>
+          </td>          
+        </tr>
+        <tr>
+          <td align="center">(d)</td>
+          <td align="center">(e)</td>          
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 6.13</strong> (a) A mesh with two triangles, numbered 0 to 4. (b) In Index Buffer #1, the vertices are listed so that both triangles swirl counterclockwisely. (c) Because both triangles swirl the same way, the normals have the same directions, which is desirable. (d) In Index Buffer #2, one triangle swirl counterclockwisely while the other swirls clockwisely. (e) Because of the different swirling, the normals are of opposite directions. This is not desirable because normals should not change abruptly when we more from one triangle to another, especially when they lie on the same plane.</figcaption>
+    </figure> 
+
+
 
     <h2>6.3 &nbsp; Vertex normals</h2>
 

@@ -1,0 +1,207 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Rotating Boxes</title>
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="c" data-engine="three.js r143" width="2100" height="2700" style="width: 2100px; height: 2700px;"></canvas>
+
+  <script async="" src="Rotating%20Boxes_files/es-module-shims.js"></script>
+
+  <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.143.0/build/three.module.js"
+        }
+      }
+    </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    function addPoint(positions, point) {
+      positions.push(point.x);
+      positions.push(point.y);
+      positions.push(point.z);
+    }
+
+    function addLine(positions, indices, p0, p1) {
+      addPoint(positions, p0);
+      addPoint(positions, p1);
+      indices.push(positions.length / 3 - 2);
+      indices.push(positions.length / 3 - 1)
+    }
+
+    function createBoxWireframeGeometry(width, height, depth, options) {
+      let positions = [];
+      let indices = [];
+      let numVertices = 0;
+
+      let corners = [];
+      for (let a2=0;a2<2;a2++) {
+        let z = (a2 == 0) ? (-depth*0.5) : depth*0.5;
+        for (let a1=0;a1<2;a1++) {
+          let y = (a1 == 0) ? (-height*0.5) : height*0.5;
+          for (let a0=0;a0<2;a0++) {
+            let x = (a0 == 0) ? (-width*0.5) : width*0.5;
+            corners.push(new THREE.Vector3(x, y, z));
+          }
+        }
+      }
+
+      let powersOfTwo = [1, 2, 4];
+      for (let i=0;i<8;i++) {
+        for (let k=0;k<3;k++) {
+          let powerOfTwo = powersOfTwo[k];
+          let j = i ^ powerOfTwo;
+          if (j > i) {
+            addLine(positions, indices, corners[i], corners[j]);
+          }
+        }        
+      }
+
+      let geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+      geometry.setIndex(indices);
+      return geometry;
+    }
+
+    function main() {
+      const canvas = document.querySelector("#c");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(2100, 2700);
+
+      const camera = new THREE.PerspectiveCamera(
+        60,
+        1.0,
+        0.01,
+        100,
+      );
+      camera.lookAt(0, 0, 0);      
+
+      const scene = new THREE.Scene();      
+
+      let boxHeight = 1.0;
+      let boxGeometry = new THREE.BoxGeometry(1,boxHeight,1);
+      let boxMaterial = new THREE.MeshBasicMaterial({
+        color: 0x4488ff,
+        transparent: true,
+        opacity: 0.25
+      });
+      let box = new THREE.Mesh(boxGeometry, boxMaterial);
+
+      let boxWireframe = new THREE.LineSegments(
+        createBoxWireframeGeometry(1,boxHeight,1),
+        new THREE.LineBasicMaterial({color: 0x000000}));
+      scene.add(boxWireframe);
+
+      scene.add(box);
+
+      let aabbCornerSpheres = [];
+      let sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
+      for (let i=0;i<4;i++) {
+        let sphereGeometry = new THREE.SphereGeometry(0.001, 32, 32);
+        let sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        scene.add(sphere);
+        aabbCornerSpheres.push(sphere);
+      }      
+
+      {
+        const light = new THREE.AmbientLight(0xffffff, 1.0);
+        scene.add(light);
+      }
+
+      scene.background = new THREE.Color(1.0, 1.0, 1.0);
+
+      function render(time) {
+        time *= 0.001;
+        let windowWidth = 300;
+        let windowHeight = 300;
+        for (let j=-4;j<=4;j++) {
+          let startY = windowHeight * (j+4);
+          for (let i=-3;i<=3;i++) {
+            let startX = windowWidth*(i+3);
+            renderer.setViewport(startX,startY,windowWidth,windowHeight);
+            renderer.setScissor(startX,startY,windowWidth,windowHeight);
+            renderer.setScissorTest(true);
+
+            let boxYAngle = Math.PI/12*i;
+            box.rotation.y = boxYAngle;
+            boxWireframe.rotation.y = boxYAngle;
+
+            let cameraElevationAngle = Math.PI/8*j;
+            let cameraDistance = 2.5;
+            camera.position.y = Math.sin(cameraElevationAngle) * cameraDistance;
+            camera.position.z = Math.cos(cameraElevationAngle) * cameraDistance;
+            camera.lookAt(0,0,0);
+            camera.updateMatrix();
+            camera.updateProjectionMatrix();
+            
+            let rotMat = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(0,1,0), boxYAngle);
+            let aabbPlaneDistance = 0.1;
+            for(let aabbCornerIndex=0;aabbCornerIndex<4;aabbCornerIndex++) {
+              aabbCornerSpheres[aabbCornerIndex].position.set(0.0,0.0,0.0);
+            }
+            for(let cornerIndex=0;cornerIndex<8;cornerIndex++) {
+              let x = ((cornerIndex ^ 1) == 0) ? -0.5 : 0.5;
+              let y = ((cornerIndex ^ 2) == 0) ? -boxHeight*0.5 : boxHeight*0.5;
+              let z = ((cornerIndex ^ 4) == 0) ? -0.5 : 0.5;
+              let p = new THREE.Vector3(x,y,z);
+              p.applyMatrix4(rotMat);
+              //p.applyMatrix4(camera.matrixWorldInverse);
+              //p.x = p.x / p.z * aabbPlaneDistance;
+              //p.y = p.y / p.z * aabbPlaneDistance;
+              //p.z = -aabbPlaneDistance;
+
+
+              for(let aabbCornerIndex=0;aabbCornerIndex<4;aabbCornerIndex++) {
+               if ((aabbCornerIndex ^ 1) == 0) {
+                if (aabbCornerSpheres[aabbCornerIndex].position.x > p.x) {
+                  aabbCornerSpheres[aabbCornerIndex].position.x = p.x
+                }
+               } else {
+                if (aabbCornerSpheres[aabbCornerIndex].position.x < p.x) {
+                  aabbCornerSpheres[aabbCornerIndex].position.x = p.x
+                }
+               }
+
+               if ((aabbCornerIndex ^ 2) == 0) {
+                if (aabbCornerSpheres[aabbCornerIndex].position.y > p.y) {
+                  aabbCornerSpheres[aabbCornerIndex].position.y = p.y
+                }
+               } else {
+                if (aabbCornerSpheres[aabbCornerIndex].position.y < p.y) {
+                  aabbCornerSpheres[aabbCornerIndex].position.y = p.y
+                }                
+               }
+
+               aabbCornerSpheres[aabbCornerIndex].position.z = p.z
+              }
+            }
+            for(let aabbCornerIndex=0;aabbCornerIndex<4;aabbCornerIndex++) {
+              //aabbCornerSpheres[aabbCornerIndex].position.applyMatrix4(camera.matrixWorld); 
+              aabbCornerSpheres[aabbCornerIndex].updateMatrix();
+            }            
+
+            renderer.render(scene, camera);
+          }
+
+        }
+        
+        requestAnimationFrame(render);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    main();
+  </script>
+
+
+
+</body></html>
