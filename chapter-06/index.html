@@ -628,9 +628,69 @@
       <figcaption class="figure-caption"><strong>Figure 6.13</strong> (a) A mesh with two triangles, numbered 0 to 4. (b) In Index Buffer #1, the vertices are listed so that both triangles swirl counterclockwisely. (c) Because both triangles swirl the same way, the normals have the same directions, which is desirable. (d) In Index Buffer #2, one triangle swirl counterclockwisely while the other swirls clockwisely. (e) Because of the different swirling, the normals are of opposite directions. This is not desirable because normals should not change abruptly when we more from one triangle to another, especially when they lie on the same plane.</figcaption>
     </figure> 
 
+    <p>Another consistency issue to watch out for is when a mesh models a closed surface. In this case, we want the face normals to all point outward from the surface according to the convention in Section 6.1.7. To achieve this, we want to make sure that the vertex indices are ordered so that the vertices swirl counterclockwisely when you look at each triangle straight on from the outside of the mesh.</p>
 
+    <figure class="figure">      
+      <figcaption class="figure-caption"><strong>Figure 6.14</strong> <b>TODO:</b> A figure that contains an example of a closed mesh with consistent normals and another example of a closed mesh with inconsistent normals.</figcaption>
+    </figure> 
 
     <h2>6.3 &nbsp; Vertex normals</h2>
+
+    <p>Remember from the last chapter that the normal vector can be a vertex attribute. This attribute is what we mean by the <b>vertex normal</b>. This means that the vertex normals are data that the 3D modeler specifies as a part of the mesh they create.</p>
+
+    <p>Let us compare the vertex normal with the other two normals we previously introduce. The surface normal is a mathematical concept, and so it applies to abstract surfaces like the planes and the regular surfaces. The face normal is also another mathematical concept: it is the surface normal of a face in a mesh. <b>Surface normals and face normals are not data. We never specify them directly inside a vertex buffer.</b> In particular, face normals are defined <b>implicitly</b> by vertex positions and the order in which the vertices are listed in the index buffer.</p>
+
+    <h3>6.3.1 &nbsp; Interpolation of Vertex Normals</h3>
+
+    <p>Recall from the last chapter that, when WebGL draws a primitive, it must fill in points between the vertices of that primitive. The in-between points will inherit the vertex attributes. Points have positions because vertices have positions. We also saw in the last chapter (Figure 5.4 and Figure 5.5, in particular) that, when vertices have colors, points will also have colors. Similarly, when vertices have normals, points will also have normals. WebGL computes a point normal by interpolating vertex normals in the same way that it interpolates colors in the last chapter. (We will discuss how this interpolation is performed in the next chapter.) Figure 6.15 shows a triangle whose vertices have normals and the normals of some points on the triangle.</p>
+
+    <figure class="figure">      
+      <figcaption class="figure-caption"><strong>Figure 6.15</strong> <b>TODO:</b> A figure showing interpolate vertex normals.</figcaption>      
+    </figure>
+
+    <p>The above figure, however, does not offer us the complete picture of what the interpolated normals are like as it only contains a sparse sample of points whose normals we visualize as arrows. It is hard to visualize all normals because arrows have volume. If we show too many arrows at once, they would end intersecting and occluding each other, leading to a picture that is not at all understandable.</p>
+
+    <p>Fortunately, compute graphic practitioners have come up with a way to avoid this problem: representing normal vectors with colors. Because we require that normal vectors be unit vectors, it follows that each component of a normal vector must have value between $-1$ and $1$. Mathematically, if $\mathbf{n} = (n_x, n_y, n_z)$ is a normal vector, then it must be the case that $\| n \| = 1$ or
+    \begin{align*}
+    n_x^2 + n_y^2 + n_z^2 = 1,
+    \end{align*}
+    which implies
+    \begin{align*}
+    -1 &\leq n_x, \leq 1,\\
+    -1 &\leq n_y, \leq 1,\\
+    -1 &\leq n_z, \leq 1.
+    \end{align*}
+    This means that
+    \begin{align*}
+    \bigg( \frac{n_x + 1}{2}, \frac{n_y + 1}{2}, \frac{n_z + 1}{2} \bigg)
+    \end{align*}
+    is a valid RGB color. Figure 6.16 shows the interpolated normals in Figure 6.15 visualized with the color scheme above. Notice that the color changes smoothly across the triangle, showing that the point normals vary continuously.
+    </p>
+    
+    <figure class="figure">      
+      <figcaption class="figure-caption"><strong>Figure 6.16</strong> <b>TODO:</b> A figure showing interpolated normals visualized as colors.</figcaption>      
+    </figure>
+
+    <p>Note that we can also visualize the face normal of the triangle like in Figure 6.17. This time, all points have the same color because a triangle has only one face normal.</p>
+
+    <figure class="figure">      
+      <figcaption class="figure-caption"><strong>Figure 6.16</strong> <b>TODO:</b> A figure showing a triangle's face normal visualized as a color.</figcaption>      
+    </figure>
+
+    <h3>6.3.2 &nbsp; Vertex Normals as Samples of Surface Normals</h3>
+
+    <p>Vertex normals are data, which means that the modeler can specify them any way they want. Arbitrary assignments, however, are almost always not useful, so we want more principled ways to specify the data. In computer graphics, there are at least two.</p>
+
+    <ol>
+      <li>Treating vertex normals as samples of surface normals.</li>
+      <li>Computing vertex normals from face normals.</li>
+    </ol>
+
+    <p>This subsection discusses the former, and the subsection discusses the latter.</p>
+
+    <p>Treating vertex normals as samples of surface normals comes from a particular way we may think of a mesh: as an approximation of a (potentially curved) regular surface.</p>
+
+    <h3>6.3.3 &nbsp; Calculating Vertex Normals from Face Normals</h3>
 
     <hr>
     <div class="footnotes">
