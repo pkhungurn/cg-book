@@ -674,12 +674,14 @@
     <p>Note that we can also visualize the face normal of the triangle like in Figure 6.17. This time, all points have the same color because a triangle has only one face normal.</p>
 
     <figure class="figure">      
-      <figcaption class="figure-caption"><strong>Figure 6.16</strong> <b>TODO:</b> A figure showing a triangle's face normal visualized as a color.</figcaption>      
+      <figcaption class="figure-caption"><strong>Figure 6.17</strong> <b>TODO:</b> A figure showing a triangle's face normal visualized as a color.</figcaption>      
     </figure>
+
+    <p>Notice the difference between Figure 6.16 and Figure 6.17. Looking at Figure 6.17, we understand immediately that the surface is flat because all points have the same surface normals. On the other hand, while the surface in Figure 6.16 is geometrically flat (because it is a triangle), the normal vectors vary across the surface like the way normal vectors of curved surface do. Furthermore, when we use these normals to compute the colors on the surface like in Figure 5.6 of the last chapter, the colors can convincingly fool the viewer that the surface is curved. Hence, <b>vertex normals are a tool to make flat surfaces look curved.</b> It is a key to model real-world objects with organic shapes with flat and straight mathematical objects.</p>
 
     <h3>6.3.2 &nbsp; Vertex Normals as Samples of Surface Normals</h3>
 
-    <p>Vertex normals are data, which means that the modeler can specify them any way they want. Arbitrary assignments, however, are almost always not useful, so we want more principled ways to specify the data. In computer graphics, there are at least two.</p>
+    <p>Vertex normals are data, which means that the modeler can specify them any way they want. Arbitrary assignments, however, are almost always not useful, so we want more principled ways to specify the data. In computer graphics, there are at least two approaches.</p>
 
     <ol>
       <li>Treating vertex normals as samples of surface normals.</li>
@@ -688,9 +690,40 @@
 
     <p>This subsection discusses the former, and the subsection discusses the latter.</p>
 
-    <p>Treating vertex normals as samples of surface normals comes from a particular way we may think of a mesh: as an approximation of a (potentially curved) regular surface.</p>
+    <p>Treating vertex normals as samples of surface normals comes from a particular way we may think of a mesh: as an approximation of a curved regular surface. A curved regular surface has infinitely many points, all of which cannot be stored as computer data. We therefore sample a finite number of points from it, call these points "vertices," and connect the vertices to form primitives, thereby approximating the regular surface with many pieces of flat geometry. Because a vertice is originally a point on the regular surface, its position and its normal vector should agree with those of the corresponding regular surface point.</p>
+
+    <p>Let us look at a concrete example. Say, we want to create a mesh that approximates the sphere in Section 6.1.6.3. If we make a vertex out of a point $P$ on the surface of the sphere, then the vertex's normal vector should be $(P-O)/ \| P - O\|$ where $O$ is the origin of the sphere. We can see the consequence of specifying vertex normals in this way in Figure 6.18. NOtice that, even with a few number of faces, the surface alreay looks curved. As we increase the number of faces, the faces become smaller, and the interpolate normals become more and more closer to the normals vectors of the sphere.</p>
+
+    <figure class="figure">      
+      <figcaption class="figure-caption"><strong>Figure 6.18</strong> <b>TODO:</b> A figure showing the result of treating vertex normals as samples of space normals.</figcaption>      
+    </figure>
+
+    <p>The drawback of this approach is that it only works when we know the normal vector of any point we want to make a vertex. This is only possible when we have mathematical formulas for everything. When this is the case, then the approach should be prefered because the normals would always have correct values.</p>
 
     <h3>6.3.3 &nbsp; Calculating Vertex Normals from Face Normals</h3>
+
+    <p>Unlike the previous approach, this approach allows us to deal with arbitrary meshes that we have position data. What we do is very simple: make the normal at each vertex point in the same direction as the average of the face normals of all the faces that contain that vertex.</p>
+
+    <p>For example, let us say that we have a mesh with 3 triangles: $ABC$, $ACD$, and $ADB$ as shown in Figure 6.19. Let $\ve{n}_A$, $\ve{n}_B$, $\ve{n}_C$, and $\ve{n}_D$ denote the vertex normals, and let $\ve{n}_{ABC}$, $\ve{n}_{ACD}$, $\ve{n}_{ADB}$ denote the face normals. Then,
+    \begin{align*}
+      \ve{n}_A 
+      = \frac{\frac{1}{3}(\ve{n}_{ABC} + \ve{n}_{ACD} + \ve{n}_{ADB}) }{\| \frac{1}{3}(\ve{n}_{ABC} + \ve{n}_{ACD} + \ve{n}_{ADB}) \|}
+      = \frac{\ve{n}_{ABC} + \ve{n}_{ACD} + \ve{n}_{ADB} }{\| \ve{n}_{ABC} + \ve{n}_{ACD} + \ve{n}_{ADB} \|}.
+    \end{align*}
+    because $A$ is a part of all three triangles. Similarly, we have that
+    \begin{align*}
+      \ve{n}_B
+      &= \frac{\ve{n}_{ABC} + \ve{n}_{ADB} }{\| \ve{n}_{ABC} + \ve{n}_{ADB} \|}, \\
+      \ve{n}_C
+      &= \frac{\ve{n}_{ABC} + \ve{n}_{ACD} }{\| \ve{n}_{ABC} + \ve{n}_{ACD} \|}, \\
+      \ve{n}_D
+      &= \frac{\ve{n}_{ACD} + \ve{n}_{ADB} }{\| \ve{n}_{ACD} + \ve{n}_{ADB} \|}.\\
+    \end{align*}
+    </p>
+
+    <figure class="figure">      
+      <figcaption class="figure-caption"><strong>Figure 6.19</strong> <b>TODO:</b> A figure showing mesh with 3 triangles.</figcaption>      
+    </figure>
 
     <hr>
     <div class="footnotes">
