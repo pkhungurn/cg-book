@@ -644,8 +644,26 @@
 
     <p>Recall from the last chapter that, when WebGL draws a primitive, it must fill in points between the vertices of that primitive. The in-between points will inherit the vertex attributes. Points have positions because vertices have positions. We also saw in the last chapter (Figure 5.4 and Figure 5.5, in particular) that, when vertices have colors, points will also have colors. Similarly, when vertices have normals, points will also have normals. WebGL computes a point normal by interpolating vertex normals in the same way that it interpolates colors in the last chapter. (We will discuss how this interpolation is performed in the next chapter.) Figure 6.15 shows a triangle whose vertices have normals and the normals of some points on the triangle.</p>
 
-    <figure class="figure">      
-      <figcaption class="figure-caption"><strong>Figure 6.15</strong> <b>TODO:</b> A figure showing interpolate vertex normals.</figcaption>      
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/normal-interpolate-00.png"><img src="images/normal-interpolation-00.png" width="300"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/normal-interpolate-01.png"><img src="images/normal-interpolation-01.png" width="300"></a>
+            </div>
+          </td>          
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>          
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 6.15</strong> (a) A triangle whose vertices have vertex normals. (b) Visualization of normals of some points the graphics pipeline fill in when drawing the triangle.</figcaption>      
     </figure>
 
     <p>The above figure, however, does not offer us the complete picture of what the interpolated normals are like as it only contains a sparse sample of points whose normals we visualize as arrows. It is hard to visualize all normals because arrows have volume. If we show too many arrows at once, they would end intersecting and occluding each other, leading to a picture that is not at all understandable.</p>
