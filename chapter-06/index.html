@@ -10,11 +10,12 @@
   <script type="text/javascript">
     MathJax = {
       tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']]
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        tags: "ams",
       },
       svg: {
         fontCache: 'global'
-      }
+      },
     };
   </script>
   <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
@@ -666,7 +667,7 @@
       <figcaption class="figure-caption"><strong>Figure 6.15</strong> (a) A triangle whose vertices have vertex normals. (b) Visualization of normals of some points the graphics pipeline fill in when drawing the triangle.</figcaption>      
     </figure>
 
-    <p>The above figure, however, does not offer us the complete picture of what the interpolated normals are like as it only contains a sparse sample of points whose normals we visualize as arrows. It is hard to visualize all normals because arrows have volume. If we show too many arrows at once, they would end intersecting and occluding each other, leading to a picture that is not at all understandable.</p>
+    <p>The above figure, however, does not offer us the complete picture of what the interpolated normals are like as it only contains a sparse sample of points whose normals we visualize as arrows. It is hard to visualize all normals because arrows have volume. If we show too many arrows at once, they would end up intersecting and occluding each other, leading to a picture that is not at all understandable.</p>
 
     <p>Fortunately, compute graphic practitioners have come up with a way to avoid this problem: representing normal vectors with colors. Because we require that normal vectors be unit vectors, it follows that each component of a normal vector must have value between $-1$ and $1$. Mathematically, if $\mathbf{n} = (n_x, n_y, n_z)$ is a normal vector, then it must be the case that $\| n \| = 1$ or
     \begin{align*}
@@ -679,20 +680,22 @@
     -1 &\leq n_z, \leq 1.
     \end{align*}
     This means that
-    \begin{align*}
-    \bigg( \frac{n_x + 1}{2}, \frac{n_y + 1}{2}, \frac{n_z + 1}{2} \bigg)
-    \end{align*}
+    \begin{equation} \label{eq:normal-as-color}
+    \bigg( \frac{n_x + 1}{2}, \frac{n_y + 1}{2}, \frac{n_z + 1}{2} \bigg)  
+    \end{equation}
     is a valid RGB color. Figure 6.16 shows the interpolated normals in Figure 6.15 visualized with the color scheme above. Notice that the color changes smoothly across the triangle, showing that the point normals vary continuously.
     </p>
     
-    <figure class="figure">      
-      <figcaption class="figure-caption"><strong>Figure 6.16</strong> <b>TODO:</b> A figure showing interpolated normals visualized as colors.</figcaption>      
+    <figure class="figure">
+      <img src="images/normal-color-visualization-00.png" alt="" width="300">
+      <figcaption class="figure-caption"><strong>Figure 6.16</strong> Visualization of interpolated normals with colors defined according to Equation \eqref{eq:normal-as-color}. The colors of the vertex normals are shown next to the normal vectors.</figcaption>      
     </figure>
 
     <p>Note that we can also visualize the face normal of the triangle like in Figure 6.17. This time, all points have the same color because a triangle has only one face normal.</p>
 
     <figure class="figure">      
-      <figcaption class="figure-caption"><strong>Figure 6.17</strong> <b>TODO:</b> A figure showing a triangle's face normal visualized as a color.</figcaption>      
+      <img src="images/normal-color-visualization-01.png" alt="" width="300">
+      <figcaption class="figure-caption"><strong>Figure 6.17</strong> Visualization of the face normal of the triangle in Figure 6.15 with colors defined according to Equation \eqref{eq:normal-as-color}.</figcaption>      
     </figure>
 
     <p>Notice the difference between Figure 6.16 and Figure 6.17. Looking at Figure 6.17, we understand immediately that the surface is flat because all points have the same surface normals. On the other hand, while the surface in Figure 6.16 is geometrically flat (because it is a triangle), the normal vectors vary across the surface like the way normal vectors of curved surface do. Furthermore, when we use these normals to compute the colors on the surface like in Figure 5.6 of the last chapter, the colors can convincingly fool the viewer that the surface is curved. Hence, <b>vertex normals are a tool to make flat surfaces look curved.</b> It is a key to model real-world objects with organic shapes with flat and straight mathematical objects.</p>
