@@ -720,7 +720,7 @@
 
     <h3>6.3.3 &nbsp; Calculating Vertex Normals from Face Normals</h3>
 
-    <p>Unlike the previous approach, this approach allows us to deal with arbitrary meshes that we have position data. What we do is very simple: make the normal at each vertex point in the same direction as the average of the face normals of all the faces that contain that vertex.</p>
+    <p>Unlike the previous approach, this approach allows us to deal with arbitrary meshes that we have position data. What we do is very simple: make the normal at each vertex point in the same direction as the average of the face normals of all the faces that contain that vertex. The idea is that a vertex can be a part of multiple triangles. As a result, the vertex's normal vector can be any of the triangles' face normals. To reconcile between different options, we take the average of the normal vectors.</p>
 
     <p>For example, let us say that we have a mesh with 3 triangles: $ABC$, $ACD$, and $ADB$ as shown in Figure 6.19. Let $\ve{n}_A$, $\ve{n}_B$, $\ve{n}_C$, and $\ve{n}_D$ denote the vertex normals, and let $\ve{n}_{ABC}$, $\ve{n}_{ACD}$, $\ve{n}_{ADB}$ denote the face normals. Then,
     \begin{align*}
@@ -743,12 +743,120 @@
       <figcaption class="figure-caption"><strong>Figure 6.19</strong> <b>TODO:</b> A figure showing mesh with 3 triangles.</figcaption>      
     </figure>
 
+    <p>When we apply the approach to a mesh that approximates a regular surface that is finely triangulated enough, the vertex normals would yield interpolated normals that approximate the real surface normals well.</p>
+
+    <figure class="figure">      
+      <figcaption class="figure-caption"><strong>Figure 6.20</strong> <b>TODO:</b> A figure showing the result of computing vertex normals from face normals in meshes that finely approximate a sphere.</figcaption>      
+    </figure>
+
+    <p>However, the result can be counter intuitive for coarse meshes. For example, the approach would try to make the box in Figure 6.21 look round while the silhouette is telling the viewer otherwise.</p>
+
+    <figure class="figure">      
+      <figcaption class="figure-caption"><strong>Figure 6.21</strong> <b>TODO:</b> A figure showing the normals of a cube whose vertex normals are computed from face normals.</figcaption>      
+    </figure>
+
+    <h3>6.3.4 &nbsp; Dealing with Flat Faces and Sharp Edges</h3>
+
+    <p>Real world objects do not always have smooth, curved surfaces. Man-made objects such as buildings, machines, and various types of food items can have flat faces and sharp corners or edges. When dealing with such objects, the two approaches for assigning vertex normals we have discussed about so far prove inadequate. Surfaces with sharp edges are not regular surfaces, so we cannot hope to find an underlying regular surface to take surface normal vectors from. Moreover, as can be seen in Figure 6.20, computing vertex normals from face normals will make the whole surface look round while we want each face individually to look flat.</p>
+
+    <p>The problem we face stems from the fact that vertices that are on sharp corners or edges must exhibit multiple normal vectors at once. For example, a corner of the cube in Figure 6.20 are a part of three flat faces with three different face normals. Unfortuately, a vertex has only one vertex normal attribute, so it cannot accommodate three normals at once.<sup><a href="#fn:multiple-normal-vectors">2</a></sup></p>
+
+    <p>The solution, however, is incredibly simple. Whenever we have a vertex that needs to exhibit multiple normal vectors (or multiple values of any other attributes for that matter), split it into a number of distinct vertices that have the same positions but different normals. Now, when constructing triangles that meet at sharp corners or edges, we can use the appropriate vertex for that triangle. For example, instead of creating a cube in Figure 6.20 with only 8 corner vertices, we can instead model the cube as a collection of 6 flat faces where each face has its own 4 corner vertices (Figure 6.21).  </p>
+
+    <figure class="figure">      
+      <figcaption class="figure-caption"><strong>Figure 6.21</strong> <b>TODO:</b> A figure showing the result of modeling a cube as a collection of 6 flat surfaces.</figcaption>      
+    </figure>
+
+    <h3>6.4 &nbsp; Summary</h3>
+
+    <ul>
+      <li>In computer graphics, we deal with three different types of normal vectors.
+        <ol>
+          <li>Surface normals.</li>
+          <li>Face normals.</li>
+          <li>Vertex normals.</li>
+        </ol>
+      </li>
+
+      <li>A <b>secant plane</b> to a surface is a plane that passes through three points on the surface.</li>
+
+      <li>Imagine taking the limit of the secant plane as the three points approaches a particular point. If the limit exists, it is called the <b>tangent plane</b> at that point. The tangent plane "touches" the surface at that point.</li>
+
+      <li>A <b>surface normal</b> at a point on a surface is a vector that is perpendicular to the tangent plane to the surface at that point.
+        <ul>
+          <li>A surface normal does not exist if the tangent plane does not exist.</li>
+          <li><b>Regular surfaces</b> have a tangent plane (and so a surface normal) at every point on the surface.</li>
+          <li>There can be infinitely many surface normal vectors. However, if we restrict ourselves to only unit vectors, then there are only two.</li>
+          <li>We typically pick only one unit vector to serve as "the" surface normal vector at a particular point.</li>
+        </ul>
+      </li>
+
+      <li>A way of picking normal vectors at all points on the surface so that the normal vectors vary continously is called an <b>orientation</b> of the surface.
+        <ul>
+          <li>Some surfaces, such as the Möbius strip, have no orientations. We do not deal with such surfaces in this book.</li>
+          <li>Picking an orientation is equivalent to picking which side of the surface is the "front" side and which side is the "back" side.</li>
+          <li>The convention of this book is that the surface normals of a closed surface should point outward from the surface. An orientation must be picked accordingly.</li>
+        </ul>
+      </li>
+
+      <li>A <b>face</b> is a 2D primitive in a mesh.
+      <ul>
+        <li>In the context of this chapter, a face is always a triangle.</li>
+      </ul>
+      </li>
+
+      <li>A <b>face normal</b> is just a normal of a face.
+      <ul>
+        <li>It is completely defined by (1) the positions of the three vertices of the face and (2) the order in which the vertices are list in the index buffer.</li>
+        <li>If the vertices of the triangle $ABC$ is listed in the $A$, $B$, $C$ order, then the face normal is given by.
+        \begin{align*}
+          \ve{n}_{ABC} = \frac{(B-A) \times (C-A)}{\| (B - A) \times (C-A) \|}.
+        \end{align*}
+        </li>
+        <li>Visually, the direction that the face normal is pointing can be inferred from the direction that the vertices "swirl."</li>
+      </ul>
+      </li>
+
+      <li>When listing vertices in an index buffer of a mesh, it is important to do so in the way that the face normals are consistent with one another.
+      <ul>
+        <li>Face normals should not change abruptly when going from one triangle to an adjacent one.</li>
+        <li>Face normals of a closed mesh should point outward.</li>
+      </ul>
+      </li>
+
+      <li>A <b>vertex normal</b> is an attribute of a vertex. It is meant to represented the normal vector at the vertex.
+      <ul>
+        <li>Unlike surface normals and face normals, vertex normals are data that are defined explicitly by the modeler.</li>
+      </ul>
+      </li>
+
+      <li>Vertex normals are interpolated to obtained normals at fill-in points when WebGL draws a primitive.
+      <ul>
+        <li>Normals at fill-in points can be visualized as colors.</li>
+        <li>The interpolated normals given the impression that the surface is curved instead of being flat.</li>
+      </ul>
+      </li>
+
+      <li>A modeler can set the vertex normals to any values that they want, but there are at least two principled approaches of assigning the values.
+      <ul>
+        <li>Thinking of vertex normals as surface normals of the underlying regular surface.</li>
+        <li>Computing vertex normals from face normals.</li>
+      </ul>
+      </li>
+
+      <li>The two approaches above break down when the surface have sharp corners and/or edges. In such case, one should split a vertex on a sharp corner/edge into multiple distinct vertices, each having the same position but different normal vectors.</li>
+    </ul>
+
     <hr>
     <div class="footnotes">
       <ol> 
         <li class="footnote" id="fn:regular-surface-definition">
           <p>A mathematically inclined reader can consult standard textbooks on differential geometry such Manfredo P. do Carmo's <a href="https://www.amazon.co.jp/Differential-Geometry-Curves-Surfaces-Mathematics/dp/0486806995">Differential Geometry of Curves and Surfaces</a> for a rigorous definition of regular surfaces.</p>
-        </li>               
+        </li>
+        
+        <li class="footnote" id="fn:multiple-normal-vectors">
+          <p>Actually, it is possible to add more attributes to score the 2nd normal, 3rd normal, 4th normal and so on, but there are even more problems with this approach. First, we do not know in advance how many faces a vertex would be a part of, so we cannot know for sure how many attributes to allocated. Second, it becomes unclear which normal to use at which time.</p>
+        </li>
       </ol>
     </div>
 
