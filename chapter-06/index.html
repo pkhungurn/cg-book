@@ -687,14 +687,14 @@
     </p>
     
     <figure class="figure">
-      <img src="images/normal-color-visualization-00.png" alt="" width="300">
+      <a href="images/normal-color-visualization-00.png"><img src="images/normal-color-visualization-00.png" alt="" width="300"></a>
       <figcaption class="figure-caption"><strong>Figure 6.16</strong> Visualization of interpolated normals with colors defined according to Equation \eqref{eq:normal-as-color}. The colors of the vertex normals are shown next to the normal vectors.</figcaption>      
     </figure>
 
     <p>Note that we can also visualize the face normal of the triangle like in Figure 6.17. This time, all points have the same color because a triangle has only one face normal.</p>
 
     <figure class="figure">      
-      <img src="images/normal-color-visualization-01.png" alt="" width="300">
+      <a href="images/normal-color-visualization-01.png"><img src="images/normal-color-visualization-01.png" alt="" width="300"></a>
       <figcaption class="figure-caption"><strong>Figure 6.17</strong> Visualization of the face normal of the triangle in Figure 6.15 with colors defined according to Equation \eqref{eq:normal-as-color}.</figcaption>      
     </figure>
 
@@ -713,10 +713,11 @@
 
     <p>Treating vertex normals as samples of surface normals comes from a particular way we may think of a mesh: as an approximation of a curved regular surface. A curved regular surface has infinitely many points, all of which cannot be stored as computer data. We therefore sample a finite number of points from it, call these points "vertices," and connect the vertices to form primitives, thereby approximating the regular surface with many pieces of flat geometry. Because a vertice is originally a point on the regular surface, its position and its normal vector should agree with those of the corresponding regular surface point.</p>
 
-    <p>Let us look at a concrete example. Say, we want to create a mesh that approximates the sphere in Section 6.1.6.3. If we make a vertex out of a point $P$ on the surface of the sphere, then the vertex's normal vector should be $(P-O)/ \| P - O\|$ where $O$ is the origin of the sphere. We can see the consequence of specifying vertex normals in this way in Figure 6.18. NOtice that, even with a few number of faces, the surface alreay looks curved. As we increase the number of faces, the faces become smaller, and the interpolate normals become more and more closer to the normals vectors of the sphere.</p>
+    <p>Let us look at a concrete example. Say, we want to create a mesh that approximates the sphere in Section 6.1.6.3. If we make a vertex out of a point $P$ on the surface of the sphere, then the vertex's normal vector should be $(P-O)/ \| P - O\|$ where $O$ is the origin of the sphere. We can see the consequence of specifying vertex normals in this way in Figure 6.18. Notice that, even with a few number of faces, the surface alreay looks curved. As we increase the number of faces, the faces become smaller, and the interpolate normals become more and more closer to the normals vectors of the sphere.</p>
 
-    <figure class="figure">      
-      <figcaption class="figure-caption"><strong>Figure 6.18</strong> <b>TODO:</b> A figure showing the result of treating vertex normals as samples of space normals.</figcaption>      
+    <figure class="figure">
+      <a href="images/vertex-normals-as-samples-of-surface-normals.png"><img src="images/vertex-normals-as-samples-of-surface-normals.png" alt="" width="600"></a>  
+      <figcaption class="figure-caption"><strong>Figure 6.18</strong> The effect of using surface normals of the underlying regular surface as vertex normals. Here, we would like to approximate a sphere with coarse meshes. On the top row, the meshes are colored with the colors of the face normals, and we can see the flat faces of the meshes very clearly. On the bottom row, we color the meshes with the colors of the interpolated normals. It becomes harder to notice the flat faces, and the interior of the meshes does look like that of a curved surface.</figcaption>      
     </figure>
 
     <p>The drawback of this approach is that it only works when we know the normal vector of any point we want to make a vertex. This is only possible when we have mathematical formulas for everything. When this is the case, then the approach should be prefered because the normals would always have correct values.</p>
