@@ -750,13 +750,15 @@
     <p>When we apply the approach to a mesh that approximates a regular surface that is finely triangulated enough, the vertex normals would yield interpolated normals that approximate the real surface normals well.</p>
 
     <figure class="figure">      
-      <figcaption class="figure-caption"><strong>Figure 6.20</strong> <b>TODO:</b> A figure showing the result of computing vertex normals from face normals in meshes that finely approximate a sphere.</figcaption>      
+      <a href="images/vertex-normals-from-face-normals-sphere.png"><img src="images/vertex-normals-from-face-normals-sphere.png" alt="" width="600"></a>  
+      <figcaption class="figure-caption"><strong>Figure 6.20</strong> The effect of computing vertex normals from face normals. Like in Figure 6.18, we want to approximate a sphere with meshes that become finer as we go to the right. The face normals are visualized on the top row, and the interpolated normals from computed face normals are visualized on the bottom row. To the naked eyes, the results are very similar to Figure 6.18, but there are some noticable differences, especially on the coarsest mesh.</figcaption>      
     </figure>
 
     <p>However, the result can be counter intuitive for coarse meshes. For example, the approach would try to make the box in Figure 6.21 look round while the silhouette is telling the viewer otherwise.</p>
 
     <figure class="figure">      
-      <figcaption class="figure-caption"><strong>Figure 6.21</strong> <b>TODO:</b> A figure showing the normals of a cube whose vertex normals are computed from face normals.</figcaption>      
+      <a href="images/vertex-normals-from-face-normals-cube.png"><img src="images/vertex-normals-from-face-normals-cube.png" alt="" width="300"></a>  
+      <figcaption class="figure-caption"><strong>Figure 6.21</strong> A cube mesh whose vertex normals are computed from face normals. As can be seen from the colors, the interpolated normals vary continuously across the surface, giving the impression that the surface is curved instead of being straight.</figcaption>      
     </figure>
 
     <h3>6.3.4 &nbsp; Dealing with Flat Faces and Sharp Edges</h3>
@@ -864,7 +866,6 @@
       </ol>
     </div>
 
-    
     <hr>
     <p>
       <a href="../chapter-05/index.html"><<</a>
