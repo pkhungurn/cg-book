@@ -631,8 +631,26 @@
 
     <p>Another consistency issue to watch out for is when a mesh models a closed surface. In this case, we want the face normals to all point outward from the surface according to the convention in Section 6.1.7. To achieve this, we want to make sure that the vertex indices are ordered so that the vertices swirl counterclockwisely when you look at each triangle straight on from the outside of the mesh.</p>
 
-    <figure class="figure">      
-      <figcaption class="figure-caption"><strong>Figure 6.14</strong> <b>TODO:</b> A figure that contains an example of a closed mesh with consistent normals and another example of a closed mesh with inconsistent normals.</figcaption>
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/closed-mesh-normals-00.png"><img src="images/closed-mesh-normals-00.png" width="300"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/closed-mesh-normals-01.png"><img src="images/closed-mesh-normals-01.png" width="300"></a>
+            </div>
+          </td>          
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>          
+        </tr>               
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 6.14</strong> Here, we see a pyramidal mesh. The vertex in the center is the pyramid's apex. In (a), the vertices of the triangles are arranged so that they swirl in the counterclockwise direction when we look at them from the outside. As a result, the normals all point outward. In (b), the vertices of the top triangle swirl clockwisely, and the triangle's normal point into the mesh.</figcaption>
     </figure> 
 
     <h2>6.3 &nbsp; Vertex normals</h2>
@@ -743,8 +761,32 @@
     \end{align*}
     </p>
 
-    <figure class="figure">      
-      <figcaption class="figure-caption"><strong>Figure 6.19</strong> <b>TODO:</b> A figure showing mesh with 3 triangles.</figcaption>      
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/vertex-normals-from-face-normals-3-triangles-00.png"><img src="images/vertex-normals-from-face-normals-3-triangles-00.png" height="200"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/vertex-normals-from-face-normals-3-triangles-01.png"><img src="images/vertex-normals-from-face-normals-3-triangles-01.png" height="200"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/vertex-normals-from-face-normals-3-triangles-02.png"><img src="images/vertex-normals-from-face-normals-3-triangles-02.png" height="200"></a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+          <td align="center">(c)</td>
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 6.19</strong> (a) A mesh with 4 vertices and 3 triangles. (b) From the positions of the vertices, we can compute the normals of triangular faces. (c) Then, from the face normals, we can compute the vertex normals by averaging the face normals together.</figcaption>      
     </figure>
 
     <p>When we apply the approach to a mesh that approximates a regular surface that is finely triangulated enough, the vertex normals would yield interpolated normals that approximate the real surface normals well.</p>
@@ -769,8 +811,26 @@
 
     <p>The solution, however, is incredibly simple. Whenever we have a vertex that needs to exhibit multiple normal vectors (or multiple values of any other attributes for that matter), split it into a number of distinct vertices that have the same positions but different normals. Now, when constructing triangles that meet at sharp corners or edges, we can use the appropriate vertex for that triangle. For example, instead of creating a cube in Figure 6.20 with only 8 corner vertices, we can instead model the cube as a collection of 6 flat faces where each face has its own 4 corner vertices (Figure 6.21).  </p>
 
-    <figure class="figure">      
-      <figcaption class="figure-caption"><strong>Figure 6.21</strong> <b>TODO:</b> A figure showing the result of modeling a cube as a collection of 6 flat surfaces.</figcaption>      
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/sharp-corner-normals-00.png"><img src="images/sharp-corner-normals-00.png" height="300"></a>
+            </div>
+          </td>
+          <td>
+            <div style="border: 1px solid;">
+            <a href="images/sharp-corner-normals-01.png"><img src="images/sharp-corner-normals-01.png" height="300"></a>
+            </div>
+          </td>          
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>          
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 6.22</strong> (a) A cube mesh whose faces are flat, unlike the one in Figure 6.20. (b) The mesh is constructed by putting together 6 flat rectangles. Each rectangle has 4 vertices, resulting in 24 distinct vertices. However, there are only 8 distinct positions and 6 different normal vectors.</figcaption>      
     </figure>
 
     <h3>6.4 &nbsp; Summary</h3>
