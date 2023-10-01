@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script type="text/javascript">
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        tags: "ams",
+      },
+      svg: {
+        fontCache: 'global'
+      },
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
+  <link rel="stylesheet"
+      href="../highlight/styles/default.min.css">
+  <script src="../highlight/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+    
+  <title>Chapter 7</title>
+</head>
+
+<body>
+  <div class="container" style="max-width: 640px;">
+    <span style="visibility: hidden;">
+      \(
+      \def\sc#1{\dosc#1\csod}
+      \def\dosc#1#2\csod{{\rm #1{\small #2}}}
+
+      \newcommand{\dee}{\mathrm{d}}
+      \newcommand{\Dee}{\mathrm{D}}
+      \newcommand{\In}{\mathrm{in}}
+      \newcommand{\Out}{\mathrm{out}}
+      \newcommand{\pdf}{\mathrm{pdf}}
+      \newcommand{\Cov}{\mathrm{Cov}}
+      \newcommand{\Var}{\mathrm{Var}}
+
+      \newcommand{\ve}[1]{\mathbf{#1}}
+      \newcommand{\mrm}[1]{\mathrm{#1}}
+      \newcommand{\ves}[1]{\boldsymbol{#1}}
+      \newcommand{\etal}{{et~al.}}
+      \newcommand{\sphere}{\mathbb{S}^2}
+      \newcommand{\modeint}{\mathcal{M}}
+      \newcommand{\azimint}{\mathcal{N}}
+      \newcommand{\ra}{\rightarrow}
+      \newcommand{\mcal}[1]{\mathcal{#1}}
+      \newcommand{\X}{\mathcal{X}}
+      \newcommand{\Y}{\mathcal{Y}}
+      \newcommand{\Z}{\mathcal{Z}}
+      \newcommand{\x}{\mathbf{x}}
+      \newcommand{\y}{\mathbf{y}}
+      \newcommand{\z}{\mathbf{z}}
+      \newcommand{\tr}{\mathrm{tr}}
+      \newcommand{\sgn}{\mathrm{sgn}}
+      \newcommand{\diag}{\mathrm{diag}}
+      \newcommand{\Real}{\mathbb{R}}
+      \newcommand{\sseq}{\subseteq}
+      \newcommand{\ov}[1]{\overline{#1}}
+      \DeclareMathOperator*{\argmax}{arg\,max}
+      \DeclareMathOperator*{\argmin}{arg\,min}
+      \)
+    </span>
+
+    <h1>7 &nbsp; The graphics pipeline, OpenGL, and WebGL</h1>
+    <hr>
+
+    <p>We have learned in the previous chapters about how to represent scenes and objects with triangle meshes. It is now time to learn about how we transform these representations into images that will be consumed by users. As mentioned previously in <a href="../chapter-01/index.html">Chapter 1</a>, the technical word for this process is "rendering." We have also mentioned the only rendering algorithm we will use in this book, the "graphics pipeline," and its particular implementation, "WebGL," several times. In this chapter, we will discuss what they are and how they work.</p>
+
+    <h2>7.1 &nbsp; Rendering algorithms</h2>
+
+    <p>First, let us specify precisely what a rendering algorithm is. A <b>rendering algorithm</b> takes as input (1) a description of a 3D scene and (2) a description of how the scene is viewed by an observer. It then outputs an image that depicts the scene through the aforementioned viewpoint. Metaphorically, a rendering algorithm is thus the inner working of a camera that takes snapshots of the scene.</p>
+
+    <p>Let us take a closer look at the output. We learned in <a href="../chapter-02/">Chapter 2</a> that, most of the times, images that a rendering algorithm produces would be raster images. A raster image is made of a number of pixels. Hence, the main task of a rendering algorithm is to figure out the colors of all the pixels in the output color images. We also learned that the description of the scene defines an implicit continuous image from which we must construct the raster image from. A continous image contains much more information than a raster image can ever store, so a rendering algorithm is practically "summarizes" the continuous image into a raster one.</p>
+
+    <p>Now, looking closer at the input, a scene would consist of a number of objects. We have decided that each of these objects would be represented by meshes that are in turn made out of primitives. We can think of these primitives as emitting light which has color, and this color should be recorded by a rendering algorithm in the output image if the observer can see the primitive from the input viewpoint. There are several reasons why a primitive, or some parts of it, may not be recorded by a rendering algorithm. First, the primitive may be out of the viewpoint's "field of view." For examples, a primitive that is behind the camera would not be seen by the camera. Second, the primitive might be behind another primitive from the camera's point of view. As a result, rendering involves figuring out, for each pixel, which primitive we should take the color from.</p>
+
+    <p>In computer graphics, there are two main ways to organize computation to answer the question of "which primitive contributes to which pixel." This results in two types of rendering algorithms: <b>image-order rendering algorithms</b> and <b>object-order rendering algorithms.</b> Simplified pseudocode for the algorithms is given in Figure 7.1.</p>
+
+    <figure class="figure">
+    <table class="table table-bordered" width="100%">
+        <tr class="table-primary">
+            <td scope="col" style="text-align: center"><b>Image-order rendering algorithm</b></td>
+        </tr>    
+        <tr>
+            <td>
+                <ul style="list-style-type: none;">
+                    <li>
+                        <b>for each</b> pixel <b>in</b> output image <b>do</b>
+                        <ul style="list-style-type: none;">
+                            <li>
+                                <b>for each</b> primitive <b>in</b> scene <b>do</b>
+                                <ul style="list-style-type: none;">
+                                    <li><b>if</b> primitive contributes to pixel <b>then</b>
+                                        <ul style="list-style-type: none;">
+                                            <li>Record primitive's contribution to pixel</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr class="table-primary">
+            <td scope="col" style="text-align: center"><b>Object-order rendering algorithm</b></td>
+        </tr>
+        <tr>
+            <td>
+                <ul style="list-style-type: none;">
+                    <li>
+                        <b>for each</b> primitive <b>in</b> scene <b>do</b>                                
+                        <ul style="list-style-type: none;">
+                            <li>
+                                <b>for each</b> pixel <b>in</b> output image <b>do</b>
+                                <ul style="list-style-type: none;">
+                                    <li><b>if</b> primitive contributes to pixel <b>then</b>
+                                        <ul style="list-style-type: none;">
+                                            <li>Record primitive's contribution to pixel</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+    <figcaption class="figure-caption"><strong>Figure 7.1</strong> Simplified pseudocode of an image-order rendering algorithm and an object-order rendering algorithm.</figcaption>
+    </figure>
+
+    <p>The two algorithms are very similar: two for loops with the same loop body. The only difference between them is the order of the loops. Image-order algorithms' outer loops cycle through the pixels, while those for object-order algorithms cycle through the primitives. For the pseudocode in Figure 7.1, the two algorithms are equivalent. However, more advanced versions of the algorithms have more sophisticated ways of pruning useless pixel-primitive pairs to make computation faster.</p>
+
+    <p>One of the most well-kwown image-order rendering algorithm is <b>ray casting</b>. The algorithm posits that the color of a pixel is the color of the light that travels along the ray that passes through the center of the pixel in the image plane. (Recall <a href="../chapter-02/index.html#figure-2p3">Figure 2.3</a>.) So, figure out the color, it finds the first primitive that intersects the ray and take the color from that primitive. A more sophisticated version of ray casting called <b>path tracing</b> takes into account that primitives can also reflects light that comes from light source or other primitives, and so it can spawn more rays from the intersection point until it finds a light source. Path tracing can generative high-quality rendering that looks photo-realistic, and it is the basis of rendering algorithms used in CG-animated movies and special effect shots in live-action films. Image-order rendering algorithms are usually implemented entirely in software, making it difficult for them to meet the strigent speed requirement of interactive applications.</p>
+
+    <p>The "graphics pipeline" is the most well-known example of object-order rendering algorithms, and we will describe it in more details in the next section. In constrast to ray casting and path tracing, it has hardware that is designed specifically to run it: the <b>graphics processing units</b> (GPUs).<sup><a href="#fn:gpu">1</a></sup> Hardware acceleration makes it possible to render complex scenes in real-time, enabling applications such as computer games and interactive visualization.</p>
+
+    <h2>7.2 &nbsp; The graphics pipeline</h2>
+
+    <hr>
+    <div class="footnotes">
+      <ol> 
+            <li class="footnote" id="fn:gpu">
+                <p>While GPUs are designed to run the graphics pipeline, modern GPUs can run many other types of algorithms. Currently, GPUs are the main workhorse of artificial intelligence because it can execute and train neural networks fast.</p>
+            </li>
+      </ol>
+    </div>
+
+    <hr>
+    <p>
+      <a href="../chapter-06/index.html"><<</a>
+      <a href="../index.html">Contents</a>
+    </p>
+  </div>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/littlefoot.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    const { littlefoot } = require('littlefoot')
+
+    const lf = littlefoot({
+      activateOnHover: true,
+      hoverDelay: 250,
+    });
+  </script>
+</body>
+
+</html>

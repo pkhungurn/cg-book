@@ -123,6 +123,7 @@
     <p>The reason is that, in 3DCG, all raster images that we produce come from some continuous images. Recall from the last chapter that we create a 3D-looking image by creating a virtual scene and then taking a picture of that scene with a virtual camera. The virual scene lives in an imaginary 3D world, and our virtual camera is also located in it. We can think that the camera is observing a small portion of an <strong>image plane</strong>. In case the camera is a pinhole camera, each point on the image plane has a color, and it is defined by the light that travels along the ray between the point and the camera's focal point. So, we now have a continuous image that is implicitly defined by the scene and the camera. We must then convert this portion of the continous image to a raster image in order to produce a usable output.</p>
 
     <p>
+      <a name="figure-2p3"></a>
       <a href="images/3d-scene-continuous-image.png"><img src="images/3d-scene-continuous-image.png" width="640" alt=""></a>
       <br>
       <strong>Figure 2.3</strong> The raster image on the left is created by "taking a photograph" of a virtual 3D scene with 3 solid shapes sitting on a flat rectangle. The situation is depicted on the right where a virtual camera is capturing a portion of an image plane in front of it. If we map each point on the image plane to the color that goes through the ray along the point and the camera's focal point, we have a continous image. This continuous image is implicity defined by the 3D scene and the camera's parameters.
