@@ -145,12 +145,61 @@
 
     <h2>7.2 &nbsp; The graphics pipeline</h2>
 
+    <p>The graphics pipeline takes as input a specification of a scene. Here, unlike what we discussed previously, the specification of the camera and the camera's viewpoint is implicitly included in the scene specifiction, and we will discuss how this inclusion is accomplished momemtarily. The graphics pipeline assumes that objects in the scene are represented by meshes. Recall from <a href="../chapter-06/">Chapter 6</a>, that a mesh is a collection of vertices and a list of primitives that are constructed from these vertices. A scene can also have image data called "textures," but we will not discuss them until Chapter XXX. The graphics pipline must then produces a raster image of the scene. The memory that stores the output image is called the <b>framebuffer</b>. It is a special area of GPU memory that the color values written there would be displayed on the monitor connected to the GPU.</p>
+
+    <p>The graphics pipeline convert meshes into a raster image with the following 5-step process.
+    <ol>
+      <li>Vertex processing.</li>
+      <li>Primitive assembly.</li>
+      <li>Rasterization.</li>
+      <li>Fragment processing.</li>
+      <li>Raster operation.</li>
+    </ol>
+    </p>
+
+    <p>An overview of what each step does is shown in Figure 7.1. Let us now discuss each of the step in more details.</p>
+
+    <figure class="figure">
+      <figcaption class="figure-caption"><strong>Figure 7.1</strong> TODO: A figure that gives an overview of what each step of the graphics pipeline does.</figcaption>
+    </figure> 
+
+    <h3>7.2.1 &nbsp; Vertex Processing</h3>
+
+    <p>The main goal of this step is to process vertex attributes so that they are easy for later steps to work on. The most important attribute to process is the position of the vertex. At the end of vertex processing, all positions must be transformed so that they becomes <b>normalized device coordinates</b> (NDCs). NDCs are coordinates in the <b>normalized device coordinate system</b>: a 3D coordinate system such that anything outside a certain volume is not visible in the output image. Different implementations of the graphics pipeline have different definitons of the "visible volume." For OpenGL and WebGL, it is the cube $\{ (x,y,z) : -1 \leq x,y,z \leq 1\}$. For DirectX, it is the box $\{ (x,y,z) : -1 \leq x, y \leq 1, 0 \leq  z \leq 1\}$.</p>
+
+    <p>We said earlier that the graphics pipeline assumes that the viewpoint is implicitly included in the scene description. What we meant by this is that, in modern implementation of the graphics pipeline, it is the responsibility of the programmer to customize the vertex processing step so the transformation of vertex positions into NDCs would take into account the viewpoint and the camera. This customization is often done through writing a piece of code called the <b>vertex shader</b>, which can be thought of as a part of the scene's specification. We will discuss how to write vertex shaders to implement two frequently-used types of cameras in Chapter XXX. For now, just remember that simulating cameras can be done inside a vertex shader, and it is our responsibility to do so.</p>
+
+    <h3>7.2.2 &nbsp; Primitive Assembly</h3>
+
+    <p>The primitive assembly step process information about primitives. Mainly, it does the following.
+    <ul>
+      <li><b>Primitive simplification.</b> Complex primitives are converted into simpler "base primitives" (points, lines, and triangles). In WebGL, for examples, line strips and line loops are turned into individual lines. Triangle strips and triangle fans are turned into individual triangles.</li>
+
+      <li><b>Face culling.</b> If all vertices of a primitive have NDCs that are outside the visible volume, the primitive is not visible in the output image, and so can be dropped from further processing because it would not have any impact on the output. Face culling refers to the removal of such primitives.</li>
+    </ul>
+    </p>
+
+    <p>Modern implementations of the graphics pipeline also supports customization of the primitive assembly steps by allowing the programmer to write <b>tessllation shaders</b> and <b>geometry shaders</b>. However, we will not cover these aspects of the graphics pipeline in this book because they are not currently supported by WebGL.</p>
+    
+    <h3>7.2.3 &nbsp; Rasterization</h3>
+
+    <p>Primivites that survive face culling (meaning that they are potentially visible in the output image if not occluded by other primitives) are sliced into rectangular areas, each has the size of a pixel. This process is called <b>rasterization</b>, and each generated rectangular area is called a <b>fragment</b>. A fragment can be thought of as a "potential pixel," whose visibility will be determined in a later step of the pipeline. Unlike the previous two steps, this step is often not customizable. </p>
+
+    <h3>7.2.4 &nbsp; Fragment Processing</h3>
+
+    <h3>7.2.5 &nbsp; Raster Operation</h3>
+
+    <h2>7.3 &nbsp; OpenGL and WebGL</h2>
+
     <hr>
     <div class="footnotes">
       <ol> 
             <li class="footnote" id="fn:gpu">
                 <p>While GPUs are designed to run the graphics pipeline, modern GPUs can run many other types of algorithms. Currently, GPUs are the main workhorse of artificial intelligence because it can execute and train neural networks fast.</p>
             </li>
+            <li class="footnote" id="fn:ndc-convension">
+              <p>While GPUs are designed to run the graphics pipeline, modern GPUs can run many other types of algorithms. Currently, GPUs are the main workhorse of artificial intelligence because it can execute and train neural networks fast.</p>
+          </li>
       </ol>
     </div>
 
