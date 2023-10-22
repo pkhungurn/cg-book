@@ -139,13 +139,15 @@
 
     <p>The two algorithms are very similar: two for loops with the same loop body. The only difference between them is the order of the loops. Image-order algorithms' outer loops cycle through the pixels, while those for object-order algorithms cycle through the primitives. For the pseudocode in Figure 7.1, the two algorithms are equivalent. However, more advanced versions of the algorithms have more sophisticated ways of pruning useless pixel-primitive pairs to make computation faster.</p>
 
-    <p>One of the most well-kwown image-order rendering algorithm is <b>ray casting</b>. The algorithm posits that the color of a pixel is the color of the light that travels along the ray that passes through the center of the pixel in the image plane. (Recall <a href="../chapter-02/index.html#figure-2p3">Figure 2.3</a>.) So, figure out the color, it finds the first primitive that intersects the ray and take the color from that primitive. A more sophisticated version of ray casting called <b>path tracing</b> takes into account that primitives can also reflects light that comes from light source or other primitives, and so it can spawn more rays from the intersection point until it finds a light source. Path tracing can generative high-quality rendering that looks photo-realistic, and it is the basis of rendering algorithms used in CG-animated movies and special effect shots in live-action films. Image-order rendering algorithms are usually implemented entirely in software, making it difficult for them to meet the strigent speed requirement of interactive applications.</p>
+    <p>One of the most well-known image-order rendering algorithm is <b>ray casting</b>. The algorithm posits that the color of a pixel is the color of the light that travels along the ray that passes through the center of the pixel in the image plane. (Recall <a href="../chapter-02/index.html#figure-2p3">Figure 2.3</a>.) So, figure out the color, it finds the first primitive that intersects the ray and take the color from that primitive. A more sophisticated version of ray casting called <b>path tracing</b> takes into account that primitives can also reflects light that comes from light source or other primitives, and so it can spawn more rays from the intersection point until it finds a light source. Path tracing can generative high-quality rendering that looks photo-realistic, and it is the basis of rendering algorithms used in CG-animated movies and special effect shots in live-action films. Image-order rendering algorithms are usually implemented entirely in software, making it difficult for them to meet the strigent speed requirement of interactive applications.</p>
 
     <p>The "graphics pipeline" is the most well-known example of object-order rendering algorithms, and we will describe it in more details in the next section. In constrast to ray casting and path tracing, it has hardware that is designed specifically to run it: the <b>graphics processing units</b> (GPUs).<sup><a href="#fn:gpu">1</a></sup> Hardware acceleration makes it possible to render complex scenes in real-time, enabling applications such as computer games and interactive visualization.</p>
 
+    <p>Implementations of the graphics pipeline usually come in the form of <b>Application Programming Interfaces</b> (APIs), which are libraries of functions and data structures that programmers can use to build their own applications. Well-known implementations include  <a href="https://en.wikipedia.org/wiki/DirectX">DirectX</a>, <a href="https://en.wikipedia.org/wiki/Vulkan">Vulcan</a>, and <a href="https://en.wikipedia.org/wiki/Metal_(API)">Metal</a>. In this book, we will focus on <a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a> and its web-based offshoot, <a href="https://en.wikipedia.org/wiki/WebGL">WebGL</a>. These implementations all rely on GPUs to perform almost of all its operations. As a result, they can be regarded as interfaces to the GPUs that allow 3D rendering.</p>
+
     <h2>7.2 &nbsp; The graphics pipeline</h2>
 
-    <p>The graphics pipeline takes as input a specification of a scene. Here, unlike what we discussed previously, the specification of the camera and the camera's viewpoint is implicitly included in the scene specifiction, and we will discuss how this inclusion is accomplished momemtarily. The graphics pipeline assumes that objects in the scene are represented by meshes. Recall from <a href="../chapter-06/">Chapter 6</a>, that a mesh is a collection of vertices and a list of primitives that are constructed from these vertices. A scene can also have image data called "textures," but we will not discuss them until Chapter XXX. The graphics pipline must then produces a raster image of the scene. The memory that stores the output image is called the <b>framebuffer</b>. It is a special area of GPU memory that the color values written there would be displayed on the monitor connected to the GPU.</p>
+    <p>The graphics pipeline takes as input a specification of a scene. Here, unlike what we discussed previously, the specification of the camera and the camera's viewpoint is implicitly included in the scene specifiction, and we will discuss how this inclusion is accomplished momentarily. The graphics pipeline assumes that objects in the scene are represented by meshes. Recall from <a href="../chapter-06/">Chapter 6</a>, that a mesh is a collection of vertices and a list of primitives that are constructed from these vertices. A scene can also have image data called "textures," but we will not discuss them until Chapter XXX. The graphics pipline must then produces a raster image of the scene. The memory that stores the output image is called the <b>framebuffer</b>. It is a special area of GPU memory that the color values written there would be displayed on the monitor connected to the GPU.</p>
 
     <p>The graphics pipeline convert meshes into a raster image with the following 5-step process.
     <ol>
@@ -199,9 +201,68 @@
 
     <h3>7.2.5 &nbsp; Raster Operation</h3>
 
-    <p></p>
+    <p>The fragment processing step can produce multiple fragments that occupy the same pixel location. The raster operation step process these fragments into a single color value. The step can be divided into two important substeps.</p>
+
+    <ul>
+      <li><b>Culling tests.</b> The fragments are tested to see whether they should be discarded or not. There are multiple types of tests that can performed on this steps. These include the "scissor test," "stencil test," and the "depth test." By far the most important test is the <b>depth test</b> where the pipeline determines whether the fragment should be discarded based on whether the fragment is "behind" any other fragments. We will cover the depth test in more details in Chapter XXX.</li>
+
+      <li><b>Blending.</b> If a fragment passes all the culling tests, its color is written to the framebuffer. The default behavior is to overwrite whatever the color information is already there at the pixel localtion. However, the graphics pipeline also allows other behaviors that combine the fragment's color with the color that has already been recorded. These combining behaviors are referred to collectively as "blending." We will also cover blending in more details in Chapter XXX.</li>
+    </ul>
+
+    <p>Different implementations of the graphics pipeline may differ on how they implement the raster operation step. Some may have more culling tests, blending operations, or add entirely new operations altogether. </p>
 
     <h2>7.3 &nbsp; OpenGL and WebGL</h2>
+
+    <p><b>OpenGL</b> stands for "<b>Open</b> <b>G</b>raphics <b>L</b>ibrary." It is originally developed by <a href="https://en.wikipedia.org/wiki/Silicon_Graphics">Silicon Graphics</a>, a well-known tech company that unfortunately went bankrupt in 2009. A organization called the <a href="https://en.wikipedia.org/wiki/Khronos_Group">Khronos Group</a> has been responsible for development and maintenance of OpenGL since 2006.</p>
+
+    <p>"OpenGL" refers to the library that is written in the C programming language and intended to be used to develop native applications for personal computers. A spinoff library called <a href="https://en.wikipedia.org/wiki/OpenGL_ES">OpenGL for Embedded Systems</a> (abbreviated as "OpenGL ES") was released in 2003. It targets less powerful devices such as video game consoles, tablets, and smartphones.</p>
+
+    <p><b>WebGL</b> is a spinoff of OpenGL ES for web applications. It is packaged as a Javascript library and is generally available in modern web browsers such as <a href="https://www.google.com/chrome/">Chrome</a>, <a href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>,  <a href="https://www.apple.com/safari/">Safari</a>, and <a href="https://www.microsoft.com/en-us/edge">Edge</a> without the need to install any extra software. In this book, we will use <a href="https://registry.khronos.org/webgl/specs/latest/2.0/"> WebGL version 2.0</a>, which has now been supported by all the aforementioned browsers above since 2022.</p>
+
+    <p>Now, let us discuss details of the graphics pipeline's implementation that is specific to WebGL.</p>
+
+    <h3>7.3.1 &nbsp; Programs and Shaders</h3>
+
+    <p>There are two parts to writing problems WebGL. The first part is using Javascript to call functions in the WebGL to do its job. This includes preparing an area in the web page that WebGL will draw the primitives to, sending the data to the GPU, altering various settings of the graphics pipeline, and then asking WebGL to draws the primitives we want to see. We will discuss in the next chapters how to use these functions to create the simplest computer graphics programs in the next Chapter.</p>
+
+    <p>The second part is customizing the graphics pipeline by writing <b>WebGL programs</b>. Here, a WebGL program is an object that contains as its constituent parts two shaders that WebGL 2.0 allows you to write: the <b>vertex shader</b> and the <b>fragment shader</b>. Shaders are written in a programming language called the <b>OpenGL Shading Language</b>, abbreviated as "GLSL." Like WebGL, there are multiple versions of the GLSL language. In this book, we will use <a href="https://registry.khronos.org/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf">GLSL ES version 3.0</a>, which is the latest version supported by WebGL 2.0. The syntax of the GLSL language is similar to languages in the C family, and we will discuss it in more details in Chapter XXX.</p>
+
+    <p>Now, we mentioned earlier that modern implementations of the graphics pipeline allows the user to customize the pipeline to their needs. This kind of implies that there can be default behaviors to which the implication would fall back to if the user does not do any configurations. However, for WebGL 2.0, customizing the graphics pipeline with a WebGL program is a requirement if one wants to do anything more complicated than clearning the screen. As a result, if we want to draw any primitive at all, we must write two shaders in GLSL, combine them into a WebGL program, and have WebGL execute it for us.</p>
+
+    <h3>7.3.2 &nbsp; Vertex Shaders</h3>
+
+    <p>Recall that a vertex shader is a piece of code that customizes the vertex processing step of the graphics pipeline. Moreover, the main output of the vertex processing step is the NDCs corresponding to the vertex positions. WebGL has its own convention on how the NDCs are computed, and we must understand it in order for us to write effective shaders.</p>
+
+    <p>The main data that WebGL expects a vertex shader to output is the positions of the vertices in <b>clip space</b>, and these positions are referred to as <b>clip space coordinates</b>. Clip space coordinates are <i>homogeneous coordinates</i> (<a href="../chapter-04/index.html#homogeneous-coordinates">Section 4.3 of Chapter 4</a>), which means that they have 4 components: $x$, $y$, $z$, and $w$. WebGL will convert clip space coordinates to NDCs by itself, and this part the user cannot change.</p>
+
+    <p>The process that WebGL computes NDCs from clip space coordinates is called the <b>perspective divide</b>. Suppose that the clip space coordinates that the vertex shader outputs is $P_{\mrm{clip}} = (x_{\mrm{clip}}, y_{\mrm{clip}}, z_{\mrm{clip}}, w_{\mrm{clip}})$. WebGL would compute the NDC, denoted by $P_{\mrm{ndc}} = (x_{\mrm{ndc}}, y_{\mrm{ndc}}, z_{\mrm{ndc}})$ by dividing all clip space coordinates with the $z$-coordinate:
+    \begin{align*}
+      \begin{bmatrix}
+        x_{\mrm{ndc}} \\ 
+        y_{\mrm{ndc}} \\
+        z_{\mrm{ndc}}        
+      \end{bmatrix}
+      = \begin{bmatrix}
+      x_{\mrm{clip}} / w_{\mrm{clip}} \\ 
+      y_{\mrm{clip}} / w_{\mrm{clip}} \\
+      z_{\mrm{clip}} / w_{\mrm{clip}}       
+      \end{bmatrix}.
+    \end{align*}
+    After the NDCs are computed, they would then be used in primitive assembly.</p>
+
+    <p>A question that might come to the reader's mind right now is how we are supposed to write vertex shaders so they they output the right clip space coordinates. The answer is that there is a standard way to do it, and that computer graphics applications rarely deviate from this method. It involves multiplying the coordinates with matrices and the technical term for this is "transforming" them. There are three main types of transformations. One is used to put objects into a scene (<b>modeling transformation</b>), one is used to set up the camera's viewpoint (<b>view transformation</b>), and the last is used to project 3D objects to a 2D plane (<b>projective transformation</b> or <b>projection</b>). We will learn about the first two types of transformations in Chapter XXX and Chapter XXX, and we will learn about projections in Chapter XXX.</p>
+
+    <p>However, for the next few chapters, we will not have the tools to do the "standard transformation pipeline" above yet. We will, for now, write vertex shaders so that they directly output clip space coordinates. Moreover, we will always set the $w$-coordinate to $1$ so that the NDCs are equal to the $xyz$-components of the clip space coordinates. Recall that WebGL considers any vertices whose NDCs are out of the cube $\{(x,y,z) : -1 \leq x,y,z \leq 1\}$</p> to be invisible to the camera. As a result, we must make sure that all primitives we want to show have positions in the $[-1,1]$ range.</p>
+    
+    <p>Other than the clip space coordinates of the vertex positons, the vertex shader can output other vertex attributes, and these are typically refer to as <b>varying variables</b>, and we will learn how to use them in Chapter XXX. These varying variables are interpolated by the rasterization step and then passed to the fragment shader.</p>
+
+    <h3>7.3.3 &nbsp; Fragment Shaders</h3>
+
+    <p>Recall that the rasterization step chops primivites into square areas, each having a size of a pixel, called framents. With each fragment, it attaches interpolated values of varying variables. Then, the graphics pipeline would transition to the fragment processing step, invoking the fragment shader on each fragment in order to process them.</p>
+
+    <p>The fragment shader receives as input interpolated varying variables. It also have access to image data called "textures" (Chapter XXX) that can be set up by Javascript code. It must then process these information and perform one of the two actions previously discussed in Section 7.2.4.</p>
+
+    <p>Because fragment shaders decide the fragment colors, it plays a central role in determining how objects appear in images. Hence, it must take into account information that are related to appearance, and these include the object's colors, textures, and how the object's surface reflect or emit light. It must also take into account the intensity and the direction in which light comes to illuminate the object. We will learn about how to model light interaction in Chapter XXX and Chapter XXX.</p>
 
     <hr>
     <div class="footnotes">
@@ -209,9 +270,6 @@
             <li class="footnote" id="fn:gpu">
                 <p>While GPUs are designed to run the graphics pipeline, modern GPUs can run many other types of algorithms. Currently, GPUs are the main workhorse of artificial intelligence because it can execute and train neural networks fast.</p>
             </li>
-            <li class="footnote" id="fn:ndc-convension">
-              <p>While GPUs are designed to run the graphics pipeline, modern GPUs can run many other types of algorithms. Currently, GPUs are the main workhorse of artificial intelligence because it can execute and train neural networks fast.</p>
-          </li>
       </ol>
     </div>
 
