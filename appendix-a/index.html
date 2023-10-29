@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script type="text/javascript">
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        tags: "ams",
+      },
+      svg: {
+        fontCache: 'global'
+      },
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
+  <link rel="stylesheet"
+      href="../highlight/styles/default.min.css">
+  <script src="../highlight/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+    
+  <title>Appendix A</title>
+</head>
+
+<body>
+  <div class="container" style="max-width: 640px;">
+    <span style="visibility: hidden;">
+      \(
+      \def\sc#1{\dosc#1\csod}
+      \def\dosc#1#2\csod{{\rm #1{\small #2}}}
+
+      \newcommand{\dee}{\mathrm{d}}
+      \newcommand{\Dee}{\mathrm{D}}
+      \newcommand{\In}{\mathrm{in}}
+      \newcommand{\Out}{\mathrm{out}}
+      \newcommand{\pdf}{\mathrm{pdf}}
+      \newcommand{\Cov}{\mathrm{Cov}}
+      \newcommand{\Var}{\mathrm{Var}}
+
+      \newcommand{\ve}[1]{\mathbf{#1}}
+      \newcommand{\mrm}[1]{\mathrm{#1}}
+      \newcommand{\ves}[1]{\boldsymbol{#1}}
+      \newcommand{\etal}{{et~al.}}
+      \newcommand{\sphere}{\mathbb{S}^2}
+      \newcommand{\modeint}{\mathcal{M}}
+      \newcommand{\azimint}{\mathcal{N}}
+      \newcommand{\ra}{\rightarrow}
+      \newcommand{\mcal}[1]{\mathcal{#1}}
+      \newcommand{\X}{\mathcal{X}}
+      \newcommand{\Y}{\mathcal{Y}}
+      \newcommand{\Z}{\mathcal{Z}}
+      \newcommand{\x}{\mathbf{x}}
+      \newcommand{\y}{\mathbf{y}}
+      \newcommand{\z}{\mathbf{z}}
+      \newcommand{\tr}{\mathrm{tr}}
+      \newcommand{\sgn}{\mathrm{sgn}}
+      \newcommand{\diag}{\mathrm{diag}}
+      \newcommand{\Real}{\mathbb{R}}
+      \newcommand{\sseq}{\subseteq}
+      \newcommand{\ov}[1]{\overline{#1}}
+      \DeclareMathOperator*{\argmax}{arg\,max}
+      \DeclareMathOperator*{\argmin}{arg\,min}
+      \)
+    </span>
+
+    <h1>A &nbsp; Development Environment</h1>
+    <hr>
+
+    <p>This appendix contains how to set up a development environment so that the reader can run the sample codes in the book and the accompanying Github repository. In general, we use <a href="https://nodejs.org/en">Node.js</a> to package Javascript code with HTML, images, and 3D contents. We also use it to serve the packaged webpage so that web browsers would run out code without triggering the <a href="https://developer.mozilla.org/ja/docs/Web/HTTP/CORS/Errors">cross-origin resource sharing (CORS) errors.</a></p>
+        
+    <p>We tested all the sample codes with the <a href="https://www.google.com/chrome/">Chrome</a> web browser, which supports WebGL 2.0 since 2017.</p>
+
+    <p>If the reader wishes to modify the sample code, we recommend the reader use <a href="https://code.visualstudio.com/">Visual Studio Code</a> as it is available for free and have extensions for HTML, Javascript, and GLSL coding.</p>
+
+    <h2>A.1 &nbsp; Setting up Node.js</h2>
+
+    <h2>A.2 &nbsp; How to run a sample code</h2>
+
+    <hr>
+    <div class="footnotes">
+      <ol> 
+            <li class="footnote" id="fn:gpu"></li>
+      </ol>
+    </div>
+
+    <hr>
+    <p>
+      <a href="../index.html">Contents</a>
+    </p>
+  </div>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/littlefoot.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    const { littlefoot } = require('littlefoot')
+
+    const lf = littlefoot({
+      activateOnHover: true,
+      hoverDelay: 250,
+    });
+  </script>
+</body>
+
+</html>

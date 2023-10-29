@@ -159,10 +159,10 @@
     </ol>
     </p>
 
-    <p>An overview of what each step does is shown in Figure 7.1. Let us now discuss each of the step in more details.</p>
+    <p>An overview of what each step does is shown in Figure 7.2. Let us now discuss each of the step in more details.</p>
 
     <figure class="figure">
-      <figcaption class="figure-caption"><strong>Figure 7.1</strong> TODO: A figure that gives an overview of what each step of the graphics pipeline does.</figcaption>
+      <figcaption class="figure-caption"><strong>Figure 7.2</strong> TODO: A figure that gives an overview of what each step of the graphics pipeline does.</figcaption>
     </figure> 
 
     <h3>7.2.1 &nbsp; Vertex Processing</h3>
@@ -263,6 +263,41 @@
     <p>The fragment shader receives as input interpolated varying variables. It also have access to image data called "textures" (Chapter XXX) that can be set up by Javascript code. It must then process these information and perform one of the two actions previously discussed in Section 7.2.4.</p>
 
     <p>Because fragment shaders decide the fragment colors, it plays a central role in determining how objects appear in images. Hence, it must take into account information that are related to appearance, and these include the object's colors, textures, and how the object's surface reflect or emit light. It must also take into account the intensity and the direction in which light comes to illuminate the object. We will learn about how to model light interaction in Chapter XXX and Chapter XXX.</p>
+
+    <h2>7.4 &nbsp; Summary</h2>
+
+    <ul>
+      <li>A <b>rendering algorithm</b> takes a description of a scene and a description of how the scene is viewed. It then creates a image of the scene accordingly as if taking a photograph.</li>
+
+      <li>In computer graphics, scenes are typically described as a collection of primitives. Images are typically raster images, which is a collection of pixels.</li>
+
+      <li>There are two main types of rendering algorithms based on the order of how primitives are pixels are iterated over.
+      <ol>
+        <li>An <b>image order rendering algorithm</b>'s main loop iterates over the pixels. For each pixel, it finds all primitives that contribute to the pixel's color and accumulate the contribution. <b>Ray tracing</b> and <b>path tracing</b> are examples of image order rendering algorithms.</li>
+
+        <li>An <b>object order rendering algorithm</b>'s main loop iterates over the primitives. For each primitive, it finds all pixels that the primitive overlap with and write the contribution to the pixel.</li>
+      </ol>
+      </li>
+
+      <li>The <b>graphics pipeline</b> is an object order rendering algorithm that is widely used in real-time applications such as 3D modelers and computer games. It is often executed by the graphics processing units (GPUs) so as to satisfy real-time constraints.</li>
+
+      <li>The graphics pipeline renders a scene using a 5-ste process, but the main rendering step is <b>rasterization</b>: identifying the pixels that a primitive overlaps with and slicing the primitive small areas call <b>fragments</b> that correspond to those pixels.</li>
+
+      <li>Implementations of the graphics pipeline usually come in the form of <b>application programming interfaces</b> (APIs) that are to be used by programmers to write computer graphics programs. Well-known APIs include DirectX, Vulcan, Metal, and OpenGL.</li>
+
+      <li><b>OpenGL</b> is an implementation of the graphics pipeline originally created by Silocon Graphics and now maintained by the Khronos Group.</li>
+
+      <li><b>WebGL</b>, the graphics API that we shall study in this book, is a version of OpenGL that runs in the web browser. Functions and data structures in the API are accessible through the Javascript language that most browsers can interpret.</li>
+
+      <li>In order to create a graphics application with WebGL, one almost always have to customize the graphics pipeline by writing an <b>OpenGL program</b> in the <b>OpenGL Shading Language</b> (GLSL).</li>
+
+      <li>An OpenGL program is a collection of two pieces of code.
+      <ul>
+        <li>The <b>vertex shader</b> is used to customize how the graphics pipeline would process vertex data. The main output of the vertex shader is the vertex's position in <b>clip space</b>.</li>
+        <li>The <b>fragment shader</b> is used to specify the color of each fragment created by the rasterization step. The only output of the fragment shader is the fragment's color.</li>
+      </ul>
+      </li>
+    </ul>
 
     <hr>
     <div class="footnotes">
