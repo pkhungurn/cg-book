@@ -86,7 +86,7 @@
     <p>Next, let us test whether you can run the software from a shell. Invoke Window's <tt>cmd</tt> program. At the command line, execute:</p>
 
 <pre>
-<code lang="shell">node --version</code>
+<code class="language-shell">&gt; node --version</code>
 </pre>
 
     <p>If the software was install correctly, the program should print the version of Node.js that was installed like in the following figure.</p>
@@ -98,13 +98,73 @@
 
     <h3>A.1.2 &nbsp; OS X</h3>
 
+    <p>TODO: Fill in this section.</p>
+
     <h3>A.1.3 &nbsp; Ubuntu</h3>
+
+    <p>TODO: Fill in this section.</p>
 
     <h2>A.2 &nbsp; How to run a sample code</h2>
 
-    <p>The process of running sample code that accompanies the book is the same for all projects. In this chapter, we will be running one sample program to familarize ourselves with the process.</p>
+    <p>The process of running sample code that accompanies the book is the same for all projects. In this chapter, we will be running one sample program to familarize ourselves with the process. All sample code is available from the <a href="https://github.com/pkhungurn/cg-book-code/">book's code Github repository.</a> Please clone the repository to a directory in your PC. Let us assume that this directory is <tt>~/cg-book-code.</tt></p>
 
-    <p>All sample code is available from the <a href="https://github.com/pkhungurn/cg-book-code/">book's code Github repository.</a> Please clone the repository to a directory in your PC. The reposity is divided into directories, each corresponding to a chapter. Each chapter's directory has one or multiple directories for sample programs in that chapter. The directory for this chapter, Appendix A is <tt>appendix-a</tt>, and it contains on program, whose directory is <tt>appendix-a/program-01</tt>.</p>
+    <p>The reposity is divided into directories, each corresponding to a chapter. Each chapter's directory has one or multiple directories for sample programs in that chapter. The directory for this chapter, Appendix A is <tt>appendix-a</tt>, and it contains one program, whose directory is <tt>appendix-a/program-01</tt>. This is the program we will run in this chapter.</p>
+
+    <h3>A.2.1 &nbsp; Understanding the sample code</h3>
+
+    <p>The <tt>appendix-a/program-01</tt> directory houses a Node.js project that uses <a href="https://webpack.js.org/">webpack</a> to bundle Javascript code and other resources so that they can be conveniently served with an HTTP server. The directory has 4 files arranged in the layout below:</p>
+
+<pre><code>+ cg-book-code/appendix-a/program-01
+  + src
+    - index.js
+    - index.html
+  - package-lock.json
+  - package.json
+  - webpack.config.js</code></pre>
+
+    <p>The <tt>package-lock.json</tt>, <tt>package.json</tt> and <tt>webpack.config.js</tt> files are setting files. The <tt>src</tt> directory contains the "source code" for the program: <tt>index.js</tt> contains the Javascript code, and <tt>index.html</tt> contains a web page that will use the Javascript code. Each sample program in this book has one <tt>index.html</tt>, and running the program means viewing this web page after all assets have been bundled by webpack and served correctly.</p>
+
+    <h3>A.2.2 &nbsp; Installing Node.js packages</h3>
+
+    <p>To run the program, the first thing to do is to open a command-line shell. Then, change the directory to the directory of <tt>appendix-a/program-01</tt>.</p>
+
+<pre><code class="language-shell">&gt; cd &lt;your-cloning-location&gt;/cg-book-code/appendix-a/program-01</code>
+</pre>
+
+    <p>Next, we will need to install Node.js packages that are necessary to bundle all the assets. To do so, run the following command:</p>
+
+<pre><code class="language-shell">&gt; npm install</code>
+</pre>
+
+    <p>This command will download Node.js packages into a directory named <tt>node_modules</tt>, and so the structure of the program's directory will become:</p>
+
+<pre><code>+ cg-book-code/appendix-a/program-01
+  + node_modules
+  + src
+    - index.js
+    - index.html
+  - package-lock.json
+  - package.json
+  - webpack.config.js</code></pre>
+
+    <p>The <tt>node_modules</tt> directory will in general contain many files and directories underneath. However, there is no need to be concerned with its content. What to keep in mind is that this directory needs to be present before we can run the sample code. If you will not run it again, you can simply delete the directory. If you change your mind and want to run the code after deleting <tt>node_modules</tt>, just run <tt>npm install</tt> again to recreate it.</p>
+    
+    <p>We are now ready to run the sample code. There are two ways to do this: the "development mode"  and the "production mode."</p>
+
+    <h3>A.2.3 &nbsp; Running the sample code in development mode</h3>
+
+    <p>We run the sample code in development mode when we want to change the code and sees the result immediately. To do so, run the following command under the directory of a specific program:</p>
+
+<pre>
+<code class="language-shell">npm run serve</code>
+</pre>
+
+    <p>This command does several things all at once. It first use webpack to bundle the Javascript code, the web package, and all the other assets. It then sets up an HTTP server to serve these contents. You can see a screenshot of the shell after running the command in the figure below.</p>
+
+    <figure class="figure">
+      <a href="images/windows-nodejs-test-run.png"><img src="images/windows-nodejs-test-run.png" alt="" width="640"></a>
+      <figcaption class="figure-caption"><strong>Figure A.1</strong> If Node.js is install correctly, you should be able to run <tt>node --version</tt> in the <tt>cmd</tt> program and get a printout of the software version.</figcaption>
+    </figure>
 
     <hr>
     <p>
