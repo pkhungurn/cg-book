@@ -176,7 +176,7 @@
 
     <p>We run the sample code in development mode when we want to change the code and sees the result immediately. To do so, run the following command under the directory of a specific program:</p>
 
-<pre><code class="language-shell">npm run serve</code></pre>
+<pre><code class="language-shell">&gt; npm run serve</code></pre>
 
     <p>This command does several things all at once. It first use webpack to bundle the Javascript code, the web package, and all the other assets. It then sets up an HTTP server to serve these contents. You can see a screenshot of the shell after running the command in the figure below.</p>
 
@@ -207,6 +207,58 @@
     </figure>
 
     <p>We have just seen first hand that the change we made to the Javascript code is reflected immediately in the browser. This feature of the development mode is very useful when we want to study the sample code by modifying it and seeing the result.</p>
+
+    <h3>A.2.4  &nbsp; Running the sample code in production mode</h3>
+
+    <p>We run code in production mode when we want to serve our program to users other than ourselves. This involves two steps.</p>
+
+    <ol>
+      <li><b>Building.</b> We prepare the HTML web pages, the Javascript code, and all the other types of contents in a form that is ready to be served to the user. In our case, webpack does the building for us.</li>
+      <li><b>Deployment.</b> We serve the built program with a web server.</li>
+    </ol>
+
+    <p>Unlike developmet mode, if we make any changes to the program after deployment, the changes will not be reflected in the deployed program. We have to build and deploy the program again to include the changes. The <tt>npm run serve</tt> command in the last section carry out the above two steps altogether. However, he web server is only available on the machine we use, and it might also reveal too much information about the program because it is intende to be used for program development. In production mode, we have more freedom to choose the web server. This means that we can serve our program from other computers and choose a server that have better security guarantees.</b>
+
+    <p>Let's get to running the code in production mode. To build the sample program, run the following command:</p>
+
+<pre><code class="language-shell">&gt; npm run build</code></pre>
+
+    <p>This command uses webpack to bundle the program. The result is a directory named <tt>dist</tt> under the directory of the Node.js project. The files under this directory is the built program. In our case, the directory only contains two files: <tt>index.html</tt> and <tt>index.bundle.js</tt>.</p>    
+
+    <pre><code>+ cg-book-code/appendix-a/program-01
+      + dist
+        - index.html
+        - index.bundle.js
+      + node_modules
+      + src
+        - index.js
+        - index.html
+      - package-lock.json
+      - package.json
+      - webpack.config.js</code></pre>
+    
+    <p>We can tell that the web application is ready to be deployed because the <tt>index.bundle.js</tt> file that is referenced by <tt>index.html</tt> is present. The files under <tt>dist</tt> are <i>portable</i>. We can move them anywhere and serve them with a web server, and the program would function correctly.</p>
+
+    <p>Let's try to serve the build program with a web server. To do so, we need a web server, and we will use one called <a href="https://www.npmjs.com/package/http-server">http-server</a> that is available as a Node.js package. To install the package, run:</p>
+
+<pre><code class="language-shell">&gt; npm install --global http-server</code></pre>
+
+    <p>After the installation is done, change to the <tt>dist</tt> directory.</p>
+    
+<pre><code class="language-shell">&gt; cd dist</code></pre>
+
+    <p>Then, run the command <tt>http-server</tt> that we just installed.</p>
+
+<pre><code class="language-shell">&gt; http-server</code></pre>
+
+    <p>The shell would display messages like the following figure:</p>
+
+    <figure class="figure">
+      <a href="images/windows-program-01-production-mode.png"><img src="images/windows-program-01-production-mode.png" alt="" width="640"></a>
+      <figcaption class="figure-caption"><strong>Figure A.8</strong> Running <tt>http-server</tt> from the <tt>dist</tt> directory to serve the sample program. Note that one of the URL might be different.</figcaption>
+    </figure>
+
+    <p>The HTTP server is telling us that we can access our program from the URL <tt>http://127.0.0.1:8080/</tt>, which is equivalent to <tt>http://localhost:8080</tt>. If we open the URL with a web browser, we should get a result similar to Figure A.7, assuming that you have changed the text the program prints.</p>
 
     <hr>
     <p>
