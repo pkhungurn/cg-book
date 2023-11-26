@@ -22,7 +22,11 @@
   <link rel="stylesheet"
       href="../highlight/styles/default.min.css">
   <script src="../highlight/highlight.min.js"></script>
-  <script>hljs.highlightAll();</script>
+  <script src="../js/highlightjs-line-numbers.min.js"></script>
+  <script>
+  hljs.highlightAll();
+  hljs.initLineNumbersOnLoad();
+  </script>
     
   <title>Chapter 8</title>
 </head>
@@ -68,14 +72,53 @@
       \)
     </span>
 
-    <h1>8 &nbsp; OpenGL Programming Basics</h1>
+    <h1>8 &nbsp; WebGL Programming Basics</h1>
     <hr>
 
     <p>We have studied the basics of computer graphics in details and have learned at a high level what WebGL, the implementation of the graphics pipeline we are going to use, is. It's now time to learn how to use WebGL to write computer graphics applications.</p>
 
     <p>Before proceeding further, we recommend the reader read and follow the instruction in <a href="../appendix-a/index.html">Appendix A</a> in order to run the sample code in this chapter.</p>
 
-    <h2>&.1 &nbsp; Program 1: Your first WebGL program</h2>
+    <h2>8.1 &nbsp; Program 1: Your first WebGL program</h2>
+
+    <p>This program is available in the <a href="http:/https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-01">chapter-08/program-01</a> directory of the accompanying <a href="https://github.com/pkhungurn/cg-book-code/">code repository</a>. If you run it, the following is the screen that you would see.</p>
+
+    <figure class="figure">
+      <a href="images/program-01-screenshot.png"><img src="images/program-01-screenshot.png" alt="" height="300"></a>
+      <figcaption class="figure-caption"><strong>Figure 8.1</strong> Screenshot of Program 1.</figcaption>
+    </figure>
+  
+    <p>As you can see, the program does not do much. It just displays a black square. However, this square is a very important part of every WebGL program.</p>
+
+    <p>We have learned in the last chapter that the output of a rendering algorithm is an image, which must be shown to the user somehow. For our rendering algorithm, WebGL, its outputs are typically displayed on a canvas HTML element. As a result, the first step in creating a WebGL application is to create a canvas that will act as the "screen" to project 3D scenes. We can see how this is done in the <a href="https://github.com/pkhungurn/cg-book-code/blob/dbd2033b42303be28d4642c68d33b8de14f59fab/chapter-08/program-01/src/index.html#L9"><code>index.html</code></a> file of Program 1.</p>
+
+<pre><code class="language-html">&lt;canvas 
+  id="webglCanvas" 
+  style="border: none; background-color: black;" 
+  width="512" 
+  height="512">
+&lt;/canvas></code></pre>
+
+    <p>Here, we use a <code>canvas</code> tag to specify a canvas element. In the tag, we can specify the canvas' ID, CSS style, width (in pixels), and height (also in pixels). It is very important to specify the ID because we will use it to refer to the canvas in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-01/src/index.js">Javascript code</a>, which is shown below.</p>
+
+<pre><code class="language-javascript">const $ = require('jquery');
+var canvas = $("#webglCanvas");
+var gl = canvas[0].getContext("webgl2");
+if (!gl) {
+    alert("Cannot get WebGL 2 context!");
+}</code></pre>
+
+    <p>To make manipulation of HTML elements easier and concise, we make use of the <a href="https://jquery.com/">jQuery</a> library, which we import into the customary <code>$</code> symbol. We immediately use it to retrieve all HTML element with ID "webglCanvas" in Line 3. (Note that we must add <code>#</code> in front of the ID like in <code>"#webglCanvas"</code> in order to tell jQuery to look for elements with IDs equal to what come after the <code>#</code> mark.) What is stored in the <code>canvas</code> variable is a <a href="https://learn.jquery.com/using-jquery-core/jquery-object/"><code>jQuery</code></a> object that contains all HTML elements that have the specified ID. These can be accessed by indexing the <code>jQuery</code> object. So, the one canvas element in <code>index.html</code> can be retrieved as <code>canvas[0]</code>, which is used in Line 4 just below.</p>
+    
+    <p>In order to use WebGL, we need an object called the <b>WebGL context</b>, which gives access to functions and constants that make up the WebGL API. In Javascript, a WebGL context can be obtained by calling the <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext"><code>getContext</code></a> method on an instance of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a> class. Because we want to use a WebGL 2 context, we must give the string <code>"webgl2"</code> as the argument of the method.</p>
+
+    <h2>8.2 &nbsp; Program 2: Getting info about WebGL context</h2>
+
+    <h2>8.3 &nbsp; Program 3: Clearing the screen</h2>
+
+    <h2>8.4 &nbsp; Program 4: Continuous updates</h2>
+
+    <h2>8.5 &nbsp; Program 5: Setting the viewport</h2>
  
     <hr>
     <div class="footnotes">
