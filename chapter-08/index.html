@@ -92,28 +92,106 @@
 
     <p>We have learned in the last chapter that the output of a rendering algorithm is an image, which must be shown to the user somehow. For our rendering algorithm, WebGL, its outputs are typically displayed on a canvas HTML element. As a result, the first step in creating a WebGL application is to create a canvas that will act as the "screen" to project 3D scenes. We can see how this is done in the <a href="https://github.com/pkhungurn/cg-book-code/blob/dbd2033b42303be28d4642c68d33b8de14f59fab/chapter-08/program-01/src/index.html#L9"><code>index.html</code></a> file of Program 1.</p>
 
+<figure class="figure">
 <pre><code class="language-html">&lt;canvas 
   id="webglCanvas" 
   style="border: none; background-color: black;" 
   width="512" 
   height="512">
 &lt;/canvas></code></pre>
+<figcaption class="figure-caption"><strong>Lising 8.1</strong> Definition of the canvas element in the <code>index.html</code> file of Program 1.</figcaption>
+</figure>
 
     <p>Here, we use a <code>canvas</code> tag to specify a canvas element. In the tag, we can specify the canvas' ID, CSS style, width (in pixels), and height (also in pixels). It is very important to specify the ID because we will use it to refer to the canvas in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-01/src/index.js">Javascript code</a>, which is shown below.</p>
 
+<a name="listing-8.2"></a>
+<figure class="figure">
 <pre><code class="language-javascript">const $ = require('jquery');
 var canvas = $("#webglCanvas");
 var gl = canvas[0].getContext("webgl2");
 if (!gl) {
-    alert("Cannot get WebGL 2 context!");
+    alert("Cannot get WebGL 2.0 context!");
 }</code></pre>
+<figcaption class="figure-caption"><strong>Lising 8.2</strong> The <code>index.js</code> file of Program 1.</figcaption>
+</figure>
 
-    <p>To make manipulation of HTML elements easier and concise, we make use of the <a href="https://jquery.com/">jQuery</a> library, which we import into the customary <code>$</code> symbol. We immediately use it to retrieve all HTML element with ID "webglCanvas" in Line 3. (Note that we must add <code>#</code> in front of the ID like in <code>"#webglCanvas"</code> in order to tell jQuery to look for elements with IDs equal to what come after the <code>#</code> mark.) What is stored in the <code>canvas</code> variable is a <a href="https://learn.jquery.com/using-jquery-core/jquery-object/"><code>jQuery</code></a> object that contains all HTML elements that have the specified ID. These can be accessed by indexing the <code>jQuery</code> object. So, the one canvas element in <code>index.html</code> can be retrieved as <code>canvas[0]</code>, which is used in Line 4 just below.</p>
+    <p>To make manipulation of HTML elements easier and more concise, we make use of the <a href="https://jquery.com/">jQuery</a> library, which we import into the customary <code>$</code> symbol. We immediately use it to retrieve all HTML element with ID "webglCanvas" in Line 2 of <a href="#listing-8.2">Lising 8.2</a>. (Note that we must add <code>#</code> in front of the ID like in <code>"#webglCanvas"</code> in order to tell jQuery to look for elements with IDs equal to what come after the <code>#</code> mark.) What is stored in the <code>canvas</code> variable is a <a href="https://learn.jquery.com/using-jquery-core/jquery-object/"><code>jQuery</code></a> object that contains all HTML elements that have the specified ID. These can be accessed by indexing the <code>jQuery</code> object. So, the one canvas element in <code>index.html</code> can be retrieved as <code>canvas[0]</code> as in Line 3. Because it is a canvas element, it is an instance of the  <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a> class.</p>
     
-    <p>In order to use WebGL, we need an object called the <b>WebGL context</b>, which gives access to functions and constants that make up the WebGL API. In Javascript, a WebGL context can be obtained by calling the <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext"><code>getContext</code></a> method on an instance of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a> class. Because we want to use a WebGL 2 context, we must give the string <code>"webgl2"</code> as the argument of the method.</p>
+    <p>In order to use WebGL, we need an object called the <b>WebGL context</b>, which gives access to functions and constants that make up the WebGL API. In Javascript, it is an instance of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext"><code>WebGL2RenderingContext</code></a> class, and it can be obtained by calling the <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext"><code>getContext</code></a> method on an instance of the <code>HTMLCanvasElement</code> class, which we have just retrieved using jQuery. Because we want to use a WebGL 2 context, we must give the string <code>"webgl2"</code> as the argument of the method like in Line 3 of <a href="#listing-8.2">Lising 8.2</a>.</p>
+
+    <p>If your web browser supports WebGL 2.0<sup><a href="#fn:icanuse-webgl2">1</a></sup>, the <code>getContext</code> method should return a WebGL context. Otherwise, it would return <code>null</code>. In Line 4 to 6 of <a href="#listing-8.2">Lising 8.2</a>, we check whether return value is null or not. If it is, we show an alert message. As a result, Program 1 runs successfully if you do not see any alert windows after loading the web page.</p>
+
+    <p>To recap, our first program does the bare minimum of what can be called a program that uses WebGL 2.0: creating a canvas element and retrieving a WebGL context from it.</p>
 
     <h2>8.2 &nbsp; Program 2: Getting info about WebGL context</h2>
 
+    <p>In the second program, we become more familiar with the WebGL context. The program's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-02">chapter-08/program-02</a> directory. The screenshots of the program is given below.</p>
+
+    <a name="program-2-screenshots"></a>
+    <figure class="figure">
+      <table cellpadding="2">
+        <tr>
+          <td><a href="images/program-02-screenshot-01.png"><img src="images/program-02-screenshot-01.png" alt="" height="300"></a></td>
+          <td><a href="images/program-02-screenshot-02.png"><img src="images/program-02-screenshot-02.png" alt="" height="300"></a></td>
+        </tr>
+      </table>      
+      <figcaption class="figure-caption"><strong>Figure 8.2</strong> Screenshots of Program 2.</figcaption>
+    </figure>
+
+    <p>As we can see from the screenshots, the web page has a canvas element like that of Program 1, but Program 2's web page now has two more sections&mdash;"Parameters" and "Extensions"&mdash;that show information about the WebGL context.</p>
+
+    <h3>8.2.1 &nbsp; WebGL context's fields and methods</h3>
+
+    <p>Before discussing what the program does, let us talk about the WebGL context. First of all, it is a Javascript object, which means that it contains fields and methods. A large number of WebGL context's fields are numerical constants, and all of them are listed in this <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants">web page</a>. These constants are of type <code>GLenum</code>, which is simply a shorthand for <code>unsigned long</code>. The name <code>GLenum</code> signifies that the values are part of a fixed set of defined constants, like in enumerate types of many other programming languages.  We mainly use <code>GLenum</code> values as arguments to WebGL context's methods. For example, if we want WebGL to perform the depth test (<a href="../chapter-07/index.html#raster-operation">Section 7.5.2</a>), we would issue the following statement.</p>
+
+<pre><code class="language-javascript">gl.enable(gl.DEPTH_TEST);</code></pre>
+
+    <p>Here, the variable <code>gl</code> is suppoosed to hold a WebGL context, which we can obtain using the process in Program 1. <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/enable"><code>enable</code></a> is a method that is used to turn on WebGL features. The feature we turn on with the above statement is the depth test, and we indicate this with the <code>GLenum</code> value stored in the <code>gl.DEPTH_TEST</code> field.</p>
+
+    <p>Methods of a WebGL context correspond to functions defined in the <a href="https://registry.khronos.org/webgl/specs/latest/2.0/">WebGL 2.0 API specification</a>. Documentation of the actual methods can be found in the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext">documentation page</a> for the <code>WebGL2RenderingContext</code> class, where all methods are listed in <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext#browser_compatibility">table</a> along with information about which methods are available in which major browsers.</p>
+
+    <p>One good thing to know is that these methods often come from C functions in the OpenGL API, and these functions names always begin with "<code>gl</code>". For example, the <code>enable</code> method above corresponds to the <a href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml"><code>glEnable</code></a> function in standard OpenGL. Hence, a quick way to find documentation for a WebGL context's method is to take the method name, capitalize the first letter, add <code>gl</code> in front of the name, and search for the resulting name with a search engine or ask an LLM about it.</p>
+
+    <h3>8.2.2 &nbsp; WebGL parameters</h3>
+
+    <p>A WebGL context maintains a collections of values called <b>parameters</b>, each of which indicate a particular setting of the WebGL implementation. These include, among other things, (1) whether a certain functionality such as the depth test is enabled or not, (2) the width in pixels of line primitives, and (3) the maximum number of attributes a vertex can have. These values can be accessed by calling WebGL context's <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter"><code>getParameter</code></a> method, passing a <code>GLenum</code> value that indicates the parameter we want to fetch. For examples, the following code snippet retrieves the three parameters we just discussed.</p>
+
+<pre><code class="language-javascript">gl.getParameter(gl.DEPTH_TEST);
+gl.getParameter(gl.LINE_WIDTH);
+gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
+
+    <p>The return values of the <code>getParameter</code> method have different types that depend on the method's input. While <code>gl.getParameter(gl.DEPTH_TEST)</code> would return a boolean indicating whether the depth test is enabled or not, <code>gl.getParameter(gl.LINE_WIDTH)</code> would return a floating point value, and <code>gl.getParameter(gl.MAX_VERTEX_ATTRIBS)</code> would return an integer.</p>    
+
+    <p>One thing that Program 2 does is using <code>getParameter</code> to retrieve a number of parameters and display the values nicely in a table. A lot of these parameters have names that being with <code>MAX</code>, and they indicate the limits of various settings of the particular WebGL implementation in the browser you use.</p>
+
+    <h3>8.2.3 &nbsp; WebGL extensions</h3>
+
+    <p>Some browsers implement functionalities that are not included in the standard WebGL 2.0 specification. Related functionalities are grouped together in bundles called <b>extensions</b>, and all extensions that are recognized by Khronos are listed in <a href="https://registry.khronos.org/webgl/extensions/">this web page</a>. Extensions are referred to by names such as <code>WEBGL_debug_renderer_info</code>, <code>WEBGL_multi_draw</code>, <code>OES_texture_float_linear</code>, and so on.</p>
+
+    <p>The functionalities of an extension are not enabled by default. To use an extension, one must explicitly request it by calling the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getExtension"><code>getExtension</code></a> method of a WebGL context, giving the method the extension's name. For example, Program 2 uses the  <a href="https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_debug_renderer_info"><code>WEBGL_debug_renderer_info</code></a>, and it retrieves the extension with <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-02/src/index.js#L9">the following statement</a>:</p>
+
+<pre><code class="language-javascript">var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');</code></pre>
+
+    <p>The <code>getExtension</code> method would return an object that would give us access to the extension's specific constants and functions. In particular, we use the extension to retrieve the <code>GLenum</code> values called <code>UNMASKED_VENDOR_WEBGL</code> and <code>UNMASKED_RENDERER_WEBGL</code>, which can be used as arguments to WebGL context's <code>getParameter</code> method in order to retrieve information about the WebGL implementation's vector and renderer. According to <a href="#program-2-screenshots">Figure 8.2</a>, which contains the result of running Program 2 on the author's computer, we learn that the vendor was Google Inc., and the renderer was called "ANGLE."</p>
+
+    <h3>8.2.4 &nbsp; How Program 2 works</h3>
+    
+    <p>Let's look at Program 2's code to see how it functions. The <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-02/src/index.html"><code>index.html</code></a> file is pretty much the same as the same file of Program 1, except that it has two <code>div</code> elements that are going to host the parameter table and the list of supported extensions.</p>
+
+<a name="listing-8.2"></a>
+<figure class="figure">
+<pre><code class="language-html">  &lt;h2>Parameters&lt;/h2>
+
+  &lt;div id="paramsTable">&lt;/div>
+
+  &lt;h2>Extensions&lt;/h2>
+
+  &lt;div id="extensionList">&lt;/div></code></pre>
+<figcaption class="figure-caption"><strong>Lising 8.3</strong> A part of a <code>index.html</code> file of Program 2.</figcaption>
+</figure>
+
+    <p></p>
+        
     <h2>8.3 &nbsp; Program 3: Clearing the screen</h2>
 
     <h2>8.4 &nbsp; Program 4: Continuous updates</h2>
@@ -123,6 +201,9 @@ if (!gl) {
     <hr>
     <div class="footnotes">
       <ol> 
+            <li class="footnote" id="fn:icanuse-webgl2">
+                <p>You can check whether your web browser support WebGL 2.0 or not by checking the <a href="https://caniuse.com/?search=webgl2">following web page</a>.</p>
+            </li>
       </ol>
     </div>
 
