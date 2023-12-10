@@ -223,7 +223,7 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
 
     <p>We see that, for each parameter name in the <code>paramNames</code> list, we first retrieve its <code>GLenum</code> value by looking up the field with the corresponding name in either the <code>gl</code> or the <code>debugInfo</code> variables. The <code>||</code> operator in the 2nd line allows us to try to retrieve the <code>GLenum</code> value from the <code>gl</code> variable first. If this fails, we will get the <code>undefined</code> value, and the program would then attempt to retrieve the value from the <code>debugInfo</code> variable instead. Note that we need to do this because the <code>GLenum</code> values associated with <code>UNMASKED_VENDOR_WEBGL</code> and <code>UNMASKED_RENDERER_WEBGL</code> are not available in the standard WebGL context, and they are only available in in the <code>WEBGL_debug_renderer_info</code> extension. Once we have retrieved the <code>GLEnum</code> value, we can pass the value to the <code>getParameter</code> method of the WebGL context to obtain the WebGL parameter.</p>
 
-    <p>The next <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-02/src/index.js#L32">two</a> <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-02/src/index.js#L36">statements</a> in this Section simply create an HTML table out of the table rows computed by the previous statement and then insert the table to the web page with the help of JQuery. Because these details are not relevant to WebGL programming, we will not explain them further.</p>
+    <p>The next <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-02/src/index.js#L32">two</a> <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-02/src/index.js#L36">statements</a> in this Section simply create an HTML table out of the table rows computed by the previous statement and then insert the table to the web page at the <code>div</code> element under the "Parameters" section with the help of JQuery. Because these details are not relevant to WebGL programming, we will not explain them further.</p>
 
     <h4>8.2.4.2 &nbsp; Retrieving WebGL extensions</h4>
 
@@ -231,7 +231,7 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
 
 <pre><code class="language-javascript">var extensions = gl.getSupportedExtensions();</code></pre>
 
-    <p>The rest of the section just converts the return value, which is a list of string, into a bullet list and then inserts it to the web page.</p>
+    <p>The rest of the section just converts the return value, which is a list of strings, into a bullet list and then inserts it to the web page at the <code>div</code> element under the "Extensions" section.</p>
         
     <h2>8.3 &nbsp; Program 3: Clearing the screen</h2>
 
