@@ -148,13 +148,13 @@ if (!gl) {
 
     <p>Here, the variable <code>gl</code> is suppoosed to hold a WebGL context, which we can obtain using the process in Program 1. <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/enable"><code>enable</code></a> is a method that is used to turn on WebGL features. The feature we turn on with the above statement is the depth test, and we indicate this with the <code>GLenum</code> value stored in the <code>gl.DEPTH_TEST</code> field.</p>
 
-    <p>Methods of a WebGL context correspond to functions defined in the <a href="https://registry.khronos.org/webgl/specs/latest/2.0/">WebGL 2.0 API specification</a>. Documentation of the actual methods can be found in the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext">documentation page</a> for the <code>WebGL2RenderingContext</code> class, where all methods are listed in <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext#browser_compatibility">table</a> along with information about which methods are available in which major browsers.</p>
+    <p>Methods of a WebGL context correspond to functions defined in the <a href="https://registry.khronos.org/webgl/specs/latest/2.0/">WebGL 2.0 API specification</a>. Documentation of the actual methods can be found in the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext">documentation page</a> for the <code>WebGL2RenderingContext</code> class, where all methods are listed in <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext#browser_compatibility">this table</a> along with information about which methods are available in which major browsers.</p>
 
     <p>One good thing to know is that these methods often come from C functions in the OpenGL API, and these functions names always begin with "<code>gl</code>". For example, the <code>enable</code> method above corresponds to the <a href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml"><code>glEnable</code></a> function in standard OpenGL. Hence, a quick way to find documentation for a WebGL context's method is to take the method name, capitalize the first letter, add <code>gl</code> in front of the name, and search for the resulting name with a search engine or ask an LLM about it.</p>
 
     <h3>8.2.2 &nbsp; WebGL parameters</h3>
 
-    <p>A WebGL context maintains a collections of values called <b>parameters</b>, each of which indicate a particular setting of the WebGL implementation. These include, among other things, (1) whether a certain functionality such as the depth test is enabled or not, (2) the width in pixels of line primitives, and (3) the maximum number of attributes a vertex can have. These values can be accessed by calling WebGL context's <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter"><code>getParameter</code></a> method, passing a <code>GLenum</code> value that indicates the parameter we want to fetch. For examples, the following code snippet retrieves the three parameters we just discussed.</p>
+    <p>A WebGL context maintains a collections of values called <b>parameters</b>, each of which indicates a particular setting of the WebGL implementation. These include, among other things, (1) whether a certain functionality such as the depth test is enabled or not, (2) the width in pixels of line primitives, and (3) the maximum number of attributes a vertex can have. These values can be accessed by calling WebGL context's <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter"><code>getParameter</code></a> method, passing a <code>GLenum</code> value that indicates the parameter we want to fetch. For examples, the following code snippet retrieves the three parameters we just discussed.</p>
 
 <pre><code class="language-javascript">gl.getParameter(gl.DEPTH_TEST);
 gl.getParameter(gl.LINE_WIDTH);
@@ -172,7 +172,7 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
 
 <pre><code class="language-javascript">var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');</code></pre>
 
-    <p>The <code>getExtension</code> method would return an object that would give us access to the extension's specific constants and functions. In particular, we use the extension to retrieve the <code>GLenum</code> values called <code>UNMASKED_VENDOR_WEBGL</code> and <code>UNMASKED_RENDERER_WEBGL</code>, which can be used as arguments to WebGL context's <code>getParameter</code> method in order to retrieve information about the WebGL implementation's vector and renderer. According to <a href="#program-2-screenshots">Figure 8.2</a>, which contains the result of running Program 2 on the author's computer, we learn that the vendor was Google Inc., and the renderer was called "ANGLE."</p>
+    <p>The <code>getExtension</code> method would return an object that would give us access to the extension's specific constants and functions. In particular, we use the extension above to retrieve the <code>GLenum</code> values called <code>UNMASKED_VENDOR_WEBGL</code> and <code>UNMASKED_RENDERER_WEBGL</code>, which can be used as arguments to WebGL context's <code>getParameter</code> method in order to retrieve information about the WebGL implementation's vector and renderer. According to <a href="#program-2-screenshots">Figure 8.2</a>, which contains the result of running Program 2 on the author's computer, we learn that the vendor was Google Inc., and the renderer was called "ANGLE."</p>
 
     <h3>8.2.4 &nbsp; How Program 2 works</h3>
     
@@ -189,6 +189,28 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
   &lt;div id="extensionList">&lt;/div></code></pre>
 <figcaption class="figure-caption"><strong>Lising 8.3</strong> A part of a <code>index.html</code> file of Program 2.</figcaption>
 </figure>
+
+    <p>The Javascript code in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-02/src/index.js"><code>index.js</code></a> would get the relevant information from the WebGL context to fill the <code>div</code>s.</p>
+    
+    <h4>8.2.4.1 &nbsp; Creating the parameter table</h4>
+
+    <p>To create a table of WebGL parameters, we first retrieve the <code>WEBGL_debug_renderer_info</code> extension with the <code>getExtension</code> function in the last section. We then create a list of strings that are HTML code for each row of the parameter table with the following statement:</p>
+
+<pre><code class="language-javascript">var tableRows = paramNames.map(paramName => {
+  var paramID = gl[paramName] || debugInfo[paramName];
+  var value = gl.getParameter(paramID);
+  return "&lt;tr>&lt;td>" + paramName + "&lt;/td>&lt;td>" + String(value) + "&lt;/td>&lt;/tr>"
+});</code></pre>
+
+    <p>Here, <code>paramNames</code> is a list of parameter names that we are interested in, and it was defined in <a href="https://github.com/pkhungurn/cg-book-code/blob/237496690d110b3ef380bdfb4a48a8ded786b7e0/chapter-08/program-02/src/index.js#L10">the statement just before this one</a>. We retrieve a parameter values in two steps. The first step is to retrieve the <code>GLenum</code> value associated with the parameter name.</p>
+
+<pre><code class="language-javascript">var paramID = gl[paramName] || debugInfo[paramName];</code></pre>
+
+    <p>We use two features of the Javascript language in the line above. The first is that an object's field can be retrieved with the bracket notion: the field <code>gl.DEPTH_TEST</code> can also be access with <code>gl["DEPTH_TEST"]</code>. This feature allows us to retrieved all fields whose names are in the <code>paramNames</code> list by just using the bracket notation with each of them. The second feature is semantic of the <code>||</code> (logical or) operator: when computing the value of <code>a || b</code>, the value of the whole expression is the value of <code>b</code> if <code>a</code> is undefined. As a result, <code>gl[paramName] || debugInfo[paramName]</code> is equivalent to trying to retrieve the <code>GLenum</code> associated with the name stored in <code>paramName</code> from the WebGL context first. If the parameter with the name does not exist, the value of <code>gl[paramName]</code> would be <code>undefined</code>, and the code would try to retrieve the <code>GLenum</code> value from the <code>WEBGL_debug_renderer_info</code> extension stored in <code>debugInfo</code> instead.</p>
+
+    <p>The second step is to use the retrieved <code>GLenum</code> value to get the parameter value. This is done with the statement:</p>
+
+<pre><code class="language-javascript">var value = gl.getParameter(paramID);</code></pre>
 
     <p></p>
         
