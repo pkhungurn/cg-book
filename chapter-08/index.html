@@ -235,7 +235,7 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
         
     <h2>8.3 &nbsp; Program 3: Clearing the screen</h2>
 
-    <p>The third program covers the commands are used to clear the canvas used to display WebGL's output. From now, we shall refer to this canvas as the "screen" as it acts as the display device in our context. Clearning the screen removes whatever the screen was displaying previously, giving us a clean slate to draw new images. It is almost always the first thing we do when we want to update WebGL's output. The program's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-03">chapter-08/program-03</a> directory. The screenshots of the program is given below.</p>
+    <p>The third program covers the commands are used to clear the canvas used to display WebGL's output. From now on, we shall refer to this canvas as the "screen" as it acts as the display device in our context. Clearning the screen removes whatever the screen was displaying previously, giving us a clean slate to draw new images. It is almost always the first thing we do when we want to update WebGL's output. The program's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-03">chapter-08/program-03</a> directory. The screenshots of the program is given below.</p>
 
     <figure class="figure">
       <a href="images/program-03-screenshot.png"><img src="images/program-03-screenshot.png" alt="" height="300"></a>
@@ -259,7 +259,23 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
 
     <p>The color buffer is always present because there would be no images to display in the first place. The depth buffer and the stencil buffer are not present unless we enable the corresponding tests.</p>
 
-    <p>The <code>clear</code> method can be used to clear any combination of the above three buffers. What it receives as input is a <b>bit field</b>, an integer value whose bits represent a set of items.</p>
+    <p>The <code>clear</code> method can be used to clear any combination of the above three buffers. What it receives as input is a <b>bit field</b>, an integer value whose bits represent a set of items. The bit field can be constructed by performing the bitwise-or <code>|</code> operation on the following <code>GLenum</code> values</p>
+
+    <ol>
+      <li><code>gl.COLOR_BUFFER_BIT</code></li>
+      <li><code>gl.DEPTH_BUFFER_BIT</code></li>
+      <li><code>gl.STENCIL_BUFFER_BIT</code></li>
+    </ol>
+
+    <p>For example, the second line, <code>gl.clear(gl.COLOR_BUFFER_BIT)</code>, clears only the color buffer. To clear the color buffer and depth buffer at the same time, we would write:</p>
+
+<pre><code class="language-javascript">gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);</code></pre>
+      
+    <p>To clear all three buffers, we would write:</p>
+
+<pre><code class="language-javascript">gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);</code></pre>
+
+    <p>In this book, however, we will not use the stencil buffer and so will not clear it. Most of the time, we will clear the color buffer and the depth buffer together.</p>
 
     <h2>8.4 &nbsp; Program 4: Continuous updates</h2>
 
