@@ -279,6 +279,24 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
 
     <h2>8.4 &nbsp; Program 4: Continuous updates</h2>
 
+    <p>Most WebGL applications generate images that change with time. This might be because they have to show animations or they must respond to the user's inputs from keyboard or mouse. This means that such applications must generate a new image every so often. Program 4 shows how to do this. The program's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-04">chapter-08/program-04</a> directory.</p>    
+
+    <p>The web page of Program 4 looks similar to that of Program 3, excepth for the fact that, underneath the WebGL canvas, there are three slides corresponding to the R, G, and B channels. When you manipulate the sliders, the color of the WebGL canvas changes. This behavior is possible because the program updates the screen at a very high rate. Every time it updates the screen, it sets the clear color to the values indicated by the sliders and clears the screen accordingly</p>
+
+    <figure class="figure">
+      <table cellpadding="5">
+        <tr>
+          <td><a href="images/program-04-screenshot-01.png"><img src="images/program-04-screenshot-01.png" alt="" height="300"></a></td>
+          <td><a href="images/program-04-screenshot-02.png"><img src="images/program-04-screenshot-02.png" alt="" height="300"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+        </tr>
+      </table>      
+      <figcaption class="figure-caption"><strong>Figure 8.4</strong> (a) A screen shot of Program 4 when the program is freshly started. (b) Another screenshot of Program 4 after the sliders are manipulated so that the canvas becomes cyan.</figcaption>
+    </figure>
+
     <h2>8.5 &nbsp; Program 5: Setting the viewport</h2>
  
     <hr>
