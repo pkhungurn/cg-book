@@ -279,9 +279,9 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
 
     <h2>8.4 &nbsp; Program 4: Continuous updates</h2>
 
-    <p>Most WebGL applications generate images that change with time. This might be because they have to show animations or they must respond to the user's inputs from keyboard or mouse. This means that such applications must generate a new image every so often. Program 4 shows how to do this. The program's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-04">chapter-08/program-04</a> directory.</p>    
+    <p>Most WebGL applications generate images that change with time. This might be because they have to show animations or they must respond to the user's inputs from keyboard or mouse. This means that such applications must keeps generating a new image every so often. Program 4 shows how to do this. The program's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-04">chapter-08/program-04</a> directory.</p>    
 
-    <p>The web page of Program 4 looks similar to that of Program 3, excepth for the fact that, underneath the WebGL canvas, there are three slides corresponding to the R, G, and B channels. When you manipulate the sliders, the color of the WebGL canvas changes. This behavior is possible because the program updates the screen at a very high rate. Every time it updates the screen, it sets the clear color to the values indicated by the sliders and clears the screen accordingly</p>
+    <p>The web page of Program 4 looks similar to that of Program 3, excepth for the fact that, underneath the WebGL canvas, there are three slides corresponding to the R, G, and B channels. When you manipulate the sliders, the color of the WebGL canvas changes. This behavior is possible because the program updates the screen at a very high rate. Every time it does so, it sets the clear color to the values indicated by the sliders and clears the screen accordingly</p>
 
     <figure class="figure">
       <table cellpadding="5">
@@ -297,6 +297,79 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
       <figcaption class="figure-caption"><strong>Figure 8.4</strong> (a) A screen shot of Program 4 when the program is freshly started. (b) Another screenshot of Program 4 after the sliders are manipulated so that the canvas becomes cyan.</figcaption>
     </figure>
 
+    <p>Let us look at how the web page is set up. The <code>body</code> section of the program's <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-04/src/index.js"><code>index.html</code></a> contains the following segment:</p>
+
+<pre><code class="language-html">&lt;canvas id="webglCanvas" style="border: none; background-color: black;" width="512" height="512"></canvas>
+&lt;table cellpadding="5">
+  &lt;tr>
+    &lt;td style="text-align: right;">R:&lt;/td>
+    &lt;td width="300">&lt;div id="rSlider">&lt;/div>&lt;/td>
+    &lt;/tr>
+    &lt;tr>
+        &lt;td style="text-align: right;">G:&lt;/td>
+        &lt;td width="300">&lt;div id="gSlider">&lt;/div>&lt;/td>
+    &lt;/tr>
+    &lt;tr>
+        &lt;td style="text-align: right;">B:&lt;/td>
+        &lt;td width="300">&lt;div id="bSlider">&lt;/div>&lt;/td>
+    &lt;/tr>
+&lt;/table></code></pre>
+
+    <p>We see that there is a table containing three <code>div</code> elements named <code>rSlider</code>, <code>gSlider</code>, and <code>bSlider</code>. These <code>div</code>s are turned into sliders through the use of the <a href="https://jqueryui.com/">JQuery UI</a> library in the following code snippet in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-04/src/index.js"><code>index.js</code><a>.</p>
+
+<pre><code class="language-javascript">var sliderNames = ["rSlider", "gSlider", "bSlider"];
+var rgbSliders = sliderNames.map(name => $("#" + name).slider({
+    min: 0,
+    max: 255,
+    value: 0
+}));
+rgbSliders[0].slider("value", 255);</code></pre>
+
+    <p>In other words, we use JQuery to retrieve the <code>div</code>s by their names. We call the <code>slider</code> method to turn each <code>div</code> to a slider that can take value from 0 to 255, inclusive. (We will not cover how this method works in details because it is not the focus of the book. Please refer to the <a href="https://api.jqueryui.com/slider/">JQuery UI documentation</a> for details.) Each slider's initial value is defaulted to zero. The sliders are stored in the <code>rgbSliders</code> list in such a way that <code>rgbSliders[0]</code> is the "R" slider, <code>rgbSliders[0]</code> the "G" slider, and <code>rgbSliders[2]</code> the "B" slider. The last line of the snippet sides the value of the R slider to 255, so that the initial color is red.</p>
+
+    <p>The next section of <code>index.js</code> retrieves the WebGL context like previous programs. However, the way the code uses the context is different. The context of the <code>else</code> clause that is run when the WebGL context's retrieval is successful is as follows:</p>
+
+<pre><code class="language-javascript">function updateWebGL() {    
+  var rgb = rgbSliders.map(
+    (rgbSlider) => rgbSlider.slider("value") / 255.0);        
+  gl.clearColor(rgb[0], rgb[1], rgb[2], 0.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  window.requestAnimationFrame(updateWebGL);
+}
+
+window.requestAnimationFrame(updateWebGL);</code></pre>
+
+    <p>What we see is that we define a function called <code>updateWebGL</code>. Then, we feed it to the <a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame"><code>requestAnimationFrame</code></a> method of the <code>window</code> object. For Javascript implementations that runs in web browsers, <code>window</code> is a built-in variable that contains an instance of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window"><code>Window</code></a> object that represents the browser window. the <code>requestAnimationFrame</code> receives a function, often referred to as a <b>callback</b> function, and the function would executed the next time the window is updated as a result of the monitor being refreshed.</p>
+
+    <p>The callback function must do two things to continously update the WebGL screen as time progresses. First, it must call WebGL functions to generate an image on the WebGL screen. Second, at the end of function, it must call <code>window.requestAnimationFrame</code> with itself so that same update can be executed again the next time the monitor refreshes. Hence, the code snippet above can be summarized as follow:</p>
+
+<pre><code class="language-javascript">function updateWebGL() {    
+  // Step 1: Use WebGL to update the screen
+    :
+    :
+    :
+
+  // Step 2: Register the callback so that it is run again 
+  // the next time the monitor refreshes.
+  window.requestAnimationFrame(updateWebGL);
+}
+    
+window.requestAnimationFrame(updateWebGL);</code></pre>
+
+    <p>Notice that we call <code>window.requestAnimationFrame</code> two times. One time inside the our callback function, <code>updateWebGL</code>, and another time outside the callback function. Both calls are necessary, but they serve different purposes. The call inside is responsible for maintaining a perpetual loop of screen updates. On the other hand, the call outside makes sure that the loop is started. Notice also that the loop create this way is "as fast as possible" in the sense that the next update is carried out at the next monitor refresh after the callback function has finished doing everything it needs to update the screen.</p>
+
+    <p>Now that we have discussed the high-level structure of the code snippet, let us look at how the screen update works in Program 4. The code that updates the screen is the first 4 lines of the <code>updateWebGL</code> call back function:</p>
+
+<pre><code class="language-javascript">var rgb = rgbSliders.map(
+  (rgbSlider) => rgbSlider.slider("value") / 255.0);        
+gl.clearColor(rgb[0], rgb[1], rgb[2], 0.0);
+gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
+
+    <p>The first two lines retrieve an RGB color from the sliders by issuing <code>slider("value")</code> to each of the three sliders. The retrieved valued is divided by <code>255.0</code> to convert it to a floating point number that takes value from 0 to 1. The retrieved color is then set as the WebGL clear color through <code>gl.clearColor</code> method that we just learned about in the last section. Lastly, we clear the screen with the <code>gl.clear</code> method.</p>
+
+    <p>It is very important to remember and familiarize yourself with the structure of Program 4 as it is the structure that we will be using in every program afterwards.</p>
+  
+  
     <h2>8.5 &nbsp; Program 5: Setting the viewport</h2>
  
     <hr>
