@@ -235,6 +235,32 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
         
     <h2>8.3 &nbsp; Program 3: Clearing the screen</h2>
 
+    <p>The third program covers the commands are used to clear the canvas used to display WebGL's output. From now, we shall refer to this canvas as the "screen" as it acts as the display device in our context. Clearning the screen removes whatever the screen was displaying previously, giving us a clean slate to draw new images. It is almost always the first thing we do when we want to update WebGL's output. The program's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-03">chapter-08/program-03</a> directory. The screenshots of the program is given below.</p>
+
+    <figure class="figure">
+      <a href="images/program-03-screenshot.png"><img src="images/program-03-screenshot.png" alt="" height="300"></a>
+      <figcaption class="figure-caption"><strong>Figure 8.3</strong> Screenshot of Program 3.</figcaption>
+    </figure>
+  
+    <p>The main difference between this program and the previous ones is that the canvas is red instead of black. This is the result of the following two lines of code in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-03/src/index.js"><code>index.js</code></a> file.</p>
+
+<pre><code class="language-javascript">gl.clearColor(1.0, 0.0, 0.0, 1.0);
+gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
+
+    <p>The first line sets the color that WebGL will fill the screen with after clearning it with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/clearColor"><code>clearColor</code></a> method. The method receives four floating points numbers that represent the R, G, B, and A components of the color, where each number must be in the $[0,1]$ range. In Line 1, we specify the color $(1,0,0,1)$, which is red and opaque.</p>
+
+    <p>The second line actually clears the screen with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/clear"><code>clear</code></a> method. The specification for the argument to the method is quite complicated. In WebGL, What we refer to as the "screen" is made up of one or more <b>buffers</b>, where a buffer is an area of memory, typically on the GPU. WebGL maintains three buffers.</p>
+
+    <ol>
+      <li>The <b>color buffer</b> holds pixel colors.</li>
+      <li>The <b>depth buffer</b> holds depth values used in the depth test. (See <a href="../chapter-07/index.html#raster-operation">Section 7.2.5</a>.)</li>
+      <li>The <b>stencil buffer</b> holds values used in the stencil test. (Again, see <a href="../chapter-07/index.html#raster-operation">Section 7.2.5</a>.)</li>
+    </ol>
+
+    <p>The color buffer is always present because there would be no images to display in the first place. The depth buffer and the stencil buffer are not present unless we enable the corresponding tests.</p>
+
+    <p>The <code>clear</code> method can be used to clear any combination of the above three buffers. What it receives as input is a <b>bit field</b>, an integer value whose bits represent a set of items.</p>
+
     <h2>8.4 &nbsp; Program 4: Continuous updates</h2>
 
     <h2>8.5 &nbsp; Program 5: Setting the viewport</h2>
