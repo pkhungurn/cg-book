@@ -279,7 +279,7 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
 
     <h2>8.4 &nbsp; Program 4: Continuous updates</h2>
 
-    <p>Most WebGL applications generate images that change with time. This might be because they have to show animations or they must respond to the user's inputs from keyboard or mouse. This means that such applications must keeps generating a new image every so often. Program 4 shows how to do this. The program's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-04">chapter-08/program-04</a> directory.</p>    
+    <p>Most WebGL applications generate images that change with time. This might be because they have to show animations, or they must respond to the user's inputs from keyboard or mouse. This means that such applications must keeps generating a new image every so often. Program 4 shows how to do this, and its source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-04">chapter-08/program-04</a> directory.</p>    
 
     <p>The web page of Program 4 looks similar to that of Program 3, excepth for the fact that, underneath the WebGL canvas, there are three slides corresponding to the R, G, and B channels. When you manipulate the sliders, the color of the WebGL canvas changes. This behavior is possible because the program updates the screen at a very high rate. Every time it does so, it sets the clear color to the values indicated by the sliders and clears the screen accordingly</p>
 
@@ -371,7 +371,40 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
   
   
     <h2>8.5 &nbsp; Program 5: Setting the viewport</h2>
+
+    <p>Program 5 is about setting up the "viewport" of the WebGL context. The viewport is a rectangular area of the canvas that WebGL will draw primitives to, and any parts of primitives that fall outside the viewport would become invisible. It allows us to draw to only a part of the screen. For example, we can see from the screenshots of Program 5 below that, by using the viewport, we can draw a rectangle that is smaller than the whole screen whose color is determined by sliders that the user can manipulate</p>
  
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-05-screenshot-01.png"><img src="images/program-05-screenshot-01.png" alt="" height="300"></a></td>
+          <td><a href="images/program-05-screenshot-02.png"><img src="images/program-05-screenshot-02.png" alt="" height="300"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(a)</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 8.5</strong> (a) A screenshot of Program 5 before the user interacts with the program. (b) Another screenshot after the user has manipulated the sliders so that the rectangle becomes green.</figcaption>
+    </figure>
+
+    <p>Program 5's <code>index.html</code> file is identical to that of Program 4 (save for the web page's title and header). The <code>index.js</code> file is almost the same as well, but the <a href="https://github.com/pkhungurn/cg-book-code/blob/92f6027a406ec7207329b159fff6b5dd2f47bb03/chapter-08/program-05/src/index.js#L20"><code>updateWebGL</code></a> function now has code to set up the viewport.</p>
+
+<pre><code class="language-javascript">function updateWebGL() {    
+  var rgb = rgbSliders.map((rgbSlider) => rgbSlider.slider("value") / 255.0);
+        
+  gl.viewport(128,128,256,256);
+  gl.enable(gl.SCISSOR_TEST);
+  gl.scissor(128,128,256,256);
+
+  gl.clearColor(rgb[0], rgb[1], rgb[2], 0.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  window.requestAnimationFrame(updateWebGL);
+}</code></pre>
+
+    <p>As you can guess, the three lines in the 2nd "paragraph" of the function do the job of setting up the viewport. The first line uses WebGL context's <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/viewport"><code>viewport</code></a> function, whose functionality is implied by its name. The function takes 4 parameters: <code>x</code>, <code>y</code>, <code>width</code>, and <code>height</code>. Here, <code>x</code> and <code>y</code> specify the coordinates of top-left corner of the viewport relative to the top-left corner of the canvas, and the meaning of <code>width</code> and <code>height</code> should be self-evident. The unit of measurement for all parameters are "pixels." </p>
+
     <hr>
     <div class="footnotes">
       <ol> 
