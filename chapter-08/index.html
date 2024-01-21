@@ -370,9 +370,9 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
     <p>It is very important to remember and familiarize yourself with the structure of Program 4 as it is the structure that we will be using in every program from now on.</p>
   
   
-    <h2>8.5 &nbsp; Program 5: Setting the viewport</h2>
+    <h2>8.5 &nbsp; Program 5: Scissor Test</h2>
 
-    <p>Program 5 is about setting up the "viewport" of the WebGL context. The viewport is a rectangular area of the canvas that WebGL will draw primitives to, and any parts of primitives that fall outside the viewport would become invisible. It allows us to draw to only a part of the screen. For example, we can see from the screenshots of Program 5 below that, by using the viewport, we can draw a rectangle that is smaller than the whole screen whose color is determined by sliders that the user can manipulate</p>
+    <p>Recall from <a href="../chapter-07/index.html#raster-operation">Section 7.2.5</a> that the "scrissor test" is one of the culling tests performed in the raster operation step of the graphics pipeline. What the scissor test does is quite simple. It discards all changes to that screen that are outside the rectangular area of the canvas that the user specifies. For example, we can see from the screenshots of Program 5 below that, by using the scissor test, we can "draw" a rectangle that is smaller than the whole screen whose color is determined by sliders that the user can manipulate. Under the hood, however, we are not drawing anything. Program 5 only clears the screen with the color specified by the sliders like Program 4 does, but it uses the scissor test to limit the affected area to a rectangle in the middle of the screen.</p>
  
     <figure class="figure">
       <table>
@@ -388,12 +388,11 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
       <figcaption class="figure-caption"><strong>Figure 8.5</strong> (a) A screenshot of Program 5 before the user interacts with the program. (b) Another screenshot after the user has manipulated the sliders so that the rectangle becomes green.</figcaption>
     </figure>
 
-    <p>Program 5's <code>index.html</code> file is identical to that of Program 4 (save for the web page's title and header). The <code>index.js</code> file is almost the same as well, but the <a href="https://github.com/pkhungurn/cg-book-code/blob/92f6027a406ec7207329b159fff6b5dd2f47bb03/chapter-08/program-05/src/index.js#L20"><code>updateWebGL</code></a> function now has code to set up the viewport.</p>
+    <p>Program 5's <code>index.html</code> file is identical to that of Program 4 (save for the web page's title and header). The <code>index.js</code> file is almost the same as well, but the <a href="https://github.com/pkhungurn/cg-book-code/blob/92f6027a406ec7207329b159fff6b5dd2f47bb03/chapter-08/program-05/src/index.js#L20"><code>updateWebGL</code></a> function now has code to set up the scissor test.</p>
 
 <pre><code class="language-javascript">function updateWebGL() {    
   var rgb = rgbSliders.map((rgbSlider) => rgbSlider.slider("value") / 255.0);
         
-  gl.viewport(128,128,256,256);
   gl.enable(gl.SCISSOR_TEST);
   gl.scissor(128,128,256,256);
 
@@ -403,14 +402,80 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
   window.requestAnimationFrame(updateWebGL);
 }</code></pre>
 
-    <p>As you can guess, the three lines in the 2nd "paragraph" of the function do the job of setting up the viewport. The first line uses WebGL context's <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/viewport"><code>viewport</code></a> function, whose functionality is implied by its name. The function takes 4 parameters: <code>x</code>, <code>y</code>, <code>width</code>, and <code>height</code>. Here, <code>x</code> and <code>y</code> specify the coordinates of top-left corner of the viewport relative to the top-left corner of the canvas, and the meaning of <code>width</code> and <code>height</code> should be self-evident. The unit of measurement for all parameters are "pixels." </p>
+    <p>By default, the scissor test is not enabled by default, so WebGL functions can affect all parts of the screen. To use the scissor test, we need to enable it with <code>gl.enable(gl.SCISSOR_TEST)</code>.</p>
+
+    <p>The <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/scissor"><code>scissor</code></a> method sets up the <b>scissor box</b>: the rectangle area inside the screen where the effects of all WebGL functions are limited to. The function takes 4 parameters: <code>x</code>, <code>y</code>, <code>width</code>, and <code>height</code>. Here, <code>x</code> and <code>y</code> are coordinates of top-left corner of the rectangle relative to the top-left corner of the canvas, and <code>width</code> and <code>height</code> are the horizontal length and the verical length of the rectangle, respectively. The unit of measurement for all parameters are "pixels." Figure 8.6 graphically describes the meaning of the parameters.</p>
+
+    <figure class="figure">
+      <b>TODO: Create a figure that describes the meaning of the parameters of <tt>gl.scissor</tt>.</b>
+      <figcaption class="figure-caption"><strong>Figure 8.6</strong> Meaning of the parameters of WebGL context's <code>scissor</code> function.</figcaption>
+    </figure>
+
+    <p>In the code, <code>gl.scissor(128, 128, 256, 256)</code> sets the scissor box to be a square whose top-right corner is 128 pixels to the right and the 128 pixels below the top-right corner of the WebGL canvas and whose side lengths are 128 pixels. This square is 1/4 of the canvas's total area and is right in the middle of the canvas.</p>
+
+    <p>The scissor test is useful creating visual effects. As an example, it can be used to create a transition effect where the screen changes from one image to another in such a way that the second image grows larger over time until it fills the whole screen. Another example is the split screen effect in which we draw to the screen multiple times, each time with the right scissor test to limit which part of the screen is affected.</p>
+
+    <h2>Summary</h2>
+
+    <ul>
+      <li>A WebGL application needs a <code>canvas</code> element to act as a place WebGL can draw to. We also refer to the canvas element as the <b>screen</b>.</li>
+      <li>The first step in any WebGL application is to retrieve a <b>WebGL context</b>.
+        <ul>
+          <li>A WebGL context is an object of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext"><code>WebGLRenderingContext</code></a> class.</li>
+          <li>It can be retieved by calling <code>getContext("webgl2")</code> on the canvas element.</li>
+          <li>In this book, we typically store the WebGL context in a variabled named <code>gl</code>.</li>
+        </ul>
+      </li>
+      <li>Functionality of the graphics pipeline can be accessed through methods of the WebGL context such as <code>gl.enable</code>, <code>gl.clear</code>, and <code>gl.scissor</code>.
+        <ul>
+          <li>The methods typically correspond to C functions in the OpenGL API. The functions have the same names as the methods, but they have "<code>gl</code>" as prefixes. So, <code>gl.enable</code>, <code>gl.clear</code>, and <code>gl.scissor</code> correspond to C functions whose names are <code>glEnable</code>, <code>glClear</code>, and <code>glScissor</code>, respectively.</li>
+
+          <li>One way to get a documentation for a WebGL method is to capitalize the function's name and add <code>gl</code> at the front to get the name of the corresponding C function. Then, one can search for the C function with a search engine.</li>
+        </ul>
+      </li>
+      <li>A number of fields of the WebGL context are contants that are used exclusively as parameter values to WebGL-related methods.
+        <ul>
+          <li>These fields' names are in capital letters, and words are separated by underscores: <code>gl.DEPTH_TEST</code>, <code>gl.MAX_TEXTURE_SIZE</code>, and <code>gl.LINE_WIDTH</code>.</li>
+
+          <li>Such fields have numerical values of type <code>GLEnum</code>, which is a synnonym for the <code>unsigned long</code> type.</li>
+        </ul>
+      </li>
+      <li>A WebGL context maintains a number of <b>WebGL parameters</b>.
+        <ul>
+          <li>A WebGL parameter is a value that represents a setting in the WebGL implementation; for examples, the maximum size of a texture, the width of the line primitive, and whether a certain test is enabled or not.</li>
+          <li>Some WebGL parameters (i.e., the maximum size of a texture) are constants, but some can change over time (i.e., the width of the line primitive) due to the user's action.</li>
+          <li>The value of a parameter can be retrieved through the <code>gl.getParameter</code> method, which takes as input a <code>GLEnum</code> value that represents the parameter's name. For example, to check whether the depth test is currently enabled or not, one can look at the return value of <code>gl.getParameter(gl.DEPTH_TEST)</code>.</li>
+        </ul>
+      </li>
+      <li>Functionalities that are not part of the standard WebGL specification are packaged into bundles called <b>WebGL extensions</b>.
+        <ul>
+          <li>WebGL extensions are referred to by names such as <code>WEBGL_debug_renderer_info</code>, <code>WEBGL_multi_draw</code>, <code>OES_texture_float_linear</code>, etc.</li>
+          <li>We can call <code>gl.getSupportedExtensions()</code> to get a list of names of extensions supported by the browser we are using.</li>
+          <li>The <code>gl.getExtension</code> method can be used to retrieve a WebGL extension by name.</li>
+        </ul>
+      </li>
+      <li>The first step in using WebGL to create an image is to "clear" the screen.
+      <ul>
+        <li>Clearing the screen means changing all pixels of certain buffers to a specific value, erasing all previous contents.</li>
+        <li>WebGL maintains three buffers:
+          <ul>
+            <li>The <b>color buffer</b> contains the colors of the pixels of the screen.</li>
+            <li>The <b>depth buffer</b> contains the depth values of the pixels, and it is used for the depth test.</li>
+            <li>The <b>stencil buffer</b> is used for the stencil test, which we will not cover in this book.</li>
+          </ul>
+        </li>
+        <li>Use the <code>gl.clear</code> method to clear the screen.</li>
+        <li>The method takes a bit field constructed by performing the "bitwise-or" operation on three <code>GLEnum</code> values that represent the three buffers: <code>gl.COLOR_BUFFER_BIT</code>, <code>gl.DEPTH_BUFFER_BIT</code>, and <code>gl.STENCIL_BUFFER_BIT</code>.</li>
+      </ul>
+      </li>
+    </ul>
 
     <hr>
     <div class="footnotes">
       <ol> 
-            <li class="footnote" id="fn:icanuse-webgl2">
-                <p>You can check whether your web browser support WebGL 2.0 or not by checking the <a href="https://caniuse.com/?search=webgl2">following web page</a>.</p>
-            </li>
+        <li class="footnote" id="fn:icanuse-webgl2">
+          <p>You can check whether your web browser support WebGL 2.0 or not by checking the <a href="https://caniuse.com/?search=webgl2">following web page</a>.</p>
+        </li>
       </ol>
     </div>
 
