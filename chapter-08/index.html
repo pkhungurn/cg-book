@@ -466,7 +466,21 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
         </li>
         <li>Use the <code>gl.clear</code> method to clear the screen.</li>
         <li>The method takes a bit field constructed by performing the "bitwise-or" operation on three <code>GLEnum</code> values that represent the three buffers: <code>gl.COLOR_BUFFER_BIT</code>, <code>gl.DEPTH_BUFFER_BIT</code>, and <code>gl.STENCIL_BUFFER_BIT</code>.</li>
+        <li>The color that is used to fill the color buffer can be specified by the <code>gl.clearColor</code> method. It accepts 4 floating point values as arguments, and they represent an RGBA color.</li>
       </ul>
+      </li>
+      <li>Use the <code>requestionAnimationFrame</code> of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window"><code>Window</code></a> to create a perpetual loop that continuosly draw a new image to the WebGL canvas after the previous one is finished.
+        <ul>
+          <li>First, create a function that uses WebGL to draw the image. At the end of this function call <code>requestAnimationFrame</code> with the function's name as argument.</li>
+          <li>After the defining the function, call <code>requestAnimationFrame</code> with the function's name to schedule the function to be run for the first time, thereby starting the loop.</li>
+        </ul>
+      </li>
+      <li>The <b>scissor test</b> is a culling test in the raster operation step of the graphics pipeline.
+        <ul>
+          <li>It limits all changes to the canvas to a rentangular area called the <b>scissor box</b>. </li>
+          <li>The scissor test is not enabled by default. To use it, one need to enable it with <code>gl.enable(gl.SCISSOR_TEST)</code>.</li>
+          <li>Use <code>gl.scissor</code> to specify the scissor box.</li>
+        </ul>
       </li>
     </ul>
 
