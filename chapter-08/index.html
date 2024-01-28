@@ -407,7 +407,7 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
     <p>The <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/scissor"><code>scissor</code></a> method sets up the <b>scissor box</b>: the rectangle area inside the screen where the effects of all WebGL functions are limited to. The function takes 4 parameters: <code>x</code>, <code>y</code>, <code>width</code>, and <code>height</code>. Here, <code>x</code> and <code>y</code> are coordinates of top-left corner of the rectangle relative to the top-left corner of the canvas, and <code>width</code> and <code>height</code> are the horizontal length and the verical length of the rectangle, respectively. The unit of measurement for all parameters are "pixels." Figure 8.6 graphically describes the meaning of the parameters.</p>
 
     <figure class="figure">
-      <b>TODO: Create a figure that describes the meaning of the parameters of <tt>gl.scissor</tt>.</b>
+      <a href="images/scissor-box-parameter-semantics.png"><img src="images/scissor-box-parameter-semantics.png" alt="" width="600"></a>
       <figcaption class="figure-caption"><strong>Figure 8.6</strong> Meaning of the parameters of WebGL context's <code>scissor</code> function.</figcaption>
     </figure>
 
