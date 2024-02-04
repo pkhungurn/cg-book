@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script type="text/javascript">
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        tags: "ams",
+      },
+      svg: {
+        fontCache: 'global'
+      },
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
+  <link rel="stylesheet"
+      href="../highlight/styles/default.min.css">
+  <script src="../highlight/highlight.min.js"></script>
+  <script src="../js/highlightjs-line-numbers.min.js"></script>
+  <script>
+  hljs.highlightAll();
+  hljs.initLineNumbersOnLoad();
+  </script>
+    
+  <title>Chapter 9</title>
+</head>
+
+<body>
+  <div class="container" style="max-width: 640px;">
+    <span style="visibility: hidden;">
+      \(
+      \def\sc#1{\dosc#1\csod}
+      \def\dosc#1#2\csod{{\rm #1{\small #2}}}
+
+      \newcommand{\dee}{\mathrm{d}}
+      \newcommand{\Dee}{\mathrm{D}}
+      \newcommand{\In}{\mathrm{in}}
+      \newcommand{\Out}{\mathrm{out}}
+      \newcommand{\pdf}{\mathrm{pdf}}
+      \newcommand{\Cov}{\mathrm{Cov}}
+      \newcommand{\Var}{\mathrm{Var}}
+
+      \newcommand{\ve}[1]{\mathbf{#1}}
+      \newcommand{\mrm}[1]{\mathrm{#1}}
+      \newcommand{\ves}[1]{\boldsymbol{#1}}
+      \newcommand{\etal}{{et~al.}}
+      \newcommand{\sphere}{\mathbb{S}^2}
+      \newcommand{\modeint}{\mathcal{M}}
+      \newcommand{\azimint}{\mathcal{N}}
+      \newcommand{\ra}{\rightarrow}
+      \newcommand{\mcal}[1]{\mathcal{#1}}
+      \newcommand{\X}{\mathcal{X}}
+      \newcommand{\Y}{\mathcal{Y}}
+      \newcommand{\Z}{\mathcal{Z}}
+      \newcommand{\x}{\mathbf{x}}
+      \newcommand{\y}{\mathbf{y}}
+      \newcommand{\z}{\mathbf{z}}
+      \newcommand{\tr}{\mathrm{tr}}
+      \newcommand{\sgn}{\mathrm{sgn}}
+      \newcommand{\diag}{\mathrm{diag}}
+      \newcommand{\Real}{\mathbb{R}}
+      \newcommand{\sseq}{\subseteq}
+      \newcommand{\ov}[1]{\overline{#1}}
+      \DeclareMathOperator*{\argmax}{arg\,max}
+      \DeclareMathOperator*{\argmin}{arg\,min}
+      \)
+    </span>
+
+    <h1>9 &nbsp; GLSL programming basics</h1>
+    <hr>
+
+    <p>We learned about the basics of WebGL programming in the last chapter, but all we could do was clearing the screen and limiting the area to which the clearing affects. To do more complicated things such as displaying a scene, we need to be able to draw primitives. (Recall <a href="../chapter-05.html#primtiives">Section 5</a>.3)</p>
+
+    <p>One of the difficulty of learning WebGL is that drawing primitives is intertwined with another aspect of library: writing GLSL programs. As mentioned <a href="../chapter-07/index.html#programs-and-shaders">Section 7.3.1</a>, we need to create a GLSL program before drawing a primitive. The process of doing so has many steps, and it would take some time to explain. Once it is done, we must also specify the vertices that make up the primitives that we want to draw and connections between them. This process also takes multiple steps as well.</p>
+
+    <p>This chapter explains the above two processes that are required to draw primitives and their associated WebGL functions. We focus the the process of creating GLSL programs and give a short overview of GLSL's syntax, data types, and language features. We also dicusses the basics of primitive specification but leave the its details as the subject of the next chapter.</p>
+
+    <hr>
+    <div class="footnotes">      
+    </div>
+
+    <hr>
+    <p>
+      <a href="../chapter-08/index.html"><<</a>
+      <a href="../index.html">Contents</a>
+    </p>
+  </div>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/littlefoot.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    const { littlefoot } = require('littlefoot')
+
+    const lf = littlefoot({
+      activateOnHover: true,
+      hoverDelay: 250,
+    });
+  </script>
+</body>
+
+</html>

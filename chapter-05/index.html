@@ -251,6 +251,7 @@ const texCoordBuffer = [
 
     <p>In the context of the graphics pipeline, a point cloud alone is not enough to represent shapes. However, we also said earlier that a point cloud can represent shape on its own. This approach is not at all trivial because we immediately see a problem: a point cloud has no contiguous surface or volume that we typically associate with real world objects. In other words, the space between the points are empty, and the empty space would manifest if we look at the object from a distance close enough. As a result, any method that uses point clouds alone to represent shapes must come up with a way to fill these "holes." In any case, this is not our problem because we will use point clouds with extra information.</p>
 
+    <a name="primitives"></a>
     <h2>5.3 &nbsp; Primitives</h2>
 
     <p>The extra information that helps us fill the empty space between vertices are how to "group" or "connect" vertices so that they form simple geometric shapes. A shape specified by connecting vertices is called a <strong>primitive</strong>.</p>
