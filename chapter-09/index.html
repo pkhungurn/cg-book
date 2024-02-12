@@ -83,7 +83,7 @@
 
     <h2>9.1 &nbsp; The GLSL programming language</h2>
 
-    <p>GLSL stands for Open<b>GL</b> <b>S</b>hading <b>L</b>anguage. As the name indicates, it is a programming language designed specifically for writing shaders: small programs that are used to customize the behavior of the graphics pipeline. For this book, we will be using a version of GLSL called "<a href="https://registry.khronos.org/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf">GLSL ES 3.0</a>," which is the latest function of GLSL support by WebGL 2.0.</p>
+    <p>GLSL stands for Open<b>GL</b> <b>S</b>hading <b>L</b>anguage. As the name indicates, it is a programming language designed specifically for writing shaders: small programs that are used to customize the behavior of the graphics pipeline. Like other long living programming languages, GLSL has multiple versions. For this book, we will be using a version of GLSL called "<a href="https://registry.khronos.org/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf">GLSL ES 3.0</a>," which is the latest function of GLSL support by WebGL 2.0. It also supports other version, GLSL ES 1.0, but these two versions are not compatible with each other. Thus, is is important to note that what is written in this book only applies to OpenGL ES 3.0 and not any other versions of the langauge.</p>
 
     <h3>9.1.1 &nbsp; Similarity with Javascript</h3>
 
@@ -163,8 +163,55 @@ int f = 99, g, h = 199; // Declaration with and without assignments and can be m
       <li><code>float</code> corresponds to floating point values.</li>
     </ul>
 
-    <p>Note that the type names, except for <code>uint</code>, are the same as those in the C language.</p>
+    <p>Note that the type names, except for <code>uint</code>, are the same as those in the C language. However, the semantics of the types are not the same. In C, each type has a fixed associated size in memeory. For example, a variable of type <code>int</code> would occupy exactly 4 bytes in memory, so does a a variable of type <code>float</code>. For numerical types, their sizes indicate how much information they can store. For types store real numbers, more storage means more <a href="https://en.wikipedia.org/wiki/Significant_figures">signficant figures</a> or <a href="https://en.wikipedia.org/wiki/Significand">matissa</a> in the represented numbers. For examples, C's <code>float</code> type can store 24 significant figures in base 2, while C's <code>double</code> type can store 53. As a result, the bigger the size, the more precise the numbers that can be represented. Even though this fact does not quite apply to integer types, we may say that each type has an associated "precision," and this precision is fixed in C.</p>
+
+    <p>In GLSL, the precisions of the three numerical types (<code>int</code>, <code>uint</code>, and <code>float</code>) can be changed. This is done through the <code>precision</code> statement.</p>
+
+<pre><code class="language-c">precision &lt;precision-qualifier&gt; &lt;type&gt;;
+</code></pre>
       
+    <p>Here, <code>&lt;precision-qualifier&gt;</code> can be either <code>highp</code>, <code>mediump</code>, and <code>lowp</code>, which signify high, medium, and low precision, respectively. <code>&lt;type&gt;</code> is an applicable type, which includes the three numerical types above and other more complicated types that we will discusss later. The following listing contains some example usage of the statement.</p>
+
+<pre><code class="language-c">precision mediump int;
+precision highp float;
+precision lowp uint;
+</code></pre>
+    
+    <P>The effect of the precision qualifiers are different when applied to integer types (<code>int</code> and <code>uint</code>) and the floating point type (<code>float</code>). For integer types, the storage size and the range of values that can be stored are as follows.</P>
+
+    <figure class="figure">
+      <table class="table table-striped">
+        <tr>
+            <th>Precision qualifier</th>
+            <th>Storage size</th>
+            <th><code>int</code> value range</th>
+            <th><code>uint</code> value range</th>
+        </tr>
+        <tr>
+          <td><code>highp</code></td>
+          <td>32 bits</td>
+          <td>$-2^{31}$ to $2^{31}-1$</td>
+          <td>$0$ to $2^{32}-1$</td>
+        </tr>
+        <tr>
+          <td><code>mediump</code></td>
+          <td>16 bits</td>
+          <td>$-2^{15}$ to $2^{15}-1$</td>
+          <td>$0$ to $2^{16}-1$</td>
+        </tr>
+        <tr>
+          <td><code>lowp</code></td>
+          <td>9 bits</td>
+          <td>$-2^{8}$ to $2^{8}-1$</td>
+          <td>$0$ to $2^{9}-1$</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Table 9.1</strong> Effects of precision qualifiers on integer types.</figcaption>
+    </figure>
+
+    <p>The effects of the qualifiers on <code>float</code> is more complicated because the GLSL ES 3.0 specification specifies the behavior of <code>highp</code> very precisely but only specifies minimum requirements of other qualifiers. In particular, <code>highp</code> means the IEEE 754 standard's single-precision floating point number, exactly the same as the <code>float</code> type in C, C++, and many other major programming languages.</p>
+
+    
     <hr>
     <div class="footnotes">      
     </div>
