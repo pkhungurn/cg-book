@@ -79,8 +79,92 @@
 
     <p>One of the difficulty of learning WebGL is that drawing primitives is intertwined with another aspect of library: writing GLSL programs. As mentioned <a href="../chapter-07/index.html#programs-and-shaders">Section 7.3.1</a>, we need to create a GLSL program before drawing a primitive. The process of doing so has many steps, and it would take some time to explain. Once it is done, we must also specify the vertices that make up the primitives that we want to draw and connections between them. This process also takes multiple steps as well.</p>
 
-    <p>This chapter explains the above two processes that are required to draw primitives and their associated WebGL functions. We focus the the process of creating GLSL programs and give a short overview of GLSL's syntax, data types, and language features. We also dicusses the basics of primitive specification but leave the its details as the subject of the next chapter.</p>
+    <p>This chapter explains the above two processes that are required to draw primitives and their associated WebGL functions. We first discuss on the GLSL language and follow up with how GLSL programs are supposed to be structured. We then go over the process of writing WebGL programs that make use of GLSL shaders. We also discuss the basics of primitive specification but leave the its details as the subject of the next chapter. We end the chapter with how to use the WebGL API to get information about vertex shaders.</p>
 
+    <h2>9.1 &nbsp; The GLSL programming language</h2>
+
+    <p>GLSL stands for Open<b>GL</b> <b>S</b>hading <b>L</b>anguage. As the name indicates, it is a programming language designed specifically for writing shaders: small programs that are used to customize the behavior of the graphics pipeline. For this book, we will be using a version of GLSL called "<a href="https://registry.khronos.org/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf">GLSL ES 3.0</a>," which is the latest function of GLSL support by WebGL 2.0.</p>
+
+    <h3>9.1.1 &nbsp; Similarity with Javascript</h3>
+
+    <p>Both Jvavascript and GLSL are languages in the C famility, which means that their syntaxes are very similar.</p>
+
+    <ul>
+      <li>Statements are punctuated with semi-colon (<code>;</code>).</li>
+      <li>Blocks of statements are surround by curly braces (<code>{</code> and <code>}</code>).</li>
+      <li>Assignments are indicated with the equal sign (<code>=</code>) while testing for equality is indicated with two equal signs (<code>==</code>), and testing for inequality is indicated with <code>!=</code>.</li>
+      <li>Function calls have the syntax <code>&lt;function-name&gt;(<code>arg-1</code>, <code>arg-2</code>, ..., <code>arg-n</code>)</code>.</li>
+      <li>Mathematical expressions have the same syntax. In particular, operators such as <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>&&</code>, <code>||</code>, <code>!</code>, <code>++</code>, <code>--</code>, <code>++</code>, <code>--</code> have the same semantics as the Javascript ones. For GLSL ES 3.0 (which is the version we will be using), the semantics of the modulo operator (<code>%</code>) and bitwise operators (<code>&</code>, <code>|</code>, <code>^</code>, <code>&lt;&lt;</code>, and <code>&gt;&gt;</code>) are also the same.</li>
+      <li>The syntax for control statements <code>if</code>, <code>while</code>, and <code>for</code> are the same.</li>
+    </ul>
+
+    <p>As a result of the above similarities, it is easy to learn GLSL if you already can program in Javascript. However, the closest language to GLSL is C, so GLSL learning would be mcuh easier if you are already familiar with the language.</p>
+
+    <h3>9.1.2 &nbsp; GLSL is statically typed</h3>
+
+    <p>One of the biggest differences between Javascript and GLSL is that Javascript is <b>dynamically typed</b>, but GLSL is <b>statically typed</b>. In a dynamically-typed programming languages, one can declare a variable without specifying the type of values that it can hold. For example, in Javascript, one can declare a variable with a <code>var</code> statement such as:</p>
+
+<pre><code class="language-javascript">var x = 1;</code></pre>
+
+    <p>Now, <code>x</code> holds an integer value. However, there is no restruction on what value <code>x</code> can hold. We can later assign a floating point number or a boolean value to it without any problems.</p>
+
+<pre><code class="language-javascript">x = 2.0;   // No problem.
+x = false; // Again, no problem.
+</code></pre>
+
+    <p>On the other hand, in a statically-typed programming language, the programmer must indicate the type of data that a variable can hold. After declaration, the type cannot be changed, and the variable can only hold values of that type.</p> 
+
+    <p>In GLSL, a variable can be declared with a statement of the form:</p>
+
+<pre><code class="language-c">&lt;type-name&gt; &lt;variable-name&gt;;
+</code></pre>
+
+    <p>For example, the following statement</p>
+
+<pre><code class="language-c">int x;
+</code></pre>
+
+    <p>declare <code>x</code> as a variable of type <code>int</code>, can only store integer values. As a result, the following assignment statements are OK.</p>
+    
+<pre><code class="language-c">x = 1;   // No problem.
+x = -10; // No problem.
+x = 255; // No problem.
+</code></pre>
+
+    <p>However, <code>x</code> cannot store floating point values or boolean values. Doing so would result in a compilation error.</p>
+
+<pre><code class="language-c">x = 0.0;  // Compilation error.
+x = true; // Compilation error.
+</code></pre>
+      
+    <p>We will talk about how to detect these errors later. For now, let us return to other forms of variable declaration. Like Javascript, one can declare a variable and then immediately assign its value.</p>
+
+<pre><code class="language-c">int y = 42;
+int aPrimeNumber = 1 + 6*3;
+</code></pre>
+
+    <p>Note that, when we declare a variable without immediately assigning a value to it, the value of the variable is "undefined," which means that it would contain a value that we do not know in advanced. Hence, the value should not be used because it is unpredictable.</p>
+
+    <p>GLSL also supports declaring multiple variables at once.</p>
+
+<pre><code class="language-c">int a, b, c;            // All variables are not initialized.
+int d = 100, e = 200;   // All variables are initialized.
+int f = 99, g, h = 199; // Declaration with and without assignments and can be mixed.
+</code></pre>
+
+    <h3>9.1.3 &nbsp; Scalar types</h3>
+
+    <p>The simplest types that GLSL have are <b>scalar types</b>. These types correspond to numerical and boolean values, and there are 4 of them.</p>
+
+    <ul>
+      <li><code>bool</code> correspond to logical values of <code>true</code> and <code>false</code>.</li>
+      <li><code>int</code> corresponds signed integer values.</li>
+      <li><code>uint</code> corresponds unsigned integer values.</li>
+      <li><code>float</code> corresponds to floating point values.</li>
+    </ul>
+
+    <p>Note that the type names, except for <code>uint</code>, are the same as those in the C language.</p>
+      
     <hr>
     <div class="footnotes">      
     </div>
