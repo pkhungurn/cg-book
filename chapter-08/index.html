@@ -107,8 +107,8 @@
 <a name="listing-8.2"></a>
 <figure class="figure">
 <pre><code class="language-javascript">const $ = require('jquery');
-var canvas = $("#webglCanvas");
-var gl = canvas[0].getContext("webgl2");
+let canvas = $("#webglCanvas");
+let gl = canvas[0].getContext("webgl2");
 if (!gl) {
     alert("Cannot get WebGL 2.0 context!");
 }</code></pre>
@@ -170,7 +170,7 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
 
     <p>The functionalities of an extension are not enabled by default. To use an extension, one must explicitly request it by calling the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getExtension"><code>getExtension</code></a> method of a WebGL context, giving the method the extension's name. For example, Program 2 uses the  <a href="https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_debug_renderer_info"><code>WEBGL_debug_renderer_info</code></a>, and it retrieves the extension with <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-02/src/index.js#L9">the following statement</a>:</p>
 
-<pre><code class="language-javascript">var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');</code></pre>
+<pre><code class="language-javascript">let debugInfo = gl.getExtension('WEBGL_debug_renderer_info');</code></pre>
 
     <p>The <code>getExtension</code> method would return an object that would give us access to the extension's specific constants and functions. In particular, we use the extension above to retrieve the <code>GLenum</code> values called <code>UNMASKED_VENDOR_WEBGL</code> and <code>UNMASKED_RENDERER_WEBGL</code>, which can be used as arguments to WebGL context's <code>getParameter</code> method in order to retrieve information about the WebGL implementation's vector and renderer. According to <a href="#program-2-screenshots">Figure 8.2</a>, which contains the result of running Program 2 on the author's computer, we learn that the vendor was Google Inc., and the renderer was called "ANGLE."</p>
 
@@ -196,11 +196,11 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
 
     <p>The first statement in the first section of the <code>else</code> clause is:</p>
 
-<pre><code class="language-javascript">var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');</code></pre>
+<pre><code class="language-javascript">let debugInfo = gl.getExtension('WEBGL_debug_renderer_info');</code></pre>
 
     <p>Here, we retrieve the object that represents the <code>WEBGL_debug_renderer_info</code> extension, and we do so because we want to read the parameters that are identified by the <code>UNMASKED_VENDOR_WEBGL</code> and <code>UNMASKED_RENDERER_WEBGL</code> constants. The next stament defines a list of names of WebGL properties that we want to retrieve.</p>
 
-<pre><code class="language-javascript">var paramNames = [
+<pre><code class="language-javascript">let paramNames = [
   "UNMASKED_VENDOR_WEBGL",
   "UNMASKED_RENDERER_WEBGL",
   "MAX_TEXTURE_SIZE",
@@ -215,9 +215,9 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
 
     <p>in addition to doing so with <code>gl.MAX_TEXTURE_SIZE</code>. Retrieving a field in this way allows us to programmatically retrieve multiple fieds without writing a separate line of code for different fields. We take advantange of this capability in the next line of code, where we turn the list of field names to a list of HTML table rows, each containing a parameter name and its value.</p>
   
-<pre><code class="language-javascript">var tableRows = paramNames.map(paramName => {
-  var paramID = gl[paramName] || debugInfo[paramName];
-  var value = gl.getParameter(paramID);
+<pre><code class="language-javascript">let tableRows = paramNames.map(paramName => {
+  let paramID = gl[paramName] || debugInfo[paramName];
+  let value = gl.getParameter(paramID);
   return "<tr><td>" + paramName + "</td><td>" + String(value) + "</td></tr>"
 });</code></pre>
 
@@ -229,7 +229,7 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
 
     <p>The next section of the <code>else</code> clause of Program 2 retrieves the names of WebGL extensions that are supported by the browser that runs the program. This is done by calling the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getSupportedExtensions"><code>getSupportedExtensions</code></a> method of the WebGL context.</p>
 
-<pre><code class="language-javascript">var extensions = gl.getSupportedExtensions();</code></pre>
+<pre><code class="language-javascript">let extensions = gl.getSupportedExtensions();</code></pre>
 
     <p>The rest of the section just converts the return value, which is a list of strings, into a bullet list and then inserts it to the web page at the <code>div</code> element under the "Extensions" section.</p>
         
@@ -317,8 +317,8 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
 
     <p>We see that there is a table containing three <code>div</code> elements named <code>rSlider</code>, <code>gSlider</code>, and <code>bSlider</code>. These <code>div</code>s are turned into sliders through the use of the <a href="https://jqueryui.com/">JQuery UI</a> library in the following code snippet in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-08/program-04/src/index.js"><code>index.js</code><a>.</p>
 
-<pre><code class="language-javascript">var sliderNames = ["rSlider", "gSlider", "bSlider"];
-var rgbSliders = sliderNames.map(name => $("#" + name).slider({
+<pre><code class="language-javascript">let sliderNames = ["rSlider", "gSlider", "bSlider"];
+let rgbSliders = sliderNames.map(name => $("#" + name).slider({
     min: 0,
     max: 255,
     value: 0
@@ -330,7 +330,7 @@ rgbSliders[0].slider("value", 255);</code></pre>
     <p>The next section of <code>index.js</code> retrieves the WebGL context like previous programs. However, the way the code uses the context is different. The context of the <code>else</code> clause that is run when the WebGL context's retrieval is successful is as follows:</p>
 
 <pre><code class="language-javascript">function updateWebGL() {    
-  var rgb = rgbSliders.map(
+  let rgb = rgbSliders.map(
     (rgbSlider) => rgbSlider.slider("value") / 255.0);        
   gl.clearColor(rgb[0], rgb[1], rgb[2], 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -360,7 +360,7 @@ window.requestAnimationFrame(updateWebGL);</code></pre>
 
     <p>Now that we have discussed the high-level structure of the code snippet, let us look at how the screen update works in Program 4. The code that updates the screen is the first 4 lines of the <code>updateWebGL</code> call back function:</p>
 
-<pre><code class="language-javascript">var rgb = rgbSliders.map(
+<pre><code class="language-javascript">let rgb = rgbSliders.map(
   (rgbSlider) => rgbSlider.slider("value") / 255.0);        
 gl.clearColor(rgb[0], rgb[1], rgb[2], 0.0);
 gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
@@ -391,7 +391,7 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
     <p>Program 5's <code>index.html</code> file is identical to that of Program 4 (save for the web page's title and header). The <code>index.js</code> file is almost the same as well, but the <a href="https://github.com/pkhungurn/cg-book-code/blob/92f6027a406ec7207329b159fff6b5dd2f47bb03/chapter-08/program-05/src/index.js#L20"><code>updateWebGL</code></a> function now has code to set up the scissor test.</p>
 
 <pre><code class="language-javascript">function updateWebGL() {    
-  var rgb = rgbSliders.map((rgbSlider) => rgbSlider.slider("value") / 255.0);
+  let rgb = rgbSliders.map((rgbSlider) => rgbSlider.slider("value") / 255.0);
         
   gl.enable(gl.SCISSOR_TEST);
   gl.scissor(128,128,256,256);
@@ -495,9 +495,9 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
 
     <hr>
     <p>
-      <a href="../chapter-07/index.html"><<</a>
+      <a href="../chapter-07/index.html">&lt;&lt;</a>
       <a href="../index.html">Contents</a>
-      <a href="../chapter-09/index.html"><<</a>
+      <a href="../chapter-09/index.html">&gt;&gt;</a>
     </p>
   </div>
   <script src="../js/bootstrap.bundle.min.js"></script>
