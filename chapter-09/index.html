@@ -83,6 +83,112 @@
 
     <h2>9.1 &nbsp; Program 1: Creating and using GLSL programs</h2>
 
+    <p>The source code of the program is available in the <a href="http:/https://github.com/pkhungurn/cg-book-code/tree/main/chapter-09/program-01">chapter-09/program-01</a> directory of the source code repoository. Running it, you would see a black canvas and a combo box.</p>
+
+    <figure class="figure">
+      <a href="images/program-01-screenshot-00.png"><img src="images/program-01-screenshot-00.png" alt="" height="300"></a>
+      <figcaption class="figure-caption"><strong>Figure 9.1</strong> A screenshot of Program 1 before any user interaction.</figcaption>
+    </figure>
+
+    <p>The combo box has three options that you can select: "program0," "program1," and "No program." When you select "program0" or "program1," a dialog box will pop up that tells you that the "program" has changed to the corresponding choice. When you select "No program," the dialog would say the application is not using any program.</p>
+
+    <figure class="figure">
+      <table cellpadding="5">
+        <tr>
+          <td><a href="images/program-01-screenshot-03.png"><img src="images/program-01-screenshot-03.png" alt="" height="200"></a></td>
+          <td><a href="images/program-01-screenshot-01.png"><img src="images/program-01-screenshot-01.png" alt="" height="200"></a></td>
+          <td><a href="images/program-01-screenshot-02.png"><img src="images/program-01-screenshot-02.png" alt="" height="200"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+          <td align="center">(c)</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 9.2</strong> The dialog that is shown when (a) "program0" is selected, (b) "program1" is selected, and "No program" is selected.</figcaption>
+    </figure>
+
+    <p>What happen under the hood is that, at any given time, a WebGL application either "use" a WebGL program or does not use any. Here, when a GLSL program is used, the graphics pipeline is customized according to what is written in the program's code. Our WebGL application starts up, it creates two WebGL programs called "program0" and "program1." It then immediately uses "program0," and it changes the program it uses according to the value of the combo box, which can be changed by the user. However, the application only uses the program, but it does not draw any primitives. So, we cannot see anything on the canvas at all. (We will start putting things on the canvas from Program 2 onward. Please be patient.)</p>
+
+    <h3>9.1.1 &nbsp; GLSL programs</h3>
+
+    <p>As previously discussed in Chapter 7, A GLSL program in the context of WebGL 2.0 is made up of two shaders: a vertex shader and a fragment shaders. Program 1 has three shaders: a vertex shaders whose source code is in <a href="https:/https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/vertex-shader.vert"><code>vertex-shader.vert</code></a> and two fragment shaders whose source code is in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/fragment-shader-0.frag"><code>fragment-shader-0.frag</code></a> and <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/fragment-shader-1.frag"><code>fragment-shader-1.frag</code></a>.  The two GLSL programs are created from the shaders as follows:</p>
+
+    <table class="table table-bordered">
+      <tr>
+        <th>GLSL program</th>
+        <th>Vertex shader</th>
+        <th>Fragment shader</th>
+      </tr>
+      <tr>
+        <td>program0</td>
+        <td><code>vertex-shader.vert</code></td>
+        <td><code>fragment-shader-0.frag</code></td>
+      </tr>
+      <tr>
+        <td>program1</td>
+        <td><code>vertex-shader.vert</code></td>
+        <td><code>fragment-shader-1.frag</code></td>
+      </tr>
+    </table>      
+
+    <h3>9.1.2 &nbsp; The vertex shader</h3>
+
+    <p>Let us take a brief look at the vertex shader's source code. In this chapter, we would only read it to understand at a high-level what it does without worrying about the syntactic details.</p>
+
+<figure class="figure">
+<pre><code class="language-c">#version 300 es
+
+in vec3 position;
+
+void main() {
+    gl_Position = vec4(position, 1);
+}</code></pre>
+<figcaption class="figure-caption"><strong>Lising 8.1</strong> The content of <code>vertex-shader.vert</code>.</figcaption>
+</figure>
+
+
+    <p>The source code looks syntactically similar to Javascript because it is written in GLSL, a language in the C family to which Javascript also belongs. The first line indicates that we are using GLSL version 3.00 ES, the latest version supported by WebGL 2.0. Similar to system program languages like C and C++, there is a function called <code>main</code> that serves as the "entry point:" it is the function that is run whenever the shader is run.</p> 
+    
+    <p>Recall from <a href="../chapter-07/index.html#vertex-shaders">Section 7.3.2</a> that a vertex shader must output clip space coordinates of the vertex being processed. The receiver of this value is the <code>gl_Position</code> variable, which is implicitly defined by the system. Because clip space coordinates have 4 components, the variable is of type <code>vec4</code>, which represents 4-component vectors.</p>
+
+    <p>The shader's output is created by taking the value of the <code>position</code> variable and adding the number 1 at the end of it. Now, <code>position</code> is a global variable of type <code>vec3</code> that is declared with the "<code>in</code>" keyword, signifying that it is an input to the shader. While, in Program 1, we have not put any values in this variable yet, we will put vertex positions in it starting with Program 2.</p>
+
+    <p>So, what the vertex shader does is simply copying the $xyz$-coordinates of vertex positions into the clip space coordinates whose $w$-component is always 1. Recall again from <a href="../chapter-07/index.html#vertex-shaders">Section 7.3.2</a> that the next step in the graphics pipeline after the vertex shader runs is the perspective divide, in which the NDCs are computed from the clip space coordinates by dividing the clip space $xyz$-coordinates with the $w$-coordinate. Because the $w$-coordinate is always 1, the NDCs would be equal to the vertex positions exactly. The vertex shader thus allows the user of the graphics pipeline to directly specify the NDCs. Because the $x$- and $y$-coordinates of the NDCs represent 2D positions on the canvas, this vertex shader sets up a 2D drawing system. We will see this in more details in other Programs in this chapter.</p>
+    
+    <h3>9.1.3 &nbsp; The fragment shaders</h3>
+
+    <p>Let us now turn our attention to the fragment shaders. They are even simpler than the vertex one.</p>
+
+<figure class="figure">
+<pre><code class="language-c">#version 300 es
+
+precision highp float;
+
+out vec4 fragColor;
+
+void main() {
+    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+}</code></pre>
+<figcaption class="figure-caption"><strong>Lising 8.2</strong> The content of <code>fragment-shader-0.frag</code>.</figcaption>
+</figure>
+      
+<figure class="figure">
+  <pre><code class="language-c">#version 300 es
+
+precision highp float;
+
+out vec4 fragColor;
+
+void main() {
+    fragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}</code></pre>
+<figcaption class="figure-caption"><strong>Lising 8.3</strong> The content of <code>fragment-shader-1.frag</code>.</figcaption>
+</figure>
+
+    <p>The two source files have the exact same structure. The first lines of both files indicate the GLSL version. Both have <code>main</code> functions, which serve as entry points like in the vertex shader. Both have the <code>precision highp float;</code> lines, which specify the number of bits used to represent values held by the <code>float</code> type. We will study the precise effect of this line later in <a href="../chapther-10/index.html">Chapter 10</a>, so let us not worry about it for now.</p>
+ 
+
     <h2>9.2 &nbsp; Program 2: Drawing point primitives</h2>
 
     <h2>9.3 &nbsp; Program 3: Drawing line primitives</h2>
