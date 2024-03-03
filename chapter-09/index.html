@@ -283,7 +283,7 @@ void main() {
   // Step 4: Validate the program.
   gl.validateProgram(program);
 
-  // Step 4: Check for errors.
+  // Step 5: Check for errors.
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       let infoLog = gl.getProgramInfoLog(program);
       gl.deleteProgram(program);
