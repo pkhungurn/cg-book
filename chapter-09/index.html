@@ -132,6 +132,7 @@
       </tr>
     </table>      
 
+    <a name="the-vertex-shader"></a>
     <h3>9.1.2 &nbsp; The vertex shader</h3>
 
     <p>Let us take a brief look at the vertex shader's source code. In this chapter, we would only read it to understand at a high-level what it does without worrying about the syntactic details.</p>
@@ -144,7 +145,7 @@ in vec3 position;
 void main() {
     gl_Position = vec4(position, 1);
 }</code></pre>
-<figcaption class="figure-caption"><strong>Lising 8.1</strong> The content of <code>vertex-shader.vert</code>.</figcaption>
+<figcaption class="figure-caption"><strong>Listing 8.1</strong> The content of <code>vertex-shader.vert</code>.</figcaption>
 </figure>
 
 
@@ -170,11 +171,11 @@ out vec4 fragColor;
 void main() {
     fragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }</code></pre>
-<figcaption class="figure-caption"><strong>Lising 8.2</strong> The content of <code>fragment-shader-0.frag</code>.</figcaption>
+<figcaption class="figure-caption"><strong>Listing 8.2</strong> The content of <code>fragment-shader-0.frag</code>.</figcaption>
 </figure>
       
 <figure class="figure">
-  <pre><code class="language-c">#version 300 es
+<pre><code class="language-c">#version 300 es
 
 precision highp float;
 
@@ -183,11 +184,117 @@ out vec4 fragColor;
 void main() {
     fragColor = vec4(0.0, 1.0, 0.0, 1.0);
 }</code></pre>
-<figcaption class="figure-caption"><strong>Lising 8.3</strong> The content of <code>fragment-shader-1.frag</code>.</figcaption>
+<figcaption class="figure-caption"><strong>Listing 8.3</strong> The content of <code>fragment-shader-1.frag</code>.</figcaption>
 </figure>
 
     <p>The two source files have the exact same structure. The first lines of both files indicate the GLSL version. Both have <code>main</code> functions, which serve as entry points like in the vertex shader. Both have the <code>precision highp float;</code> lines, which specify the number of bits used to represent values held by the <code>float</code> type. We will study the precise effect of this line later in <a href="../chapther-10/index.html">Chapter 10</a>, so let us not worry about it for now.</p>
+
+    <p>We discussed earlier in <a href="../chapter-07/index.html#vertex-shaders">Section 7.3.2</a> that a fragment shader must decides whether to discard the fragment it process. If not, it must output the RGBA color of the fragment. The two fragment shaders above always does the latter. The receiver of the output value is the <code>fragColor</code> variable, which is a global variable declared with the keyward <code>out</code> to signify that it is the output. The first fragment shader always output the RGBA color $(1,1,1,1)$, which is white. The second fragment shader always output $(0,1,0,1)$, which is green. In other words, any primitives rendered by the two fragment shaders are white and green, respectively.</p>
+
+    <p>As a result, program0, which is created from the vertex shader in <a href="#the-vertex-shader">Section 9.1.2</a> and the first fragment shader, would allow the user to directly specify the on-screen position of the vertices, and it would color all primitives white. On the other hand, program1 would do the same thing, but all primitives would be green instead.</p>
  
+    <h3>9.1.4 &nbsp; How to create a GLSL shader</h3>
+
+    <p>A GLSL program is made of a vertex shader and a fragment shader. Hence, in  order to create a program and render primitive with it, we must create shaders first. The process of creating a shader is encapsulated in the function <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/program.js#L1"><code>createShader</code></a> in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/program.js"><code>program.js</code></a> file. The code is reproduced in full below.</p>
+
+    <figure class="figure">
+<pre><code class="language-c">function createShader(gl, shaderType, sourceCode) {
+  // Step 1: Create the shader.
+  let shader = gl.createShader(shaderType);
+
+  // Step 2: Set the shader source.
+  gl.shaderSource(shader, sourceCode);
+
+  // Step 3: Compile the shader.
+  gl.compileShader(shader);
+
+  // Step 4: Check for errors.
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      return shader;
+  }
+
+  let infoLog = gl.getShaderInfoLog(shader);
+  gl.deleteShader(shader);
+  throw new Error("An error occurred compiling the shader: " + infoLog);
+}</code></pre>
+    <figcaption class="figure-caption"><strong>Listing 8.4</strong> The <code>createShader</code> function.</figcaption>
+    </figure>
+
+    <p>The function has three arguments.</p>
+
+    <ol>
+      <li><code>gl</code> is the WebGL context we have been creating and using in all programs since the last chapter. We make it a a function argument instead of a global variable like in previous programs because this would allow us to put the <code>createShader</code> function in its own file without having to worry about how <code>gl</code> is obtained in <code>index.js</code>.</li>
+
+      <li><code>shaderType</code> is a <code>GLenum</code> value that indicates the type of shader the we would like to create. It can be either <code>gl.VERTEX_SHADER</code> or <code>gl.FRAGMENT_SHADER</code>.</li>
+
+      <li><code>sourceCode</code> is a string containing the source code of the shader. We will load the source code from the <code>.vert</code> and <code>.frag</code> files above, and we will discuss how to do this later.</li>
+    </ol>
+
+    <p>The process of creating a shader has four steps as indicated by the comments in the code. First, we use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createShader"><code>createShader</code></a> method of the WebGL context to create a <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLShader"><code>WebGLShader</code></a> object, which is used to represent a shader by the WebGL API. The method accepts a <code>GLenum</code> that indicates the type of the shader to which we just pass the <code>shaderType</code> variable.</p>
+
+<pre><code class="language-c">let shader = gl.createShader(shaderType);</code></pre>
+
+    <p>Second, we call the the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/shaderSource"><code>shaderSource</code></a> method of the WebGL context to set the source code of the newly created <code>WebGLShader</code> object.</p>
+
+<pre><code class="language-c">gl.shaderSource(shader, sourceCode);</code></pre>
+
+    <p>Third, we call the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/compileShader"><code>compileShader</code></a> method of the WebGL context. Here, compiling a shader turns the shader source code, which is human-readable text, into machine code that the GPU can understand and run.</p>
+
+<pre><code class="language-c">gl.compileShader(shader);</code></pre>
+
+    <p>Then, we check whether the compilation was successful or not. This is done retrieving the compilation state of the <code>WebGLShader</code> object with the WebGL context's <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getShaderParameter"><code>getShaderParameter</code></a> method, passing <code>gl.COMPILE_STATUS</code> as the second argument. If the compilation is successful, the method would return <code>true</code>. If this is the case, we can return the created <code>WebGLShader</code> object to the function's caller.</p>
+
+<pre><code class="language-c">if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+  return shader.
+}</code></pre>
+
+    <p>If compilation fails, we want to inform the function's caller why it fails. This information is available in the shader's "information log," which we can retrived with the WebGL context's <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getShaderInfoLog"><code>getShaderInfoLog</code></a> method.</p>
+
+<pre><code class="language-c">let infoLog = gl.getShaderInfoLog(shader);</code></pre>
+
+    <p>Before we can inform the caller of the infomation log, we clean up the <code>WebGLShader</code> object, which is now cannot be used because of the failed compilation. Here, we delete it with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/deleteShader"><code>deleteShader</code></a> method in order to free resources occupied by the shader so far.</p>
+
+<pre><code class="language-c">gl.deleteShader(shader);</code></pre>
+
+    <p>Lastly, we throw a Javascript exception with a message created from the information log.</p>
+
+<pre><code class="language-c">throw new Error("An error occurred compiling the shader: " + infoLog);</code></pre>
+
+    <p>Compilation can fail because of various reasons, but the most significant would be syntax errors in the source code. Throwing the above exception is thus very important because it allows us, the programmer, to learn about our mistakes and rewrite the source code to fix them.</p>
+
+    <h3>9.1.5 &nbsp; How to create a GLSL program</h3>
+
+    <p>We now turn our attention to the process of creating a GLSL program, which is encapsulated in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/program.js#L22"><code>createGlslProgram</code></a> function in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/program.js"></a><code>program.js</code></a>. This function creates a GLSL program from two pieces of source code, one for the vertex shader and another for the fragment shader. Its source code is reproduced below.</p>
+
+    <figure class="figure">
+<pre><code class="language-c">function createGlslProgram(gl, vertexShaderSource, fragmentShaderSource) {
+  // Step 1: Create a program object.
+  let program = gl.createProgram();
+
+  // Step 2: Create an attach the shaders.
+  let vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+  gl.attachShader(program, vertexShader);
+  let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+  gl.attachShader(program, fragmentShader);
+
+  // Step 3: Link the program.
+  gl.linkProgram(program);
+
+  // Step 4: Validate the program.
+  gl.validateProgram(program);
+
+  // Step 4: Check for errors.
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      let infoLog = gl.getProgramInfoLog(program);
+      gl.deleteProgram(program);
+      throw new Error("An error occurred linking the program: " + infoLog);
+  } else {
+      return program;
+  }
+}</code></pre>
+      <figcaption class="figure-caption"><strong>Lising 8.5</strong> The <code>createGlslProgram</code> function.</figcaption>
+    </figure>
+      
 
     <h2>9.2 &nbsp; Program 2: Drawing point primitives</h2>
 
