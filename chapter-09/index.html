@@ -402,6 +402,22 @@ gl.deleteShaer(fragmentShader);</code></pre>
 
     <p>We have gone through everything about how to create GLSL programs and how to use them. In this section, we go through the rest of the code in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/index.js"><code>index.js</code></a> and discuss how the whole program works.</p>
 
+    <p>We start with the bottommost section of the file, which creates the WebGL context and sets up the drawing loop.</p>
+
+<pre><code class="langauge-c">let canvas = $("#webglCanvas");
+let gl = canvas[0].getContext("webgl2");
+if (!gl) {
+    alert("Cannot get WebGL 2 context!");
+} else {
+    createPrograms(gl).then(programs => {
+        gl.useProgram(programs[0]);
+        lastProgram = programs[0];
+        window.requestAnimationFrame(() => updateWebGL(gl, programs));
+    });    
+}</code></pre>
+
+    <p>After successfully retrieving the WebGL context, we call <code>createPrograms</code> to create the two programs, which are returned in a 2-element array. We process the programs with a callback function given as the argument of the <code>then</code> method. </p>
+
     <h2>9.2 &nbsp; Program 2: Drawing point primitives</h2>
 
     <h2>9.3 &nbsp; Program 3: Drawing line primitives</h2>
