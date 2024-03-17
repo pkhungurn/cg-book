@@ -294,7 +294,20 @@ void main() {
 }</code></pre>
       <figcaption class="figure-caption"><strong>Lising 8.5</strong> The <code>createGlslProgram</code> function.</figcaption>
     </figure>
-      
+    
+    <p>The return value of this function is an instance of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLProgram"><code>WebGLProgram</code></a> object, which we create in Line 3 with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createProgram"><code>createProgram</code></a> method of the WebGL context.</p>
+
+<pre><code class="language-c">let program = gl.createProgram();</code></pre>
+
+    <p>After creating an instance, we need to specify a vertex shader and a fragment shader that are going to be used to make the program. This can be done with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/attachShader"><code>attachShader</code></a> method of the WebGL context. In Listing 8.5, we obtain the shaders by calling the <code>createShader</code> function with the appropriate arguments.</p>
+
+<pre><code class="language-c">let vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+gl.attachShader(program, vertexShader);
+let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+gl.attachShader(program, fragmentShader);
+</code></pre>
+
+    <p>After the we have specified the shaders, we can "link" the program, which simply means combining the shaders to create a complete GLSL program. The word "link" </p>
 
     <h2>9.2 &nbsp; Program 2: Drawing point primitives</h2>
 
