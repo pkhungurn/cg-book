@@ -369,7 +369,7 @@ gl.deleteShaer(fragmentShader);</code></pre>
   program1.name = "program1";
 
   return [program0, program1];
-}</code></pre>    
+}</code></pre>
 
     <p>We see that we use the <code>loadText</code> function to retrieve the source code from the three files. Then, we use <code>createGlslProgram</code> to create two programs with the pairs of source code we discussed earlier in Section <a href="#glsl-programs">9.1.1</a>. The following two lines</p>
 
@@ -384,8 +384,24 @@ gl.deleteShaer(fragmentShader);</code></pre>
 
     <h3>9.1.7 &nbsp; Using a Program</h3>
 
+    <p>At any given time in the life of a WebGL application, there is at most one GLSL program that is being "used." When a program is used, its shaders are used to modified the relevant steps in the graphics pipeline, allowing for custom vertex and fragment processing. For example, all rendered primitives would be white and green when "program0" and "program1" are used, respectively.</p>
+
+    <p>We can tell WebGL to start using a specific program with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/useProgram"><code>useProgram</code></a> method of the WebGL context. The method takes one argument, a <code>WebGLProgram</code> object to use.</p>
     
+<pre><code class="language-c">gl.useProgram(&lt;program-object-to-use&gt;);</code></pre>    
     
+    <p>We can also tell WebGL to not use any program (and therefore we would not be able to render any primtiives) by supplying <code>null</code> as the argument.</p>
+    
+    <pre><code class="language-c">gl.useProgram(null);</code></pre>
+
+    <p>The GLSL program being used by WebGL is referred to as the "current program." It can be retrieved by getting the <code>CURRENT_PROGRAM</code> parameter of the WebGL context.</p>
+
+<pre><code class="language-c">gl.getParameter(gl.CURRENT_PROGRAM)</code></pre>
+
+    <h3>9.1.8 &nbsp; The Rest of Program 1</h3>
+
+    <p>We have gone through everything about how to create GLSL programs and how to use them. In this section, we go through the rest of the code in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/index.js"><code>index.js</code></a> and discuss how the whole program works.</p>
+
     <h2>9.2 &nbsp; Program 2: Drawing point primitives</h2>
 
     <h2>9.3 &nbsp; Program 3: Drawing line primitives</h2>
