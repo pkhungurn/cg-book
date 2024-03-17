@@ -110,6 +110,7 @@
 
     <p>What happen under the hood is that, at any given time, a WebGL application either "use" a WebGL program or does not use any. Here, when a GLSL program is used, the graphics pipeline is customized according to what is written in the program's code. Our WebGL application starts up, it creates two WebGL programs called "program0" and "program1." It then immediately uses "program0," and it changes the program it uses according to the value of the combo box, which can be changed by the user. However, the application only uses the program, but it does not draw any primitives. So, we cannot see anything on the canvas at all. (We will start putting things on the canvas from Program 2 onward. Please be patient.)</p>
 
+    <a name="#glsl-programs"></a>
     <h3>9.1.1 &nbsp; GLSL programs</h3>
 
     <p>As previously discussed in Chapter 7, A GLSL program in the context of WebGL 2.0 is made up of two shaders: a vertex shader and a fragment shaders. Program 1 has three shaders: a vertex shaders whose source code is in <a href="https:/https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/vertex-shader.vert"><code>vertex-shader.vert</code></a> and two fragment shaders whose source code is in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/fragment-shader-0.frag"><code>fragment-shader-0.frag</code></a> and <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/fragment-shader-1.frag"><code>fragment-shader-1.frag</code></a>.  The two GLSL programs are created from the shaders as follows:</p>
@@ -157,6 +158,7 @@ void main() {
 
     <p>So, what the vertex shader does is simply copying the $xyz$-coordinates of vertex positions into the clip space coordinates whose $w$-component is always 1. Recall again from <a href="../chapter-07/index.html#vertex-shaders">Section 7.3.2</a> that the next step in the graphics pipeline after the vertex shader runs is the perspective divide, in which the NDCs are computed from the clip space coordinates by dividing the clip space $xyz$-coordinates with the $w$-coordinate. Because the $w$-coordinate is always 1, the NDCs would be equal to the vertex positions exactly. The vertex shader thus allows the user of the graphics pipeline to directly specify the NDCs. Because the $x$- and $y$-coordinates of the NDCs represent 2D positions on the canvas, this vertex shader sets up a 2D drawing system. We will see this in more details in other Programs in this chapter.</p>
     
+    <a name="the-fragment-shaders"></a>
     <h3>9.1.3 &nbsp; The fragment shaders</h3>
 
     <p>Let us now turn our attention to the fragment shaders. They are even simpler than the vertex one.</p>
@@ -193,9 +195,10 @@ void main() {
 
     <p>As a result, program0, which is created from the vertex shader in <a href="#the-vertex-shader">Section 9.1.2</a> and the first fragment shader, would allow the user to directly specify the on-screen position of the vertices, and it would color all primitives white. On the other hand, program1 would do the same thing, but all primitives would be green instead.</p>
  
+    <a name="how-to-create-shader"></a>
     <h3>9.1.4 &nbsp; How to create a GLSL shader</h3>
 
-    <p>A GLSL program is made of a vertex shader and a fragment shader. Hence, in  order to create a program and render primitive with it, we must create shaders first. The process of creating a shader is encapsulated in the function <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/program.js#L1"><code>createShader</code></a> in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/program.js"><code>program.js</code></a> file. The code is reproduced in full below.</p>
+    <p>A GLSL program is made of a vertex shader and a fragment shader. Hence, in  order to create a program and render primitive with it, we must create shaders first. The process of creating a shader is encapsulated in the function <a href="https://github.com/pkhungurn/cg-book-code/blob/259193db086c5ead70be0fcc4bcf3c7975734a79/chapter-09/program-01/src/program.js#L1-L20"><code>createShader</code></a> in the <a href="https://github.com/pkhungurn/cg-book-code/blob/259193db086c5ead70be0fcc4bcf3c7975734a79/chapter-09/program-01/src/program.js#"><code>program.js</code></a> file. The code is reproduced in full below.</p>
 
     <figure class="figure">
 <pre><code class="language-c">function createShader(gl, shaderType, sourceCode) {
@@ -209,7 +212,7 @@ void main() {
   gl.compileShader(shader);
 
   // Step 4: Check for errors.
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
       return shader;
   }
 
@@ -265,7 +268,7 @@ void main() {
 
     <h3>9.1.5 &nbsp; How to create a GLSL program</h3>
 
-    <p>We now turn our attention to the process of creating a GLSL program, which is encapsulated in the <a href="https://github.com/pkhungurn/cg-book-code/blob/f3c9c89b49726b0db4401589296e58b8a496cd48/chapter-09/program-01/src/program.js#L1-L19"><code>createGlslProgram</code></a> function in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/program.js"></a><code>program.js</code></a>. This function creates a GLSL program from two pieces of source code, one for the vertex shader and another for the fragment shader. Its source code is reproduced below.</p>
+    <p>We now turn our attention to the process of creating a GLSL program, which is encapsulated in the <a href="https://github.com/pkhungurn/cg-book-code/blob/259193db086c5ead70be0fcc4bcf3c7975734a79/chapter-09/program-01/src/program.js#L1-L20#L24-L51"><code>createGlslProgram</code></a> function in <a href="https://github.com/pkhungurn/cg-book-code/blob/259193db086c5ead70be0fcc4bcf3c7975734a79/chapter-09/program-01/src/program.js#L1-L20#"></a><code>program.js</code></a>. This function creates a GLSL program from two pieces of source code, one for the vertex shader and another for the fragment shader. Its source code is reproduced below.</p>
 
     <figure class="figure">
 <pre><code class="language-c">function createGlslProgram(gl, vertexShaderSource, fragmentShaderSource) {
@@ -285,13 +288,16 @@ void main() {
   gl.validateProgram(program);
 
   // Step 5: Check for errors.
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      let infoLog = gl.getProgramInfoLog(program);
-      gl.deleteProgram(program);
-      throw new Error("An error occurred linking the program: " + infoLog);
-  } else {
+  if (gl.getProgramParameter(program, gl.LINK_STATUS)) {        
       return program;
   }
+
+  // Step 6: Clean up if there are errors.
+  let infoLog = gl.getProgramInfoLog(program);
+  gl.deleteProgram(program);
+  gl.deleteShader(vertexShader);
+  gl.deleteShaer(fragmentShader);
+  throw new Error("An error occurred linking the program: " + infoLog);
 }</code></pre>
       <figcaption class="figure-caption"><strong>Lising 8.5</strong> The <code>createGlslProgram</code> function.</figcaption>
     </figure>
@@ -312,8 +318,74 @@ gl.attachShader(program, fragmentShader);
 
 <pre><code class="language-c">gl.linkProgram(program);</code></pre>
 
-    <p>If linking is successful, the creation process is complete, and we can start using the program immediately. However, like compiing a shader, linking can fail due to coding errors. It is good practice to check for them and report any problems to the user. </p>
+    <p>If linking is successful, the creation process is complete, and we can start using the program immediately. However, like compiling a shader, linking can fail due to coding errors. It is good practice to check for them and report any problems to the user. To do so, we first call the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/validateProgram"><code>validateProgram</code></a> of the WebGL context on the created program.</p>
 
+<pre><code class="language-c">gl.validateProgram(program);</code></pre>
+
+    <p>The next step would be to call the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getProgramParameter"><code>getProgramParameter</code></a> method on the program to get its link status: <code>gl.getProgramParameter(program, gl.LINK_STATUS)</code>. The return value is a boolean which is true if and only if linking was successful. If this is the case, we can return the created program and exit the function.</p>
+
+<pre><code class="language-c">if (gl.getProgramParameter(program, gl.LINK_STATUS)) {        
+  return program;
+}</code></pre>
+
+    <p>Note that the process to check for linking errors is a little more complicated than that to check for shader compiling errors. In Section <a href="#how-to-create-shader">9.1.4</a>, we can call <code>getShaderParameter</code> immediately after callling <code>compileShader</code>. However, in this section, we must call <code>validProgram</code> between tthe calls to <code>linkProgram</code> and <code>getProgramParameter</code>.</p>
+
+    <p>Otherwise, we know that linking failed, and we need to fetch the error message and clean up the unused programs can shaders. Similar to what we did when compiling a shader, we can retrieve the error message with WebGL context's <code>getProgramInfoLog</code> method.</p>
+
+<pre><code class="language-c">let infoLog = gl.getProgramInfoLog(program);</code></pre>
+
+    <p>Deleting a program can then be done with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/deleteProgram"><code>deleteProgram</code></a>  method of the WebGL context. However, it is not enough to just delete the program here. We must also delete the shaders that we created earlier too.</p>    
+
+<pre><code class="language-c">gl.deleteProgram(program);
+gl.deleteShader(vertexShader);
+gl.deleteShaer(fragmentShader);</code></pre>
+
+    <p>Lastly, we throw an exception with the retrieved error message.</p>
+
+<pre><code class="language-c">throw new Error("An error occurred linking the program: " + infoLog);</code></pre>
+
+    <h3>9.1.6 &nbsp; Loading Source Code and Creating Programs from It</h3>
+
+    <p>In the last section, we just discussed how to create a GLSL program if we have access to shader source code which is stored in Javascript strings. Now, we must figure out how get a hold of these strings. </p>
+      
+    <p>Recall from Section <a href="#the-vertex-shader">9.1.2</a> and <a href="#the-fragment-shaders">Section 9.1.3</a> that the source code is stored in three separte files: <code>vertex-shader.vert</code>, <code>fragment-shader-0.frag</code>, and <code>fragment-shader-1.frag</code>. When our WebGL program is served by a web server, these files will be available in the same directory as <code>index.html</code>. As a result, we need to read the files' contents and return them as strings. This is done with the <a href="https://github.com/pkhungurn/cg-book-code/blob/259193db086c5ead70be0fcc4bcf3c7975734a79/chapter-09/program-01/src/index.js#L4-L7"><code>loadText</code></a> function in the <a href="https://github.com/pkhungurn/cg-book-code/blob/259193db086c5ead70be0fcc4bcf3c7975734a79/chapter-09/program-01/src/index.js"><code>index.js</code></a> file, which uses the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch">Fetch API</a> to do the job.</p> 
+
+<pre><code class="language-c">async function loadText(url) {
+  let fetchResult = await fetch(url);
+  return fetchResult.text();
+}</code></pre>
+
+    <p>The two GLSL programs are created in the <code>createPrograms</code> function (not to be confused with the <code>createGlslProgram</code> function in the last section), whose code is reproduced in full below.</p>
+
+<pre><code class="language-c">async function createPrograms(gl) {
+  let vertexShaderSource = await loadText("vertex-shader.vert");
+  let fragmentShader0Source = await loadText("fragment-shader-0.frag");
+  let fragmentShader1Source = await loadText("fragment-shader-1.frag");
+
+  let program0 = createGlslProgram(gl, vertexShaderSource, fragmentShader0Source);
+  program0.name = "program0";
+
+  let program1 = createGlslProgram(gl, vertexShaderSource, fragmentShader1Source);
+  program1.name = "program1";
+
+  return [program0, program1];
+}</code></pre>    
+
+    <p>We see that we use the <code>loadText</code> function to retrieve the source code from the three files. Then, we use <code>createGlslProgram</code> to create two programs with the pairs of source code we discussed earlier in Section <a href="#glsl-programs">9.1.1</a>. The following two lines</p>
+
+<pre><code class="language-c">    :
+  program0.name = "program0";
+
+    :
+  program1.name = "program1";
+</code></pre>
+
+    <p>just add a field called <code>name</code> to the program objects so that we can use these names to identify the programs later. They are specific of the functionality of Program 1 and are not in any way a standard practice in WebGL programming. The function ends by returning the two programs inside a 2-element array.</p>    
+
+    <h3>9.1.7 &nbsp; Using a Program</h3>
+
+    
+    
     <h2>9.2 &nbsp; Program 2: Drawing point primitives</h2>
 
     <h2>9.3 &nbsp; Program 3: Drawing line primitives</h2>
