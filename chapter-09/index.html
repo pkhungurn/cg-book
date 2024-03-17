@@ -213,6 +213,7 @@ void main() {
       return shader;
   }
 
+  // Step 5: Clean up if there are errors.
   let infoLog = gl.getShaderInfoLog(shader);
   gl.deleteShader(shader);
   throw new Error("An error occurred compiling the shader: " + infoLog);
@@ -264,7 +265,7 @@ void main() {
 
     <h3>9.1.5 &nbsp; How to create a GLSL program</h3>
 
-    <p>We now turn our attention to the process of creating a GLSL program, which is encapsulated in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/program.js#L22"><code>createGlslProgram</code></a> function in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/program.js"></a><code>program.js</code></a>. This function creates a GLSL program from two pieces of source code, one for the vertex shader and another for the fragment shader. Its source code is reproduced below.</p>
+    <p>We now turn our attention to the process of creating a GLSL program, which is encapsulated in the <a href="https://github.com/pkhungurn/cg-book-code/blob/f3c9c89b49726b0db4401589296e58b8a496cd48/chapter-09/program-01/src/program.js#L1-L19"><code>createGlslProgram</code></a> function in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/program.js"></a><code>program.js</code></a>. This function creates a GLSL program from two pieces of source code, one for the vertex shader and another for the fragment shader. Its source code is reproduced below.</p>
 
     <figure class="figure">
 <pre><code class="language-c">function createGlslProgram(gl, vertexShaderSource, fragmentShaderSource) {
@@ -307,7 +308,11 @@ let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 gl.attachShader(program, fragmentShader);
 </code></pre>
 
-    <p>After the we have specified the shaders, we can "link" the program, which simply means combining the shaders to create a complete GLSL program. The word "link" </p>
+    <p>After the we have specified the shaders, we can "link" the program with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/linkProgram"><code>linkProgram</code></a>. Here, "linking" means combining the shaders to create a complete GLSL program.</p>
+
+<pre><code class="language-c">gl.linkProgram(program);</code></pre>
+
+    <p>If linking is successful, the creation process is complete, and we can start using the program immediately. However, like compiing a shader, linking can fail due to coding errors. It is good practice to check for them and report any problems to the user. </p>
 
     <h2>9.2 &nbsp; Program 2: Drawing point primitives</h2>
 
