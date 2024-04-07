@@ -466,13 +466,69 @@ if (!gl) {
 
     <p>We can see from the source code that the function retrieves the current program and checks whether it is the same as the <code>lastProgram</code>. If not, it shows an alert. Notice that it deals with the case where <code>lastProgram</code> is null (i.e., when no program is being used) differently. Lastly, it sets the <code>lastProgram</code> to the current program so that it correctly shows the right alert again when <code>reportCurrentProgram</code> is called.</p>
 
-    <h2>9.2 &nbsp; Program 2: Drawing point primitives</h2>
+    <h2>9.2 &nbsp; Program 2: Drawing a triangle primitive</h2>
+    
+    <p>Now that we know how to create and use GLSL programs, we are ready to draw primitives. <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-09/program-02">Program 2</a> demonstrates how to draw a triangle primitive in the simplest possible way.</p>
+
+    <figure class="figure">
+      <a href="images/program-02-screenshot.png"><img src="images/program-02-screenshot.png" alt="" height="300"></a>
+      <figcaption class="figure-caption"><strong>Figure 9.3</strong> A screenshot of Program 2.</figcaption>
+    </figure>
+
+    <p>Like creating a GLSL program, the process of drawing primitives also have multiple steps. The steps can be broken into two parts.</p>
+
+    <ol>
+      <li>Defining a buffer that hold vertex data. One can also optionally define another buffer that holds indices as well.</li>
+      <li>Drawing the primitives using the defined buffers.</li>
+    </ol>
+    
+    <h3>9.2.1 &nbsp; The buffers</h3>
+
+    <p>Recall from <a href="../chapter-05/index.html">Chapter 5</a> primtives are made of vertices, and each vertex has associated data such as its position, color, and normal. Because WebGL draws primitives using the GPU, we must download the vertice's data to the GPU first. This requires us to allocate a piece of GPU memory, which we shall call the <b>vertex buffer</b>, to store this data. Then, we must transfer the data to the GPU.</p>
+
+    <p> Recall also that defining primitives requires information about connections between the vertices, and this information can be stored in an <b>index buffer</b>. Note that the index buffer in Chapter 5 is a Javascript array. However, if we want WebGL to use it, we must store the data that it holds in a buffer that resides in the GPU too. For simplicity, we shall refer to the piece of GPU memory that hold index data as an index buffer as well.</p>
+
+    <p>Rendering primitives always require a vertex buffer, but an index buffer is optional. This is because WebGL allows connections between vertices to be defined implicitly as follows. If we want to draw 10 triangle primitives, we can create a vertex buffer that holds data for 30 different vertices. WebGL will then treat three consecutive vertices in this buffer as a traingle. This is the way of specifying connections that is used in Program 2, but we will use an index buffer to define connections explicity in Program 3.</p>
+
+    <h3>9.2.2 &nbsp; Creating a vertex buffer</h3>
+
+    <p>The following lines of code in Program 2's <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-02/src/index.js"><code>index.js</code></a> creates a vertex buffer.</p>
+
+<pre><code class="language-javascript">let vertexData = new Float32Array([
+  -0.5, -0.5, 0.0,
+  0.5, -0.5, 0.0,
+  0.5, 0.5, 0.0
+]);
+let vertexBuffer = createVertexBuffer(gl, vertexData);</code></pre>
+
+    <p>First, we create a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays">Javascript typed array</a> to hold the vertex data. WebGL requires that data that are going to be transferred to a GPU buffer be stored in one of 4 different Javascript data types. In this book, we will use typed arrays because it is convenient and simple. Here, we use a typed array where each element is a 32-bit floating point number. The array has 9 elements, which can be divided into 3 different groups. Each group corresponds to a vertex and contains its $x$-, $y$- and $z$-coordinates. Because there are 3 vertices, we can draw exactly 1 triangle with this vertex buffer.</p>
+
+    <p>Next, we pass the <code>vertexData</code> array to the <code>createVertexBuffer</code> function, whose code resides in another file: <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-02/src/vertex-buffer.js"><code>vertex-buffer.js</code></a>. We reproduce the function in full below.</p>
+
+<pre><code class="language-javascript">function createVertexBuffer(gl, vertexData) {
+  // Step 1: Create a buffer object.
+  let vertexBuffer = gl.createBuffer();
+
+  // Step 2: Bind the buffer to the ARRAY_BUFFER target.
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+
+  // Step 3: Transfer the vertex data to GPU.
+  gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+
+  // Step 4: Unbind the buffer.
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+  // Step 5: Return the vertex buffer.
+  return vertexBuffer;
+}</code></pre>
+    
+    
+
+    <h2>9.3 &nbsp; Program 3: Drawing triangle primitives using an index buffer</h2>
 
     <h2>9.3 &nbsp; Program 3: Drawing line primitives</h2>
 
-    <h2>9.4 &nbsp; Program 4: Drawing triangle primitives</h2>
-
-    <h2>9.5 &nbsp; Program 5: Using the index buffer</h2>
+    <h2>9.4 &nbsp; Program 4: Drawing triangle primitives</h2>    
 
     <h2>9.6 &nbsp; Program 6: Specifying viewports</h2>
      
