@@ -146,7 +146,7 @@ in vec3 position;
 void main() {
     gl_Position = vec4(position, 1);
 }</code></pre>
-<figcaption class="figure-caption"><strong>Listing 8.1</strong> The content of <code>vertex-shader.vert</code>.</figcaption>
+<figcaption class="figure-caption"><strong>Listing 9.1</strong> The content of <code>vertex-shader.vert</code>.</figcaption>
 </figure>
 
 
@@ -173,7 +173,7 @@ out vec4 fragColor;
 void main() {
     fragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }</code></pre>
-<figcaption class="figure-caption"><strong>Listing 8.2</strong> The content of <code>fragment-shader-0.frag</code>.</figcaption>
+<figcaption class="figure-caption"><strong>Listing 9.2</strong> The content of <code>fragment-shader-0.frag</code>.</figcaption>
 </figure>
       
 <figure class="figure">
@@ -186,7 +186,7 @@ out vec4 fragColor;
 void main() {
     fragColor = vec4(0.0, 1.0, 0.0, 1.0);
 }</code></pre>
-<figcaption class="figure-caption"><strong>Listing 8.3</strong> The content of <code>fragment-shader-1.frag</code>.</figcaption>
+<figcaption class="figure-caption"><strong>Listing 9.3</strong> The content of <code>fragment-shader-1.frag</code>.</figcaption>
 </figure>
 
     <p>The two source files have the exact same structure. The first lines of both files indicate the GLSL version. Both have <code>main</code> functions, which serve as entry points like in the vertex shader. Both have the <code>precision highp float;</code> lines, which specify the number of bits used to represent values held by the <code>float</code> type. We will study the precise effect of this line later in <a href="../chapther-10/index.html">Chapter 10</a>, so let us not worry about it for now.</p>
@@ -221,7 +221,7 @@ void main() {
   gl.deleteShader(shader);
   throw new Error("An error occurred compiling the shader: " + infoLog);
 }</code></pre>
-    <figcaption class="figure-caption"><strong>Listing 8.4</strong> The <code>createShader</code> function.</figcaption>
+    <figcaption class="figure-caption"><strong>Listing 9.4</strong> The <code>createShader</code> function.</figcaption>
     </figure>
 
     <p>The function has three arguments.</p>
@@ -299,14 +299,14 @@ void main() {
   gl.deleteShaer(fragmentShader);
   throw new Error("An error occurred linking the program: " + infoLog);
 }</code></pre>
-      <figcaption class="figure-caption"><strong>Lising 8.5</strong> The <code>createGlslProgram</code> function.</figcaption>
+      <figcaption class="figure-caption"><strong>Listing 9.5</strong> The <code>createGlslProgram</code> function.</figcaption>
     </figure>
     
     <p>The return value of this function is an instance of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLProgram"><code>WebGLProgram</code></a> object, which we create in Line 3 with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createProgram"><code>createProgram</code></a> method of the WebGL context.</p>
 
 <pre><code class="language-javascript">let program = gl.createProgram();</code></pre>
 
-    <p>After creating an instance, we need to specify a vertex shader and a fragment shader that are going to be used to make the program. This can be done with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/attachShader"><code>attachShader</code></a> method of the WebGL context. In Listing 8.5, we obtain the shaders by calling the <code>createShader</code> function with the appropriate arguments.</p>
+    <p>After creating an instance, we need to specify a vertex shader and a fragment shader that are going to be used to make the program. This can be done with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/attachShader"><code>attachShader</code></a> method of the WebGL context. In Listing 9.5, we obtain the shaders by calling the <code>createShader</code> function with the appropriate arguments.</p>
 
 <pre><code class="language-javascript">let vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
 gl.attachShader(program, vertexShader);
@@ -505,6 +505,7 @@ let vertexBuffer = createVertexBuffer(gl, vertexData);</code></pre>
 
     <p>Next, we pass the <code>vertexData</code> array to the <code>createVertexBuffer</code> function, whose code resides in another file: <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-02/src/vertex-buffer.js"><code>vertex-buffer.js</code></a>. We reproduce the function in full below.</p>
 
+    <figure class="figure">
 <pre><code class="language-javascript">function createVertexBuffer(gl, vertexData) {
   // Step 1: Create a buffer object.
   let vertexBuffer = gl.createBuffer();
@@ -521,8 +522,44 @@ let vertexBuffer = createVertexBuffer(gl, vertexData);</code></pre>
   // Step 5: Return the vertex buffer.
   return vertexBuffer;
 }</code></pre>
+      <figcaption class="figure-caption"><strong>Listing 9.6</strong> The <code>createVertexBuffer</code> function of Program 2.</figcaption>
+    </figure>
+
+    <p>The first step is to use the WebGL context's <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createBuffer"><code>createBuffer</code></a> method to create a <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer"><code>WebGLBuffer</code></a> object, which WebGL uses to represent a buffer in GPU memory.</p>
+
+    <p>The second step is to "bind" the created buffer with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindBuffer"><code>bindBuffer</code></a> method. Here, "binding" means telling WebGL to "use" the specified buffer for the next buffer-related operations until the user specifies otherwise, much like using a GLSL program. However, while at most one program can be used at a time, multiple buffers can be bound simultaneously because WebGL keeps tracks of multiple buffers, each used for a different purpose. One can think of this as having multiple buffer "slots," where a slot corresponds to a purpose. Binding means filling the slot with a buffer that the user specifies. Confusingly, the library calls such a slot a "<b>target</b>." In this chapter, we will be using two targets that are indicated by the following <code>GLEnum</code> values:</p>
+
+    <ul>
+      <li><code>gl.ARRAY_BUFFER</code>: The target for a buffer that stores vertex attributes.</li>
+      <li><code>gl.ELEMENT_ARRAY_BUFFER</code>: The target for a buffer that stores indices (i.e., the index buffer).</li>
+    </ul>
+
+    <p>The <code>bindBuffer</code> method has two arguments. The first is the <code>GLEnum</code> that indicates the target. The second is the buffer to bind to the target. In the code above, we immediately bind the created buffer to the <code>gl.ARRAY_BUFFER</code> target, indicating that we will use this buffer to store vertex attributes until we change our mind. The <code>gl.ELEMENT_ARRAY_BUFFER</code> target is not used in Program 2, but we will use it in Program 3.</p>
+
+    <p>The third step is to download the vertex data given in the <code>vertexData</code> variable to the GPU. This is done with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData"><code>bufferData</code></a> method. The first argument to the method is a <code>GLEnum</code> which indicates the target buffer where the data are to be downloaded to. The second is the Javascript variable that holds the data. The third is another <code>GLEnum</code> that indicates the usage pattern of the data in the buffer, and WebGL will use this information to optimize how the data are stored. Here, the third argument is <code>gl.STATIC_DRAW</code>, which indicates that the data in the buffer is specified once and will not change. Moreover, it will be used multiple times by the application. The <code>GLEnum</code> is a perfect fit for what we want to do in Program 2 because the training we draw does not change, and we draw it once every frame.</p>
+
+    <p>The fourth step is to "unbind" the buffer, which simply means to free the target the buffer is occupying after we are done with it. This can be done by calling <code>bindBuffer</code> with <code>null</code> as the buffer to be bound. This step is optional because the bound buffer would change once we call <code>bindBuffer</code> with a diferent buffer object. However, we include this step for hygienic purpose: we assume that the <code>gl.ARRAY_BUFFER</code> target is not bound to anything before <code>createVertexBuffer</code> is called, and we want to leave the target in the same state when the function returns.</p>
+
+    <p>Lastly, we return the created buffer as the return value of the function.</p>
     
-    
+    <h3>9.2.3 &nbsp; Drawing primitives</h3>
+
+    <p>Naturally, the code that draws primitives must be invoke every time we update the screen, so it belongs inside the <a href="https://github.com/pkhungurn/cg-book-code/blob/68616f4575e296b6620ab9f4e3281e7ed7168abb/chapter-09/program-02/src/index.js#L16-L41"><code>updateWebGL</code></a> function. However, before delving into the details of the function, let us see first how the function is used in the overall program. This can be seen in the lines of code below.</p>
+
+<pre><code class="language-javascript">let vertexData = new Float32Array([
+    -0.5, -0.5, 0.0,
+    0.5, -0.5, 0.0,
+    0.5, 0.5, 0.0
+]);
+let vertexBuffer = createVertexBuffer(gl, vertexData);
+
+createProgram(gl).then(program => {
+    windows.requestAnimationFrame(() => updateWebGL(gl, program, vertexBuffer));
+});</code></pre>
+
+    <p>We note earlier that drawing a primitive requires a GLSL program, so we must create one before anything can be drawn. In the above code, this is done with the <a href="https://github.com/pkhungurn/cg-book-code/blob/afde72cc9d05ddb3e1f2ec5a37a0c6ba3d8c6aa9/chapter-09/program-02/src/index.js#L10-L14"><code>createProgram</code></a> function, which is almost the same as the <code>createPrograms</code> function of Program 1, except that it only creates and returns one program. The vertex shader's source is in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-02/src/vertex-shader.vert"><code>vertex-shader.vert</code></a>, which is a copy of the same file in Program 1. The fragment shader's source is in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-02/src/fragment-shader.frag">fragment-shader.frag</a>, which is a copy of Program 1's <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/fragment-shader-0.frag"><code>fragment-shader-0.frag</code></a>. As explained earlier, the GLSL program made of these two shaders would allow its user to directly specify the screen positions of the vertices, and all rendered primitives would be white.</p>
+
+    <p>In addition to a GLSL program, we also need a buffer containing vertex data, and we will use the vertex buffer whose creation as described in the last section. As a result, Program 2's <code>updateWebGL</code> function takes 3 arguments: the WebGL context, a program, and a vertex buffer.</p>
 
     <h2>9.3 &nbsp; Program 3: Drawing triangle primitives using an index buffer</h2>
 
