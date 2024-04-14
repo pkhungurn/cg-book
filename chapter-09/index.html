@@ -559,7 +559,41 @@ createProgram(gl).then(program => {
 
     <p>We note earlier that drawing a primitive requires a GLSL program, so we must create one before anything can be drawn. In the above code, this is done with the <a href="https://github.com/pkhungurn/cg-book-code/blob/afde72cc9d05ddb3e1f2ec5a37a0c6ba3d8c6aa9/chapter-09/program-02/src/index.js#L10-L14"><code>createProgram</code></a> function, which is almost the same as the <code>createPrograms</code> function of Program 1, except that it only creates and returns one program. The vertex shader's source is in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-02/src/vertex-shader.vert"><code>vertex-shader.vert</code></a>, which is a copy of the same file in Program 1. The fragment shader's source is in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-02/src/fragment-shader.frag">fragment-shader.frag</a>, which is a copy of Program 1's <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/fragment-shader-0.frag"><code>fragment-shader-0.frag</code></a>. As explained earlier, the GLSL program made of these two shaders would allow its user to directly specify the screen positions of the vertices, and all rendered primitives would be white.</p>
 
-    <p>In addition to a GLSL program, we also need a buffer containing vertex data, and we will use the vertex buffer whose creation as described in the last section. As a result, Program 2's <code>updateWebGL</code> function takes 3 arguments: the WebGL context, a program, and a vertex buffer.</p>
+    <p>In addition to a GLSL program, we also need a buffer containing vertex data, and we will use the vertex buffer whose creation as described in the last section. As a result, Program 2's <code>updateWebGL</code> function takes 3 arguments: the WebGL context, a program, and a vertex buffer. Let us now looks at its source code.</p>
+
+    <figure class="figure">
+<pre><code class="language-javascript">function updateWebGL(gl, program, vertexBuffer) {
+  gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  // *******************************
+  // * Drawing triangle primitives *
+  // *******************************
+  // Step 1: Use the program.
+  gl.useProgram(program);
+  // Step 2: Get location of the attribute we want to assign with the data from the vertex buffer.
+  let positionLocation = gl.getAttribLocation(program, "position");
+  // Step 3: Enable the attribute.
+  gl.enableVertexAttribArray(positionLocation);
+  // Step 4: Bind the buffer we want to use.
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  // Step 5: Assign the attribute to the bound buffer.
+  gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 3 * 4, 0);
+  // Step 6: Unbind the buffer.
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  // Step 7: Draw.
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  // Step 8: Unuse the program.
+  gl.useProgram(null);
+
+  window.requestAnimationFrame(() => updateWebGL(gl, program, vertexBuffer));
+}</code></pre>
+      <figcaption class="figure-caption"><strong>Listing 9.7</strong> The <code>updateWebGL</code> function of Program 2.</figcaption>
+    </figure>
+
+    <p>As usual, the function starts with cleraning the screen and ends with requesting that itself be run again when the screen updates the next time. The main difference between this function and other programs' is the multi-step process to render a primitive.</p>
+
+    <p>Before rendering a primitive, we must make sure that the GLSL program that processes the vertices and the fragments is used by WebGL. So, the first step of te process is using a program, and this is paired with the last step, which unuses it.</p>
 
     <h2>9.3 &nbsp; Program 3: Drawing triangle primitives using an index buffer</h2>
 
