@@ -627,7 +627,25 @@ gl.enableVertexAttribArray(positionLocation);</code></pre>
 
     <p>After identifying and enabling the attribute variable we would like to use, we need to specify what data these variables would receive. More comcretely, we have a number of vertex buffers that store vertex data, and we must let WebGL know which part of which vertex buffer would be streamed to which attribute variable.</p>
 
-    <p></p>
+    <p>Before we can do the above, we need to bind a vertex buffer that the attribute variable would take data from. This is done in Step 4 of Listing 9.7, and we use the same <code>gl.bindBuffer</code> method as in Section 9.2.2. Step 4 is paired with Step 6 where we unbind the buffer for programming hygiene.</p>
+
+    <p>The most complicated step in this stage is Step 5 where we use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttribPointer"><code>vertexAttribPointer</code></a> method of the WebGL context to connect the vertex data to the attribute variable.</p>
+
+<pre><code class="language-javascript">// Step 5: Assign the attribute to the bound buffer.
+gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 3 * 4, 0);</code></pre>
+
+    <p>The method has 6 parameters.</p>
+
+    <p>The first parameter is the location of the variable we would like to use. In our case, this is the location of the <code>position</code> attribute variable that we have saved in the <code>positionLocation</code> variable.</p>
+
+    <p>The second parameter is the number of components of the attribute variable. Because the <code>position</code> attribute variable is a <code>vec3</code>, it represents a vector with 3 components. So, the value of the parameter is naturally 3. By the same logic, the parameter would be 2 if the atttribute variable has type <code>vec2</code> and 4 if the attribute variable has type <code>vec4</code>. We will learn more about these GLSL types in the next chapter.</p>
+
+    <p>The third parameter is the <code>GLenum</code> which represents the type of the elements of the vertex buffer. Because we prepared our vertex buffer with a <code>Float32Array</code>, the parameter value would be <code>gl.FLOAT</code>. (In fact, the value would be <code>gl.FLOAT</code> most of the times in the rest of the book.) On the other hand, if we created the vertex buffer with an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array"><code>Int32Array</code></a>, the parameter value would be <code>gl.INT</code>.</p>
+
+    <p>The fourth parameter is a boolean value. If <code>true</code>, WebGL would "normalize" the data before storing it into the attribute variable. This normalization only happends when the attribute variable store floating point values, but the vertex buffer stores integer values. (Note: This is not the same as vector normalization in Section <a href="../chapter-03/index.html#scaling">3.5.1</a>.) The parameter has not effect otherwise. Because each component of <code>vec3</code> stores a floating point number and our buffer also stores floating point numbers, the parameter has no effect. We arbitrarily leave it as <code>false</code>. (In fact, we will set this variable to <code>false</code> for the rest of this book.)</p>
+
+    <p>The fifth parameter is an integer called the <b>stride</b>. It is the distance in bytes between one instance of the vertex attribute value and the next instance in the vertex buffer. The best way to think about this to think of the vertex buffer as an <i>interleaved buffer</i> (Section <a href="../chapter-05/index.html#point-clouds">5.2</a>). An interleaved buffer is divided into contiguous blocks where each block stores a number of attributes of a vertex, and each block has the same size in bytes. The stride here would be the size of each such block. In our case, we set the parameter value to <code>3*4</code>, which is equal to 12. This is because, for our vertex buffer, each vertex has only one parameter: the position. A position is a vector with 3 components, and each component is stored as a floating-point number in the vertex buffer. As a floating-point number is 4 bytes in size, each block in the vertex buffer has $3 \times 4 = 12$ bytes.</p>
+      
 
     <h2>9.3 &nbsp; Program 3: Drawing triangle primitives using an index buffer</h2>
 
@@ -638,7 +656,7 @@ gl.enableVertexAttribArray(positionLocation);</code></pre>
     <h2>9.6 &nbsp; Program 6: Specifying viewports</h2>
      
     <hr>
-    <div class="footnotes">      
+    <div class="footnotes">
     </div>
 
     <hr>
