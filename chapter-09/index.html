@@ -591,9 +591,43 @@ createProgram(gl).then(program => {
       <figcaption class="figure-caption"><strong>Listing 9.7</strong> The <code>updateWebGL</code> function of Program 2.</figcaption>
     </figure>
 
-    <p>As usual, the function starts with cleraning the screen and ends with requesting that itself be run again when the screen updates the next time. The main difference between this function and other programs' is the multi-step process to render a primitive.</p>
+    <p>As usual, the function starts with cleraning the screen and ends with requesting that itself be run again when the screen updates the next time. The main difference between this function and those of other programs is the multi-step process to render a primitive.</p>
 
-    <p>Before rendering a primitive, we must make sure that the GLSL program that processes the vertices and the fragments is used by WebGL. So, the first step of te process is using a program, and this is paired with the last step, which unuses it.</p>
+    <p>Before rendering a primitive, we must make sure that the GLSL program that processes the vertices and the fragments is used by WebGL. So, Step 1 of the process is using a program, and this is paired with Step 8, which unuses it.</p>
+
+    <p>Next, we need to specify how the program would access the vertex data that we have prepared. More simply, we need to tell WebGL which variables in the programs are going to get what portion of the vertex data. This specification is done in Step 2 to Step 6. These 5 steps can be divided into two stages.</p>
+
+    <ul>
+      <li>The first stage consists of Step 2 and Step 3. In this stage, we identify the variables that are to receive vertex data and "enable" them.</li>
+
+      <li>The second stage consists steps from Step 4 to Step 6. We specify the portion of the vertex buffer that are going to be stored into the variables we selected.</li>
+    </ul>
+
+    <h4>9.2.3.1 &nbsp; Identifying and enabling attribute variables</h4>
+
+    <p>There are a number of special types of variables in WebGL. One type of these special variables is called <b>attribute variables</b>. These are global variables in a vertex shader that are marked with the keyword <code>in</code>. These variables are called "attribute" variables because they are mainly used to store vertex attributes. The vertex shader of Program 2 has one attribute variable called <code>position</code>, and it was declared as follows:</p>
+
+<pre><code class="language-c">in vec3 position;</code></pre>
+
+    <p>We see that the variable has type <code>vec3</code>, which means that the variable is used to store 3-component vectors. The variable name implies that these 3-vectors are 3D positions of the vertices.</p>
+
+    <p>When WebGL compiles a vertex shader, it assigns a unique integer called a <b>location</b> to each attribute variable. This number can be used later in Javascript code to refer to particular variables that we are interested in. In our case, we need to know the location of the <code>position</code> variable because we want to connect it to the vertex buffer. The location of an attribue variable can be retrieved using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getAttribLocation"><code>getAttribLocation</code></a> method of the WebGL context. The method is used in the source code of Program 2 as follows:</p>
+
+<pre><code class="language-javascript">// Step 2: Get location of the attribute we want to assign with the data from the vertex buffer.
+let positionLocation = gl.getAttribLocation(program, "position");</code></pre>
+
+    <p>As we can see, the method takes two arguments. The first is the program, and the second is a string whose content is the name of the variable. Because the location will be used multiple times later, we store it in the variable <code>positionLocation</code> for convenience.</p>
+
+    <p>All attribute variables in a vertex shader are "disabled" by default. A disabled variable cannot be used inside a vertex shader because we cannot tell what values the variable would take when the vertex shader is executed. Thus, after an attribute variable's location, we should "enable" the variable immediately. This can be done with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/enableVertexAttribArray"><code>enableVertexAttribArray</code></a> method of the WebGL context as follows:</p>
+
+<pre><code class="language-javascript">// Step 3: Enable the attribute.
+gl.enableVertexAttribArray(positionLocation);</code></pre>
+
+    <h4>9.2.3.2 &nbsp; Specifying vertex attribute data</h4>
+
+    <p>After identifying and enabling the attribute variable we would like to use, we need to specify what data these variables would receive. More comcretely, we have a number of vertex buffers that store vertex data, and we must let WebGL know which part of which vertex buffer would be streamed to which attribute variable.</p>
+
+    <p></p>
 
     <h2>9.3 &nbsp; Program 3: Drawing triangle primitives using an index buffer</h2>
 
