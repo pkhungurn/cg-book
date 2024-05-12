@@ -79,7 +79,7 @@
 
     <p>One of the difficulties of learning WebGL is that drawing primitives is intertwined with another aspect of the library: writing GLSL programs. As mentioned <a href="../chapter-07/index.html#programs-and-shaders">Section 7.3.1</a>, we need to create a GLSL program before drawing a primitive. This process has many steps that would take some time to explain. Once it is done, we must also specify the vertices that make up the primitives that we want to draw and connections between them. This process also takes multiple steps as well.</p>
 
-    <p>This chapter explains the above two processes. We first plunge ahead through the whole process  of creating and using GLSL programs without actually learning how to write them, leaving the details of GLSL programming as the subject of the next chapter. We then learn how to draw three types of primitives: points, lines, and triangles. Next, we learn about the index buffer and how it can be used to specify primitives. Lastly, we learn about viewports and how it can be used to specify the screen area over which primitives are drawn.</p>
+    <p>This chapter explains the above two processes. We first plunge ahead through the whole process  of creating and using GLSL programs without actually learning how to write them, leaving the details of GLSL programming as the subject of the next chapter. We then learn how to draw triangles. Next, we learn about the index buffer and how it can be used to alternatively specify triangles. We then learn how to draw two other types of primitives: lines and points. Lastly, we learn about viewports and how it can be used to specify the screen area over which primitives are drawn.</p>
 
     <h2>9.1 &nbsp; Program 1: Creating and using GLSL programs</h2>
 
@@ -679,9 +679,11 @@ gl.drawArrays(gl.TRIANGLES, 0, 3);</code></pre>
 
     <h2>9.3 &nbsp; Program 3: Drawing triangle primitives using an index buffer</h2>
 
+    <p></p>
+
     <h2>9.4 &nbsp; Program 4: Drawing line primitives</h2>
 
-    <h2>9.5 &nbsp; Program 4: Drawing point primitives</h2>    
+    <h2>9.5 &nbsp; Program 5: Drawing point primitives</h2>    
 
     <h2>9.6 &nbsp; Program 6: Specifying viewports</h2>
      
