@@ -544,7 +544,7 @@ let vertexBuffer = createVertexBuffer(gl, vertexData);</code></pre>
     
     <h3>9.2.3 &nbsp; Drawing primitives</h3>
 
-    <p>Naturally, the code that draws primitives must be invoke every time we update the screen, so it belongs inside the <a href="https://github.com/pkhungurn/cg-book-code/blob/68616f4575e296b6620ab9f4e3281e7ed7168abb/chapter-09/program-02/src/index.js#L16-L41"><code>updateWebGL</code></a> function. However, before delving into the details of the function, let us see first how the function is used in the overall program. This can be seen in the lines of code below.</p>
+    <p>Naturally, the code that draws primitives must be invoked every time we update the screen, so it belongs inside the <a href="https://github.com/pkhungurn/cg-book-code/blob/68616f4575e296b6620ab9f4e3281e7ed7168abb/chapter-09/program-02/src/index.js#L16-L41"><code>updateWebGL</code></a> function. However, before delving into the details of the function, let us see first how the function is used in the overall program. This can be seen in the lines of code below.</p>
 
 <pre><code class="language-javascript">let vertexData = new Float32Array([
     -0.5, -0.5, 0.0,
@@ -591,7 +591,7 @@ createProgram(gl).then(program => {
       <figcaption class="figure-caption"><strong>Listing 9.7</strong> The <code>updateWebGL</code> function of Program 2.</figcaption>
     </figure>
 
-    <p>As usual, the function starts with cleraning the screen and ends with requesting that itself be run again when the screen updates the next time. The main difference between this function and those of other programs is the multi-step process to render a primitive.</p>
+    <p>As usual, the function starts with clearing the screen and ends with requesting that itself be run again when the screen updates the next time. The main difference between this function and those of other programs is the multi-step process to render a primitive.</p>
 
     <p>Before rendering a primitive, we must make sure that the GLSL program that processes the vertices and the fragments is used by WebGL. So, Step 1 of the process is using a program, and this is paired with Step 8, which unuses it.</p>
 
@@ -644,14 +644,44 @@ gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 3 * 4, 0);</code></
 
     <p>The fourth parameter is a boolean value. If <code>true</code>, WebGL would "normalize" the data before storing it into the attribute variable. This normalization only happends when the attribute variable store floating point values, but the vertex buffer stores integer values. (Note: This is not the same as vector normalization in Section <a href="../chapter-03/index.html#scaling">3.5.1</a>.) The parameter has not effect otherwise. Because each component of <code>vec3</code> stores a floating point number and our buffer also stores floating point numbers, the parameter has no effect. We arbitrarily leave it as <code>false</code>. (In fact, we will set this variable to <code>false</code> for the rest of this book.)</p>
 
-    <p>The fifth parameter is an integer called the <b>stride</b>. It is the distance in bytes between one instance of the vertex attribute value and the next instance in the vertex buffer. The best way to think about this to think of the vertex buffer as an <i>interleaved buffer</i> (Section <a href="../chapter-05/index.html#point-clouds">5.2</a>). An interleaved buffer is divided into contiguous blocks where each block stores a number of attributes of a vertex, and each block has the same size in bytes. The stride here would be the size of each such block. In our case, we set the parameter value to <code>3*4</code>, which is equal to 12. This is because, for our vertex buffer, each vertex has only one parameter: the position. A position is a vector with 3 components, and each component is stored as a floating-point number in the vertex buffer. As a floating-point number is 4 bytes in size, each block in the vertex buffer has $3 \times 4 = 12$ bytes.</p>
-      
+    <p>The fifth parameter is an integer called the <b>stride</b>. It is the distance in bytes between one instance of the vertex attribute value and the next instance in the vertex buffer. The best way to think about this to think of the vertex buffer as an <i>interleaved buffer</i> (Section <a href="../chapter-05/index.html#point-clouds">5.2</a>). An interleaved buffer is divided into contiguous blocks where each block stores multiple attributes of a vertex, and each block has the same size in bytes. The stride here would be the size of each such block. In our case, we set the parameter value to <code>3*4</code>, which is equal to 12. This is because, for our vertex buffer, each vertex has only one parameter: the position. A position is a vector with 3 components, and each component is stored as a floating-point number in the vertex buffer. As a floating-point number is 4 bytes in size, each block in the vertex buffer has $3 \times 4 = 12$ bytes.</p>
+
+    <p>The sixth parameter is another integer, and it is called the <b>offset</b>. It is the number of bytes from the start of the interleaved buffer block to the start of the data of the vertex attribute in question. In our case, the offset is 0 because our attribution, the position, is already at the start of the block. The offset will be non-zero for attributes that are not the first one in the interleaved buffer, and we will see this in the next chapters. A good sanity check for the value of the offset is that it must be at least 0 and must also be less than the stride.</p>
+    
+    <p>Once we have specified the data that will fill the attribute variable, we can unbind the vertex buffer like in Step 6 of the code.</p>
+
+    <h3>9.2.3.3 &nbsp; Drawing</h3>
+
+    <p>Step 7 draws the primitive with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawArrays"><code>drawArrays</code></a> method of the WebGL context.</p>
+
+<pre><code class="language-javascript">// Step 7: Draw.
+gl.drawArrays(gl.TRIANGLES, 0, 3);</code></pre>
+
+    <p>The arguments to the method, expecially the the numbers 0 and 3, are rather cryptic. So let's look at them one by one.</p>
+
+    <p>The first parameter is the <code>GLEnum</code> that indicates the primitive type we want to draw. You can see all the possible values by looking at the table in <a href="../chapter-05/index.html#primitives">Section 5.3</a>. Because we want to draw a triangle, we specify <code>gl.TRIANGLEs</code>.</p>
+
+    <p>The second parameter is called <code>first</code>. It is the zero-based index of the first vertex in the vertex buffer that we wish to use to draw the primitive(s). The third parameter is called <code>count</code>, and it is the number of vertices from that indexed by <code>first</code> that we want to use in drawing. Hence, <code>drawArrays</code> tells WebGL to use a contiguous chuck of the vertex buffer to draw the primitives specified in the first argument.</p>
+
+    <p>In our case, our vertex buffer has only 3 vertices, which can make exactly one triangle. We thus set <code>first</code> to 0, which is the index of the first vertex, and <code>count</code> to 3, which is the number of all vertices. If the vertex buffer stores more than one triangle primitives, we can choose draw any set of consecutive triangles in the buffer by setting these two variables appropriately.</p>
+
+    <p>It is important to note that <code>count</code> must be consistent with the type of primitive to be drawn. When we draw triangles, <code>count</code> should be divisible by 3. When we draw line segments, <code>count</code> should be divisible by 2. For points, <code>count</code> can be any non-negative number.</p>
+
+    <p>We have gone through a lot of steps in order to just draw a single triangle. This shows us that 3D rendering requires much preparation. As a recap, let us list what are required before we call <code>drawArrays</code>.</p>
+
+    <ul>
+      <li>We must have prepared a GLSL program and used it.</li>
+      <li>We must locate all the attribute variables in the GLSL program and enable them.</li>
+      <li>We must have prepared a vertex buffer and connect it to the attribute variables in the GLSL program.</li>
+    </ul>
+
+    <p>Again, after we are done with drawing primitives, we should clean up by unusing the program, and this is done in Step 8.</p>
 
     <h2>9.3 &nbsp; Program 3: Drawing triangle primitives using an index buffer</h2>
 
-    <h2>9.3 &nbsp; Program 3: Drawing line primitives</h2>
+    <h2>9.4 &nbsp; Program 4: Drawing line primitives</h2>
 
-    <h2>9.4 &nbsp; Program 4: Drawing triangle primitives</h2>    
+    <h2>9.5 &nbsp; Program 4: Drawing point primitives</h2>    
 
     <h2>9.6 &nbsp; Program 6: Specifying viewports</h2>
      
