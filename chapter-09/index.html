@@ -679,7 +679,17 @@ gl.drawArrays(gl.TRIANGLES, 0, 3);</code></pre>
 
     <h2>9.3 &nbsp; Program 3: Drawing triangle primitives using an index buffer</h2>
 
-    <p></p>
+    <p>Program 2 draws a triangle primitive using only a vertex buffer. This means that we must prepare the buffer so that each three consecutive vertices in it contain vertex positions of triangles. This can be wasteful when multiple triangles share the same vertices because the data of those vertices must be repeated multiple times.</p>
+
+    <figure class="figure">
+      <figcaption class="figure-caption"><strong>Figure 9.4</strong> A mesh where mutliple triangles share the same vertex, and the corresponding vertex buffer. Notice that the data of Vertex 0 is repeated multiple times in the vertex buffer. <b>TODO: Draw this figure.</b></figcaption>
+    </figure>
+
+    <p>In <a href="../chapter-05/index.html#meshes">Section 5.4</a>, we learn that meshes are typically represented by two buffers: the vertex buffer and the index buffer. The index buffer stores indices of vertices in the vertex buffer in the order that from primitives. This representation is much more economical because (1) we can store vertex data with no redundancy, and (2) when a vertex is used multiple times, we only need to repeat its index instead of all vertex's data.</p>
+
+    <figure class="figure">
+      <figcaption class="figure-caption"><strong>Figure 9.5</strong> The same mesh as that in Figure 9.4. However, this time the mesh is represented by a vertex buffer and an index buffer. We can see that the vertex buffer contains no repetition, and the index buffer is much smaller than the vertex buffer in Figure 9.4. <b>TODO: Draw this figure.</b></figcaption>
+    </figure>
 
     <h2>9.4 &nbsp; Program 4: Drawing line primitives</h2>
 
