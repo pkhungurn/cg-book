@@ -482,6 +482,7 @@ if (!gl) {
       <li>Drawing the primitives using the defined buffers.</li>
     </ol>
     
+    <a name="the-buffers"></a>
     <h3>9.2.1 &nbsp; The buffers</h3>
 
     <p>Recall from <a href="../chapter-05/index.html">Chapter 5</a> primtives are made of vertices, and each vertex has associated data such as its position, color, and normal. Because WebGL draws primitives using the GPU, we must download the vertice's data to the GPU first. This requires us to allocate a piece of GPU memory, which we shall call the <b>vertex buffer</b>, to store this data. Then, we must transfer the data to the GPU.</p>
@@ -679,19 +680,78 @@ gl.drawArrays(gl.TRIANGLES, 0, 3);</code></pre>
 
     <h2>9.3 &nbsp; Program 3: Drawing triangle primitives using an index buffer</h2>
 
-    <p>Program 2 draws a triangle primitive using only a vertex buffer. This means that we must prepare the buffer so that each three consecutive vertices in it contain vertex positions of triangles. This can be wasteful when multiple triangles share the same vertices because the data of those vertices must be repeated multiple times.</p>
+    <p>Program 2 draws a triangle primitive using only a vertex buffer. As mentioned in <a href="index.html#the-buffers">Section 9.2.1</a>, connection between vertices is defined explicitly: we must prepare the buffer so that each three consecutive vertices in it contain vertex positions of triangles. This can be wasteful when multiple triangles share the same vertices because the data of those vertices must be repeated multiple times.</p>
 
     <figure class="figure">
       <figcaption class="figure-caption"><strong>Figure 9.4</strong> A mesh where mutliple triangles share the same vertex, and the corresponding vertex buffer. Notice that the data of Vertex 0 is repeated multiple times in the vertex buffer. <b>TODO: Draw this figure.</b></figcaption>
     </figure>
 
-    <p>In <a href="../chapter-05/index.html#meshes">Section 5.4</a>, we learn that meshes are typically represented by two buffers: the vertex buffer and the index buffer. The index buffer stores indices of vertices in the vertex buffer in the order that from primitives. This representation is much more economical because (1) we can store vertex data with no redundancy, and (2) when a vertex is used multiple times, we only need to repeat its index instead of all vertex's data.</p>
+    <p>The wastefulness program can be mitigated by using an index buffer, which stores indices of vertices in the vertex buffer in the order that from primitives. This representation is much more economical because (1) we can store vertex data with no redundancy, and (2) when a vertex is used multiple times, we only need to repeat its index instead of all vertex's data.</p>
 
     <figure class="figure">
       <figcaption class="figure-caption"><strong>Figure 9.5</strong> The same mesh as that in Figure 9.4. However, this time the mesh is represented by a vertex buffer and an index buffer. We can see that the vertex buffer contains no repetition, and the index buffer is much smaller than the vertex buffer in Figure 9.4. <b>TODO: Draw this figure.</b></figcaption>
     </figure>
 
-    <p>WebGL supports representing meshes with index buffers, and Program 3 uses one to draw a mesh containing two triangles that share vertices with each other.</p>
+    <p>WebGL supports representing meshes with index buffers, and Program 3 uses one to draw a mesh containing two triangles that share vertices with each other. Below is a screenshot of the program, which shows a white square.</p>
+
+    <figure class="figure">
+      <a href="images/program-03-screenshot.png"><img src="images/program-03-screenshot.png" alt="" height="300"></a>
+      <figcaption class="figure-caption"><strong>Figure 9.6</strong> A screenshot of Program 3.</b></figcaption>
+    </figure>
+
+    <h3>9.3.1 &nbsp; Creating a index buffer</h3>
+
+    <p>Program 3's source code is mostly the same as that of Program 2. One of the main difference is that Program 3 has one more file called <code>index-buffer.js</code>. It contains a function called <code>createIndexBuffer</code>, which, as the name implies, is used to create an index buffer to represent a mesh. Again, before we take a look at the function, we shall see how it is used in the main program.</p>
+
+<pre><code class="language-javascript">// **************************
+// * Creating vertex buffer *
+// **************************    
+let vertexData = new Float32Array([
+    -0.5, -0.5, 0.0,
+    0.5, -0.5, 0.0,
+    0.5, 0.5, 0.0,
+    -0.5, 0.5, 0.0
+]);
+let vertexBuffer = createVertexBuffer(gl, vertexData);
+
+// *************************
+// * Creating index buffer *
+// *************************    
+let indexData = new Int32Array([
+    0, 1, 2,
+    0, 2, 3
+]);
+let indexBuffer = createIndexBuffer(gl, indexData);
+
+createProgram(gl).then(program => updateWebGL(
+  gl, program, vertexBuffer, indexBuffer));</code></pre>
+
+    <p>Like in Program 2, we first create a vertex buffer to store vertex data. This time, though, our vertex buffer has 12 elements instead of 9 because now we want to draw a square, which has 4 vertices.</p>
+
+    <p>The main difference between Program 2 and Program 3 is the creation of the index buffer. Similar to a vertex buffer, we can store the data that are going to be stored in an index buffer can be stored in 4 Javascript, and we have chosen to use a typed array. However, we use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array"><code>Int32Array</code></a> instead of a <code>Float32Array</code> because each element of an inde buffer is an integer, not a floating point number like vertex coordinates.</p>
+
+    <p>The type array that contains the index data has 6 elements because we will draw a square that is made up of 2 triangles. The first triangle is made of vertices whose indices are 0, 1, and 2, and they form a right triangle whose right angle is the bottom left corner of the square. The second triangle's indices are 0, 2, and 3, and it is a right triangle whose right angle is the top left corner of the square. Notice that the indices are ordered so that the vertices swirl in the counterclockwise direction, following the convention that a counterclockwise swirl signifies the front face (<a href="../chapter-06/index.html#face-normal-vectors">Section 6.2</a>).</p>
+
+    <p>Now, let us look at the <code>createIndexBuffer</code> function in the <a href="https://github.com/pkhungurn/cg-book-code/blob/bc1b577a41fa4304dd888b9f7a67c698dfd0ca8e/chapter-09/program-03/src/index-buffer.js#L1"><code>index-buffer.js</code></a> file.</p>
+
+<pre><code class="language-javascript">function createIndexBuffer(gl, indexData) {
+  // Step 1: Create a buffer object.
+  let indexBuffer = gl.createBuffer();
+
+  // Step 2: Bind the buffer to the ELEMENT_ARRAY_BUFFER target.
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+  // Step 3: Transfer the buffer data.
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
+
+  // Step 4: Unbind the buffer.
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+  // Step 5: Return the buffer.
+  return indexBuffer;
+}</code></pre>
+
+    <p>We see that the <code>createIndexBuffer</code> function is very similar to the <code>createIndexBuffer</code> function. It has the same number of steps, and the steps use exactly the same methods of the WebGL context. The only difference is that the <code>GLEnum</code> that is used with the <code>glBindBuffer</code> and <code>glBufferData</code> methods are now <code>gl.ELEMENT_ARRAY_BUFFER</code> instead of <code>gl.ARRAY_BUFFER</code>. </p>
 
     <h2>9.4 &nbsp; Program 4: Drawing line primitives</h2>
 
