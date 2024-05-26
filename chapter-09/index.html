@@ -71,7 +71,7 @@
       \DeclareMathOperator*{\argmin}{arg\,min}
       \)
     </span>
-
+    
     <h1>9 &nbsp; Drawing primitives</h1>
     <hr>
 
@@ -543,6 +543,7 @@ let vertexBuffer = createVertexBuffer(gl, vertexData);</code></pre>
 
     <p>Lastly, we return the created buffer as the return value of the function.</p>
     
+    <a name="drawing-primitives"></a>
     <h3>9.2.3 &nbsp; Drawing primitives</h3>
 
     <p>Naturally, the code that draws primitives must be invoked every time we update the screen, so it belongs inside the <a href="https://github.com/pkhungurn/cg-book-code/blob/68616f4575e296b6620ab9f4e3281e7ed7168abb/chapter-09/program-02/src/index.js#L16-L41"><code>updateWebGL</code></a> function. However, before delving into the details of the function, let us see first how the function is used in the overall program. This can be seen in the lines of code below.</p>
@@ -699,9 +700,9 @@ gl.drawArrays(gl.TRIANGLES, 0, 3);</code></pre>
       <figcaption class="figure-caption"><strong>Figure 9.6</strong> A screenshot of Program 3.</b></figcaption>
     </figure>
 
-    <h3>9.3.1 &nbsp; Creating a index buffer</h3>
+    <h3>9.3.1 &nbsp; Creating an index buffer</h3>
 
-    <p>Program 3's source code is mostly the same as that of Program 2. One of the main difference is that Program 3 has one more file called <code>index-buffer.js</code>. It contains a function called <code>createIndexBuffer</code>, which, as the name implies, is used to create an index buffer to represent a mesh. Again, before we take a look at the function, we shall see how it is used in the main program.</p>
+    <p>Program 3's source code is mostly the same as that of Program 2. One of the main difference is that Program 3 has one more file called <code>index-buffer.js</code>. It contains a function called <code>createIndexBuffer</code>, which, as the name implies, is used to create an index buffer to represent a mesh. Again, before we take a look at the function, we shall see how it is used in the main program.</p>        
 
 <pre><code class="language-javascript">// **************************
 // * Creating vertex buffer *
@@ -751,7 +752,75 @@ createProgram(gl).then(program => updateWebGL(
   return indexBuffer;
 }</code></pre>
 
-    <p>We see that the <code>createIndexBuffer</code> function is very similar to the <code>createIndexBuffer</code> function. It has the same number of steps, and the steps use exactly the same methods of the WebGL context. The only difference is that the <code>GLEnum</code> that is used with the <code>glBindBuffer</code> and <code>glBufferData</code> methods are now <code>gl.ELEMENT_ARRAY_BUFFER</code> instead of <code>gl.ARRAY_BUFFER</code>. </p>
+    <p>We see that the <code>createIndexBuffer</code> function is very similar to the <code>createIndexBuffer</code> function. It has the same number of steps, and the steps use exactly the same methods of the WebGL context. The only difference is that the <code>GLEnum</code> that is used with the <code>glBindBuffer</code> and <code>glBufferData</code> methods are now <code>gl.ELEMENT_ARRAY_BUFFER</code> instead of <code>gl.ARRAY_BUFFER</code>.</p>
+
+    <h3>9.3.2 &nbsp; Using the index buffer</h3>
+
+    <p>The index buffer created above is used in the <a href="https://github.com/pkhungurn/cg-book-code/blob/bc1b577a41fa4304dd888b9f7a67c698dfd0ca8e/chapter-09/program-03/src/index.js#L17-L46"><code>updateWebGL</code></a> function. Its source code is reproduced below.</p>
+
+<pre><code class="language-javascript">function updateWebGL(gl, program, vertexBuffer, indexBuffer) {
+  gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  // *****************************************************
+  // * Drawing triangle primitives using an index buffer *
+  // *****************************************************
+  // Step 1: Use the program.
+  gl.useProgram(program);
+  // Step 2: Get location of the attribute we want to assign with the data from the vertex buffer.
+  let positionLocation = gl.getAttribLocation(program, "position");
+  // Step 3: Enable the attribute.
+  gl.enableVertexAttribArray(positionLocation);
+  // Step 4: Bind the buffer we want to use.
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  // Step 5: Assign the attribute to the bound buffer.
+  gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 3 * 4, 0);
+  // Step 6: Unbind the buffer.
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  // Step 7: Bind the index buffer.
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  // Step 8: Draw with drawElements.
+  gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);
+  // Step 9: Unbind the indexbuffer.
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+  // Step 10: Unuse the program.
+  gl.useProgram(null);
+
+  window.requestAnimationFrame(() => updateWebGL(gl, program, vertexBuffer, indexBuffer));
+}</code></pre>
+
+    <p>The function is a little more that that of the Program 2. It has an extra parameter, <code>indexBuffer</code>. It also has a few more steps, but the structure is mostly the same. We first need to use the GLSL program in Step 1 and then unuse it in the last step. (The GLSL program being used here is exactly the same as the one in Program 2.) Once we use the program, we find the location of the attribute variable that will receive the vertex position data in Step 2 and enable it in Step 3. We then specify the data that will go into the attribute variable in Step 5, 6, and 7 in the exact manner discussed in Section <a href="#drawing-primitives">9.2.3</a>.</p>
+
+    <p>However, drawing is now done differently. In Program 2, this is accomplicated by one call to the <code>drawArrays</code> method, but now we use three statements.  In the first statement, we bind the index buffer to the <code>gl.ELEMENT_ARRAY_BUFFER</code> slot, indicating that we will be using the index buffer.</p>
+
+<pre><code class="language-javascript">// Step 7: Bind the index buffer.
+gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);</code></pre>
+
+    Then, we draw the primitives with a different method, <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements"><code>drawElements</code></a> as follows.
+
+<pre><code class="language-javascript">// Step 8: Draw with drawElements.
+gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);</code></pre>
+
+    <p>The method is simpler than <code>drawArrays</code> because it has fewer arguments.</p>
+
+    <ul>
+      <li>The first argument is the type of primitive we want to draw, which is <code>gl.TRIANGLES</code> in our case.</li>
+      <li>The second argument is the number of indices in the index buffer that we would like to use. Because we want to use every index in it, we set the argument to 6.</li>
+      <li>The third argument is the data type of each index in the index buffer. Its value can either be <code>gl.UNSIGNED_BYTE</code>, <code>gl.UNSIGNED_SHORT</code>, and <code>gl.UNSIGNED_INT</code>. They indicate that an index takes 1 byte, 2 bytes, and 4 bytes, respectively. In our case, we created our index buffer with an <code>Int32Array</code> where each element has 4 bytes, so we have to use <code>gl.UNSIGNED_INT</code>.</li>
+      <li>The last argument is called <code>offset</code>, and it is the index of the first index in the buffer that we would like to use. We set the value to 0, indicating that we want to start from the very first index.</li>
+    </ul>
+    
+    <p>For the rest of the book, we will be drawing primitives using both the vertex buffer and the index buffer instead of just using the vertex buffer alone. Let us review what is required to draw primitives with an index buffer with <code>drawElements</code> before we move on to the next section.</p>
+
+    <ul>
+      <li>We must have prepared a GLSL program and used it.</li>
+      <li>We must locate all the attribute variables in the GLSL program and enable them.</li>
+      <li>We must have prepared a vertex buffer and connect it to the attribute variables in the GLSL program.</li>
+      <li>We must bind the index buffer to the <code>gl.ELEMENT_ARRAY_BUFFER</code> slot before calling <code>drawElements</code> and <b>leave the index buffer bound</b>.</li>
+      <li>We can then call <code>drawElements</code> to carry out the drawing.</li>
+      <li>Afterwards, we must unbind the index buffer and unuse the program for hygiene.</li>
+    </ul>
+
 
     <h2>9.4 &nbsp; Program 4: Drawing line primitives</h2>
 
