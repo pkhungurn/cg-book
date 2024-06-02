@@ -491,6 +491,7 @@ if (!gl) {
 
     <p>Rendering primitives always require a vertex buffer, but an index buffer is optional. This is because WebGL allows connections between vertices to be defined implicitly as follows. If we want to draw 10 triangle primitives, we can create a vertex buffer that holds data for 30 different vertices. WebGL will then treat three consecutive vertices in this buffer as a traingle. This is the way of specifying connections that is used in Program 2, but we will use an index buffer to define connections explicity in Program 3.</p>
 
+    <a name="creating-a-vertex-buffer"></a>
     <h3>9.2.2 &nbsp; Creating a vertex buffer</h3>
 
     <p>The following lines of code in Program 2's <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-02/src/index.js"><code>index.js</code></a> creates a vertex buffer.</p>
@@ -700,6 +701,7 @@ gl.drawArrays(gl.TRIANGLES, 0, 3);</code></pre>
       <figcaption class="figure-caption"><strong>Figure 9.6</strong> A screenshot of Program 3.</b></figcaption>
     </figure>
 
+    <a name="creating-an-index-buffer"></a>
     <h3>9.3.1 &nbsp; Creating an index buffer</h3>
 
     <p>Program 3's source code is mostly the same as that of Program 2. One of the main difference is that Program 3 has one more file called <code>index-buffer.js</code>. It contains a function called <code>createIndexBuffer</code>, which, as the name implies, is used to create an index buffer to represent a mesh. Again, before we take a look at the function, we shall see how it is used in the main program.</p>        
@@ -823,9 +825,82 @@ gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);</code></pre>
 
     <h2>9.4 &nbsp; Program 4: Code reorganization</h2>
 
-    <p>In this section, we break from learning new WebGL functionality and take time to reorganize the code of Program 3 so that we can program more easily later. The code we have been studying so far has been written to be pedagogical. It is simple and has all relevant steps in the same place for easy reading. However, it is has problem with variable management and is rather repetitive. We refactor Program 3 into Program 4 solve these problems. Let us discuss what the problems are and solve them one by one.</p>
+    <p>In this section, we take a break from learning new WebGL functionality and take time to reorganize the code of Program 3 so that we can program more easily later. The code we have been studying so far has been written to be pedagogical. It is simple and has all relevant steps in the same place for easy reading. However, it has problems with resource management, abstraction, and variable management. We refactor Program 3 into Program 4 to solve these problems. Let us discuss what the problems are and solve them one by one.</p>
 
-    <h3>9.4.1 &nbsp; Variable management</h3>
+    <h3>9.4.1 &nbsp; Resource management</h3>
+
+    <p>You may have noticed that, in the previous three programs, there are many WebGL commands that come in pairs.</p>
+
+    <ul>
+      <li><code>gl.useProgram(&lt;program>)</code> is paired with <code>gl.useProgram(null)</code></li>
+      <li><code>gl.bindBuffer(&lt;target>, &lt;buffer>)</code> is paired with <code>gl.bindBuffer(&lt;target>, null)</code></li>
+    </ul>
+
+    <p>This is a common programming pattern where we start using a resource, do something with it, and then clean up after ourselves once we are done. In our case, the resources are a GLSL program, a vertex buffer, or an index buffer. This pattern is so common that some programming languages such as <a href="https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">Java</a> and <a href="https://docs.python.org/3/reference/compound_stmts.html#with">Python</a> have special syntaxes for it. An advantage of these language constructs is that it reduces the two paired commands to only one command, preventing bugs that result from the programmer's forgetting to call the second command.</p>    
+
+    <p>Javascript does such special syntaxes deal with resource usage and clean-up. However, we can simulate it with a Javascript features: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions">function objects</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures">closures</a>. The idea is to create a function that, in its body, starts using the resource at the beginning and cleans up at the end. This function receives a function object that represents the action to be done with the resource, and its calls the function object between the resource allocation and clean-up. For the command pair involving GLSL programs, we introduce the <a href="https://github.com/pkhungurn/cg-book-code/blob/6371abc82a7392f5037c711962e4bdaec710cfa1/chapter-09/program-04/src/program.js#L53-L57"><code>useProgram</code></a> function.
+    </p>
+
+<pre><code class="language-javascript">export function useProgram(gl, program, code) {
+  gl.useProgram(program);
+  code();
+  gl.useProgram(null);
+}</code></pre>
+
+    <p>For the command pairs involving buffers, we introduce the <a href="https://github.com/pkhungurn/cg-book-code/blob/6371abc82a7392f5037c711962e4bdaec710cfa1/chapter-09/program-04/src/vertex-index-buffer.js#L1-L5"><code>bindBuffer</code></a> function.</p>
+
+<pre><code class="language-javascript">export function bindBuffer(gl, target, buffer, code) {
+  gl.bindBuffer(target, buffer);
+  code();
+  gl.bindBuffer(target, null);
+}</code></pre>
+
+    <p>When we call these functions, we will pass a closure that contains code that actually uses the relevant resource to do meaningful work. For examples, the <code>bindBuffer</code> function can be used to simplify the functions that create buffers (Section <a href="#creating-a-vertex-buffer">9.2.2</a> and <a href="#creating-an-index-buffer">9.3.1</a>) as follow.</p>
+
+<pre><code class="language-javascript">export function createVertexBuffer(gl, vertexData) {
+    let vertexBuffer = gl.createBuffer();
+    bindBuffer(gl, gl.ARRAY_BUFFER, vertexBuffer, () => {
+      gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+    });
+    return vertexBuffer;
+}
+
+export function createIndexBuffer(gl, indexData) {        
+  let indexBuffer = gl.createBuffer();
+  bindBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indexBuffer, () => {      
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
+  });    
+  return indexBuffer;
+}
+</code></pre>
+
+    <p>We can see that the functions became slightly shorter and much easier to read. We can also use the <code>useProgram</code> and <code>bindBuffer</code> functions to simplify the <code>updateWebGL</code> function of Program 3 as follows.</p>
+    
+<pre><code class="language-javascript">function updateWebGL(gl, program, vertexBuffer, indexBuffer) {
+  gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  useProgram(gl, program, () => {
+    let positionLocation = gl.getAttribLocation(program, "position");
+    gl.enableVertexAttribArray(positionLocation);
+    bindBufer(gl, gl.ARRAY_BUFFER, vertexBuffer, () => {
+      gl.vertexAttribPointer(
+        positionLocation, 3, gl.FLOAT, false, 3 * 4, 0);
+    })
+    bindBufer(gl, gl.ELEMENT_ARRAY_BUFFER, indexBuffer, () => {
+      gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);
+    });    
+  });
+
+  window.requestAnimationFrame(
+    () => updateWebGL(gl, program, vertexBuffer, indexBuffer));
+}</code></pre>
+
+    <p>The code becomes much less repetitive and clearer. Before, we called <code>gl.useProgram</code> two times and <code>gl.bindBuffer</code> four times. These calls are replaced by one call to <code>useProgram</code> and two calls to <code>bindBuffer</code>. The closure syntax also introduces a visual hierarchy to the code. By just looking at the indentation, we can see that (1) rendering primitives must be done while a program is use, (2) specifying the data for an attribute variable must be done while a vertex buffer is bound, and (3) calling <code>gl.drawElements</code> must be done while an index buffer is bound.</p>
+
+    <h3>9.4.2 &nbsp; Abstraction</h3>
+
+    <h3>9.4.3 &nbsp; Variable management</h3>
 
     <p>Drawing primitives with WebGL requires quite a number of pieces of information. We can notice this from the signature of the <code>updateWebGL</code> function as it evolves from Program 1 to Program 3. In Program 1, the signature quite simple.</p>
 
