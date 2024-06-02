@@ -900,7 +900,7 @@ export function createIndexBuffer(gl, indexData) {
 
     <h3>9.4.2 &nbsp; Abstraction</h3>
 
-    <p>One operation what we will perform very often is setting up attribute variables of a GLSL program. This is a process that involves three major steps: (1) getting the variable's location, (2) enable the variable, and (3) set the data that will go in to the variable. In this chapter, all programs has only one attribute variable, so it does not seem that this process is particularly cumbersome. However, GLSL programs typically has multiple variables, and repeating this process multiple times will result in long code that is hard to maintain. It is thus advisable to put all these steps into a function called <a href="https://github.com/pkhungurn/cg-book-code/blob/6371abc82a7392f5037c711962e4bdaec710cfa1/chapter-09/program-04/src/program.js#L59-L67"><code>setupVertexAttribute</code></a> as follows:</p>
+    <p>One operation what we will perform very often is setting up attribute variables of a GLSL program. This is a process that involves three major steps: (1) getting the variable's location, (2) enable the variable, and (3) set the data that will go in to the variable. In this chapter, all programs has only one attribute variable, so it does not seem that this process is particularly cumbersome. However, GLSL programs typically has multiple variables, and repeating this process multiple times will result in long code that is hard to maintain. It is thus advisable to put all these steps into a function called <a href="https://github.com/pkhungurn/cg-book-code/blob/ab1b4f507f53a6a67912e2c0309e312f97ed2891/chapter-09/program-04/src/program.js#L59-L67"><code>setupVertexAttribute</code></a> as follows:</p>
 
 <pre><code class="language-javascript">export function setupVertexAttribute(gl, program, attributeName, buffer, size, stride, offset, type=null) {
   type = type || gl.FLOAT;
@@ -909,7 +909,26 @@ export function createIndexBuffer(gl, indexData) {
   bindBuffer(gl, gl.ARRAY_BUFFER, buffer, () => {
       gl.vertexAttribPointer(attributeLocation, size, type, false, stride, offset);
   });
-}</code></pre>    
+}</code></pre>
+
+    <p>What the function does is exactly the same as what is done in Step 2 to Step 6 of the <code>updateWebGL</code> function of Program 3. We have only just turned specific values into variables. We can now use the function to simplify the <code>updateWebGL</code> function further as follows:</p>
+
+<pre><code class="language-javascript">function updateWebGL(gl, program, vertexBuffer, indexBuffer) {
+  gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  useProgram(gl, program, () => {
+    setupVertexAttribute(gl, program, "position", vertexBuffer, 3, 3*4, 0);
+    bindBufer(gl, gl.ELEMENT_ARRAY_BUFFER, indexBuffer, () => {
+      gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);
+    });    
+  });
+
+  window.requestAnimationFrame(
+    () => updateWebGL(gl, program, vertexBuffer, indexBuffer));
+}</code></pre>
+
+    <p>The function has become much shorter, and it will remain manageable even the program has several more attribute variables.</p>
 
     <h3>9.4.3 &nbsp; Variable management</h3>
 
@@ -926,6 +945,86 @@ export function createIndexBuffer(gl, indexData) {
 <pre><code class="language-javascript">function updateWebGL(gl, program, vertexBuffer, indexBuffer) { ... }</code></pre>
 
     <p>This might not seem like a big problem, but an experienced software engineer would feel uncomfortable observing this trend. This is because, typically, a scene can have multiple objects, and each object would have its own vertex buffer and index buffer. As a result, if our scene has 10 objects instead of 1, the <code>updateWebGL</code> would have 20-ish parameters, and the code would be too complex for the programmer to handle. We thus need a way to organize our data so that the code does not become too unwieldy.</p>
+    
+    <p>We do this by introduction a Javascript class to store variables such as <code>gl</code>, <code>program</code>, and <code>vertexBuffer</code> as fields and change the functions that use these variables into class methods. We can call this functions without any arguments and then access the variables through the <code>this</code> variable. Let us call the class <code>WebGLApp</code>, which represents the application we are creating. Its most important variable that is has to store as a field is the WebGL context because, without the context, we cannot run use any WebGL functionalities, and there is no point in creating the application the first place. So, we make the WebGL context an argument of the class's constructor.</p>
+
+<pre><code class="language-javascript">class WebGLApp {
+  constructor(gl) {
+      this.gl = gl;
+  }
+
+  :
+  :
+}</code></pre>
+
+    <p>We now turn our attention to how to create necessary data needed to run the application. First, we turn Program 3's <a href="https://github.com/pkhungurn/cg-book-code/blob/81f8b5c10c5e8a56636660db30442ab7c8941158/chapter-09/program-03/src/index.js#L11"><code>createProgram</code></a> function into a class method.</p>
+
+<pre><code class="language-javascript">class WebGLApp {
+  :
+  :
+
+  async createProgram() {
+    let vertexShaderSource = await loadText("vertex-shader.vert");
+    let fragmentShaderSource = await loadText("fragment-shader.frag");    
+    this.program = createGlslProgram(this.gl, vertexShaderSource, fragmentShaderSource);        
+  }
+
+  :
+  :
+}
+</code></pre>
+
+    <p>The only differences between the method and the old <code>createProgram</code> function are that (1) we must now access the WebGL context as <code>this.gl</code>, and (2) we do not need to make the method return the created program because we can just store it as a new field. Next, we also turn the code that creates the vertex and index buffers into another class method.</p>
+
+<pre><code class="language-javascript">class WebGLApp {
+  :
+  :
+
+  createBuffers() {
+    let vertexData = new Float32Array([
+      -0.5, -0.5, 0.0,
+      0.5, -0.5, 0.0,
+      0.5, 0.5, 0.0,
+      -0.5, 0.5, 0.0
+    ]);
+    this.vertexBuffer = createVertexBuffer(this.gl, vertexData);
+
+    let indexData = new Int32Array([
+      0, 1, 2,
+      0, 2, 3
+    ]);
+    this.indexBuffer = createIndexBuffer(this.gl, indexData);
+  }
+
+  :
+  :
+}</code></pre>    
+
+    <p>Again, the WebGL context is now <code>this.gl</code> instead of just <code>gl</code>, and we store the created buffers as fields. Now, we turn our attention to the <code>updateWebGL</code> method, which now can lose its arguments.</p>
+
+<pre><code class="language-javascript">class WebGLApp {
+  :
+  :
+
+  function updateWebGL() {
+    let self = this;
+    
+    this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    useProgram(this.gl, this.program, () => {
+      setupVertexAttribute(
+        self.gl, self.program, "position", self.vertexBuffer, 3, 3*4, 0);
+      drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 6, 0);            
+    });
+    
+    window.requestAnimationFrame(() => self.updateWebGL());
+  }
+
+  :
+  :
+}</code></pre>
+
+    <p>The method is almost the same as the shortened <code>updateWebGL</code> function we just discussed in the last section. Nevertheless, we need to be careful with the <code>this</code> variable. This is because the meaning of the <code>this</code> variable changes when we are inside a closure: it refers to the function object of the <code>updateWebGL</code> method instead of the class instance. To access the class instance inside the closures, we need to introduce another variable, <code>self</code>, to store it and use this variable instead of <code>this</code> there.</p>
 
     <h2>9.4 &nbsp; Program 4: Drawing line primitives</h2>
 
