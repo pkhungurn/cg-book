@@ -816,11 +816,30 @@ gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);</code></pre>
       <li>We must have prepared a GLSL program and used it.</li>
       <li>We must locate all the attribute variables in the GLSL program and enable them.</li>
       <li>We must have prepared a vertex buffer and connect it to the attribute variables in the GLSL program.</li>
-      <li>We must bind the index buffer to the <code>gl.ELEMENT_ARRAY_BUFFER</code> slot before calling <code>drawElements</code> and <b>leave the index buffer bound</b>.</li>
+      <li>We must have prepared an index buffer and bind the index buffer to the <code>gl.ELEMENT_ARRAY_BUFFER</code> slot before calling <code>drawElements</code> and <b>leave the index buffer bound</b>.</li>
       <li>We can then call <code>drawElements</code> to carry out the drawing.</li>
       <li>Afterwards, we must unbind the index buffer and unuse the program for hygiene.</li>
     </ul>
 
+    <h2>9.4 &nbsp; Program 4: Code reorganization</h2>
+
+    <p>In this section, we break from learning new WebGL functionality and take time to reorganize the code of Program 3 so that we can program more easily later. The code we have been studying so far has been written to be pedagogical. It is simple and has all relevant steps in the same place for easy reading. However, it is has problem with variable management and is rather repetitive. We refactor Program 3 into Program 4 solve these problems. Let us discuss what the problems are and solve them one by one.</p>
+
+    <h3>9.4.1 &nbsp; Variable management</h3>
+
+    <p>Drawing primitives with WebGL requires quite a number of pieces of information. We can notice this from the signature of the <code>updateWebGL</code> function as it evolves from Program 1 to Program 3. In Program 1, the signature quite simple.</p>
+
+<pre><code class="language-javascript">function updateWebGL(gl, programs) { ... }</code></pre>
+
+    <p>It has only two parameters because we only need the WebGL context and the programs to demonstrate how to use and unuse them. In Program 2, we have one more parameter, <code>vertexBuffer</code>.</p>
+
+<pre><code class="language-javascript">function updateWebGL(gl, program, vertexBuffer) { ... }</code></pre>
+
+    <p>In Program 3, we have yet another parameter, <code>indexBuffer</code>.</p>
+
+<pre><code class="language-javascript">function updateWebGL(gl, program, vertexBuffer, indexBuffer) { ... }</code></pre>
+
+    <p>This might not seem like a big problem, but an experienced software engineer would feel uncomfortable observing this trend. This is because, typically, a scene can have multiple objects, and each object would have its own vertex buffer and index buffer. As a result, if our scene has 10 objects instead of 1, the <code>updateWebGL</code> would have 20-ish parameters, and the code would be too complex for the programmer to handle. We thus need a way to organize our data so that the code does not become too unwieldy.</p>
 
     <h2>9.4 &nbsp; Program 4: Drawing line primitives</h2>
 
