@@ -900,6 +900,17 @@ export function createIndexBuffer(gl, indexData) {
 
     <h3>9.4.2 &nbsp; Abstraction</h3>
 
+    <p>One operation what we will perform very often is setting up attribute variables of a GLSL program. This is a process that involves three major steps: (1) getting the variable's location, (2) enable the variable, and (3) set the data that will go in to the variable. In this chapter, all programs has only one attribute variable, so it does not seem that this process is particularly cumbersome. However, GLSL programs typically has multiple variables, and repeating this process multiple times will result in long code that is hard to maintain. It is thus advisable to put all these steps into a function called <a href="https://github.com/pkhungurn/cg-book-code/blob/6371abc82a7392f5037c711962e4bdaec710cfa1/chapter-09/program-04/src/program.js#L59-L67"><code>setupVertexAttribute</code></a> as follows:</p>
+
+<pre><code class="language-javascript">export function setupVertexAttribute(gl, program, attributeName, buffer, size, stride, offset, type=null) {
+  type = type || gl.FLOAT;
+  let attributeLocation = gl.getAttribLocation(program, attributeName);    
+  gl.enableVertexAttribArray(attributeLocation);
+  bindBuffer(gl, gl.ARRAY_BUFFER, buffer, () => {
+      gl.vertexAttribPointer(attributeLocation, size, type, false, stride, offset);
+  });
+}</code></pre>    
+
     <h3>9.4.3 &nbsp; Variable management</h3>
 
     <p>Drawing primitives with WebGL requires quite a number of pieces of information. We can notice this from the signature of the <code>updateWebGL</code> function as it evolves from Program 1 to Program 3. In Program 1, the signature quite simple.</p>
