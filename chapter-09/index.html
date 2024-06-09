@@ -1006,7 +1006,7 @@ export function createIndexBuffer(gl, indexData) {
   :
   :
 
-  function updateWebGL() {
+  updateWebGL() {
     let self = this;
     
     this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -1026,11 +1026,45 @@ export function createIndexBuffer(gl, indexData) {
 
     <p>The method is almost the same as the shortened <code>updateWebGL</code> function we just discussed in the last section. Nevertheless, we need to be careful with the <code>this</code> variable. This is because the meaning of the <code>this</code> variable changes when we are inside a closure: it refers to the function object of the <code>updateWebGL</code> method instead of the class instance. To access the class instance inside the closures, we need to introduce another variable, <code>self</code>, to store it and use this variable instead of <code>this</code> there.</p>
 
-    <h2>9.4 &nbsp; Program 4: Drawing line primitives</h2>
+    <p>Now that we have reimplemented the <code>updateWebGL</code> function, we can refactor the main script of Program 3 into a method we call <code>run</code> as follows.</p>
 
-    <h2>9.5 &nbsp; Program 5: Drawing point primitives</h2>    
+<pre><code class="language-javascript">class WebGLApp {
+  :
+  :
 
-    <h2>9.6 &nbsp; Program 6: Specifying viewports</h2>
+  async run() {
+    let self = this;
+    await this.createProgram();
+    this.createBuffers();
+    window.requestAnimationFrame(() => self.updateWebGL());
+  }
+
+  :
+  :
+}</code></pre>
+
+    <p>The method above is easier to read than Program 3's main script because we have just refactored the main parts of Program 3 into the <code>createProgram</code>, <code>createBuffers</code>, and <code>updateWebGL</code> methods, and the <code>run</code> method just invoke these methods in turn. It also helps that we the method an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function"><code>async</code></a> method, so that we can invoke <code>createProgram</code> with the simpler <code>await</code> syntax.</p>
+
+    <p>Lastly, we need to refactor <code>index.js</code> so that it makes use of the class we just created. After refactoring, the code becomes:</p>
+
+<pre><code class="language-javascript">let canvas = $("#webglCanvas");
+let gl = canvas[0].getContext("webgl2");
+if (!gl) {
+    alert("Cannot get WebGL 2 context!");
+} else {
+    let app = new WebGLApp(gl);
+    await app.run();    
+}</code></pre>
+
+    <p>Notice that all the logic of our program is now hidden inside the <code>WebGLApp</code> class, which we would only run after a successful acquisition of a WebGL context. From now on, we shall structure all our WebGL applications in this way as it greatly helps compartmentalize the application's logic and reduces the burden of having to pass many variables between functions.</p>
+
+    <h2>9.5 &nbsp; Program 5: Drawing line primitives</h2>
+
+    <p>We have learned how to draw triangle primitives in the last three programs. Now, we turn to the remaining two primitive types: points and lines. In this program, we deal with the simpler one, the lines. Program 5 draw 6 line primitives using a vertex buffer that has 4 vertices and an index buffer. Its screenshot is given below.</p>  
+
+    <h2>9.6 &nbsp; Program 6: Drawing point primitives</h2>    
+
+    <h2>9.7 &nbsp; Program 6: Specifying viewports</h2>
      
     <hr>
     <div class="footnotes">
