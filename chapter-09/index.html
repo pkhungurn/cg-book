@@ -1062,9 +1062,60 @@ if (!gl) {
 
     <p>We have learned how to draw triangle primitives in the last three programs. Now, we turn to the remaining two primitive types: points and lines. In this program, we deal with the simpler one, the lines. Program 5 draw 6 line primitives using a vertex buffer that has 4 vertices and an index buffer. Its screenshot is given below.</p>  
 
-    <h2>9.6 &nbsp; Program 6: Drawing point primitives</h2>    
+    <figure class="figure">
+      <a href="images/program-05-screenshot.png"><img src="images/program-05-screenshot.png" alt="" height="300"></a>
+      <figcaption class="figure-caption"><strong>Figure 9.7</strong> A screenshot of Program 5.</b></figcaption>
+    </figure>
 
-    <h2>9.7 &nbsp; Program 6: Specifying viewports</h2>
+    <p>The code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-09/program-05"><code>chapter-09/program-05</code></a> directory of the book's code Github repository. Program 5's code has the same files and those of Program 4, and most files are the same except <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-05/src/index.js"><code>index.js</code></a>. This means that we are still using the same vertex shader and fragment shader as the last three programs. We didn't change <code>index.js</code> much either. One change includes the values in the index buffer, which are declared in the <code>createBuffers</code> method of the <code>WebGLApp</code> class.</p>
+
+<pre><code class="language-javascript">class WebGLApp {
+  :
+  :
+
+  createBuffers() {
+      let vertexData = new Float32Array([
+          -0.5, -0.5, 0.0,
+          0.5, -0.5, 0.0,
+          0.5, 0.5, 0.0,
+          -0.5, 0.5, 0.0
+      ]);
+      this.vertexBuffer = createVertexBuffer(this.gl, vertexData);
+
+      let indexData = new Int32Array([
+          0, 1,
+          1, 2,
+          2, 3,
+          3, 0,
+          0, 2,
+          1, 3           
+      ]);
+      this.indexBuffer = createIndexBuffer(this.gl, indexData);
+  }
+
+  :
+  :
+}</code></pre>
+
+    <p>Notice that we are still using the same vertices that were used to draw the square in Program 3. However, the index buffer now has 12 elements because we now want to draw 6 lines, and each line is made up of 2 vertices. The index values are all 6 pairs that can be made from the numbers 0, 1, 2, and 3, and the 6 lines from these pairs would give us the 4 borders of the square and its 2 diagonals.</p>
+
+    <p>Another change to <code>index.js</code> is in the <code>updateWebGL</code> method. Now, we need to change how we call the <code>drawElements</code> method from </p>
+
+<pre><code class="language-javascript">drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 6, 0);</code></pre>
+
+    <p>to</p>
+
+<pre><code class="language-javascript">drawElements(self.gl, self.indexBuffer, self.gl.LINES, 12, 0);</code></pre>
+
+    <p>We change <code>self.gl.TRIANGLES</code> to <code>self.gl.LINES</code> because now we want to draw lines. We also need to change the number of indices to use to draw our primitives. The value is now 12 because the index buffer has exactly that many elements, and we want to use all indices.</p>
+
+    <p>All in all, drawing lines is pretty much the same as drawing triangles. We only need to tell WebGL to draw lines with <code>gl.LINES</code> enum, and we need to arrange our vertex and index buffers accordingly.</p>
+
+    <h2>9.6 &nbsp; Program 6: Drawing point primitives</h2>
+
+    <p>The only remaining primtitive to discuss is the points. While the primitive is structurally the simplest (because each point has only one vertex). From the API point of view, it is more complicated than the points and the triangles because we can manipulate the primitive more inside a fragment shader.</p>
+
+    <h2>9.7 &nbsp; Program 7: Specifying viewports</h2>
      
     <hr>
     <div class="footnotes">
