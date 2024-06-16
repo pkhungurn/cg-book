@@ -1113,10 +1113,104 @@ if (!gl) {
 
     <h2>9.6 &nbsp; Program 6: Drawing point primitives</h2>
 
-    <p>The only remaining primtitive to discuss is the points. While the primitive is structurally the simplest (because each point has only one vertex). From the API point of view, it is more complicated than the points and the triangles because we can manipulate the primitive more inside a vertex shader.</p>
+    <p>The only remaining primtitive to discuss is the points. While the primitive is structurally the simplest (because each point has only one vertex). From the API point of view, it is more complicated than the points and the triangles because we can manipulate the primitive more inside a vertex shader. Program 6 draws 4 points on the canvas. Its screenshot is given below. </p>
+
+    <figure class="figure">
+      <a href="images/program-06-screenshot.png"><img src="images/program-06-screenshot.png" alt="" height="300"></a>
+      <figcaption class="figure-caption"><strong>Figure 9.8</strong> A screenshot of Program 6.</b></figcaption>
+    </figure>
+
+    <p>You might be surprised that what we see is 4 small squares instead of 4 points. The reason is that points in WebGL are implemented as squares, and we can control how big the square that represent a point is inside the vertex shader. Program 6's vertex shader code is stored in <a href="https://github.com/pkhungurn/cg-book-code/blob/2ecaae0a9c20d4b37c9121da4f8165dd6a914398/chapter-09/program-06/src/vertex-shader.vert"><code>vertex-shader.vert</code></a> like in all the other programs in this chapter, and we reproduce it below:</p>
+
+<pre><code class="language-javascript">#version 300 es
+
+in vec3 position;
+
+void main() {
+    gl_PointSize = 10.0;
+    gl_Position = vec4(position, 1);
+}</code></pre>
+
+    <p>The vertex shader has one extra line:</p>
+
+<pre><code class="language-javascript">gl_PointSize = 10.0;</code></pre>
+
+    <p>The <code>gl_PointSize</code> variable stores a floating-point value the represents the size in pixels of the square that represents a point. Setting it to 10 gets us the screenshot in Figure 9.8. In Figure 9.9, we show the results of setting it to 1, 5, 50, and 100. Note that, when the point size is 1, the screen becomes completely black. As a result, we recommend that the reader sets it to at least 2.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-06-pointsize-001.png"><img src="images/program-06-pointsize-001.png" alt="" height="300"></a></td>
+          <td><a href="images/program-06-pointsize-005.png"><img src="images/program-06-pointsize-005.png" alt="" height="300"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+        </tr>
+        <tr>
+          <td><a href="images/program-06-pointsize-050.png"><img src="images/program-06-pointsize-050.png" alt="" height="300"></a></td>
+          <td><a href="images/program-06-pointsize-100.png"><img src="images/program-06-pointsize-100.png" alt="" height="300"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(c)</td>
+          <td align="center">(d)</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 9.9</strong> The effect of setting <code>gl_PointSize</code> to (a) 1, (b) 5, (c) 50, and (d) 100.</b></figcaption>
+    </figure>
+
+    <p>Program 6 has the same files as those of Program 5 with changes in only three files. The first file with changes is <code>vertex-shader.vert</code>, which we just discussed. The second file with changes is <a href="https://github.com/pkhungurn/cg-book-code/blob/2ecaae0a9c20d4b37c9121da4f8165dd6a914398/chapter-09/program-06/src/index.html"><code>index.html</code></a> where the web page's title was changed ("Program 5" to "Program 6"). The last file with changes is <a href="https://github.com/pkhungurn/cg-book-code/blob/2ecaae0a9c20d4b37c9121da4f8165dd6a914398/chapter-09/program-06/src/index.js">index.js</a>.</p>
+
+    <p>The changes in <code>index.js</code> is similar to those in the last Section. First, we weed to change the index buffer.</p>
+
+<pre><code class="language-javascript">class WebGLApp {
+  :
+  :
+
+  createBuffers() {
+      let vertexData = new Float32Array([
+          -0.5, -0.5, 0.0,
+          0.5, -0.5, 0.0,
+          0.5, 0.5, 0.0,
+          -0.5, 0.5, 0.0
+      ]);
+      this.vertexBuffer = createVertexBuffer(this.gl, vertexData);
+
+      let indexData = new Int32Array([
+          0, 1, 2, 3           
+      ]);
+      this.indexBuffer = createIndexBuffer(this.gl, indexData);
+  }
+
+  :
+  :
+}</code></pre>
+
+    <p>Now, the index buffer has only 4 indices instead of 12 because we want to draw 4 points, and each point has only one vertex. Second, we need to change the <code>updateWebGL</code> method so that it draws points instead of lines.</p>
+
+<pre><code class="language-javascript">updateWebGL() {
+  let self = this;
+  
+  this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+  useProgram(this.gl, this.program, () => {
+      setupVertexAttribute(self.gl, self.program, "position", self.vertexBuffer, 3, 3*4, 0);
+      drawElements(self.gl, self.indexBuffer, self.gl.POINTS, 4, 0);        
+  });
+  
+  window.requestAnimationFrame(() => self.updateWebGL());
+}</code></pre>
+
+    <p>The only change is in the line</p>
+
+<pre><code class="language-javascript"></code>drawElements(self.gl, self.indexBuffer, self.gl.POINTS, 4, 0);</pre>
+
+    <p>where we change the primitive type to <code>self.gl.POINTS</code> and the number of vertices to 4 because we want to draw exactly four points.</p>
+
+    <p>In conclusion, drawing point primitives involves changing the primitive type when calling the <code>drawElements</code> method of the WebGL context. Moreover, we must also set the <code>gl_PointSize</code> to an appropriate value (which should be more than 1) in the vertex shader.</p>
 
     <h2>9.7 &nbsp; Program 7: Specifying viewports</h2>
-     
+  
     <hr>
     <div class="footnotes">
     </div>
