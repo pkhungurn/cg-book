@@ -1286,6 +1286,74 @@ void main() {
     <h3>9.7.3 &nbsp; Usage</h3>
 
     <p>What is the viewport and the scissor test good for? One clear use case is to use them to render multiple images on to the same screen. To do so, we partition the screen into subrectangles such that each would host one image. To render an image, we set the scissor test to throw out all fragments outside the image's subrectangle and set the viewport to the subrectangle as well. Then, we can follow the routine of clearing the screen and then rendering the primitives. This ensures that the rendering process would only affect the subrectangle we choose, and not the area outside of it. To reiterate, it is very important to use <b>both</b> the viewport and the scissor test when rendering multiple images on the same screen because they affect different parts of the rendering process: the viewport only affects the primitives, and the scissor test only affects the area where the fragments are written.</p>
+
+    <h2>9.8 &nbsp; Summary</h2>
+
+    <ul>
+      <li>We need to do multiple things to draw primitives with WebGL.
+      <ol>
+          <li>We must to create a <b>GLSL program</b>.</li>
+          <li>We must to create a <b>vertex buffer</b> and optionally an <b>index buffer</b>.</li>
+          <li>We must then <b>use</b> the GLSL program and tell it how to connext the vertex buffer to the relevent vertex attribute.</li>
+          <li>If we use an index buffer, we must also <b>bind</b> the index buffer before rendering.</li>
+          <li>After all of this, we can finally issue the command to render primitives.</li>
+          <li>After issuing the command, we need to clean up after ourselves by unbinding any boound buffers and unusing the GLSL program.</li>
+      </ol>
+      </li>
+
+      <li>The process of creating a GLSL program can be summarized as follows.
+      <ol>
+        <li>Load the source code of the vertex shader and the fragment shader.</li>
+        <li><b>compile</b> source code to create the vertex shader and then fragment shader.</li>
+        <li><b>Link</b> the vertex shader and the fragment shader together to form a complete GLSL program.</li>
+      </ol>
+      </li>
+      
+      <li>The process of creating a vertex buffer or an index buffer can be summarized as follows.
+      <ol>
+        <li>Prepare the data and store it as a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays">Javascript typed array</a> such as a <code>Float32Array</code> or a <code>Int32Array</code>.</li>
+
+        <li>Bind a buffer target. Use <code>gl.ARRAY_BUFFER</code> for a vertex buffer and <code>gl.ELEMENT_ARRAY_BUFFER</code> for an index buffer.</li>
+
+        <li>Use the <code>bufferData</code> method of the WebGL context to download the data to the GPU.</li>
+
+        <li>Unbind the bound buffer target.</li>
+      </ol>
+      </li>
+
+      <li>The vertex shader of a working GLSL program needs to have at least one <b>attribute variable</b> that would be used to receive data from a vertex buffer.
+        <ul>
+          <li>One needs to retrieve the "location" of this attribute variable with the <code>getAttribLocation</code> method of the WebGL context.</li>
+          <li>One also needs to connect the vertex buffer fo the attribute variable with the <code>vertexAttribPointer</code> method.</li>
+        </ul>
+      </li>
+
+      <li>Two commands can be used to render primitives.
+      <ol>
+        <li><code>drawArrays</code> is used to draw primitives with only a vertex buffer.</li>
+        <li><code>drawElements</code> is used to draw primitives with a vertex buffer and an index buffer.</li>
+      </ol>
+      For both commands, we need to specify the type of primitives to draw with a <code>GLEnum</code>. The primitives we cover in this chapter are:
+      <ul>
+        <li><code>gl.TRIANGLES</code></li>
+        <li><code>gl.LINES</code></li>
+        <li><code>gl.POINTS</code></li>
+      </ul>
+      </li>
+
+      <li>When rendrering point primitives, one must set the <code>gl_PointSize</code> variable inside the vertex shader.
+        <ul>
+          <li>It is advisable to set it to a floating point value greater than 1.</li>
+        </ul>
+      </li>
+
+      <li>The <b>viewport</b> is a subrectagle of the screen where primitives are scaled to conform with its extent.
+        <ul>
+          <li>It can be set through the <code>viewport</code> method of the WebGL context.</li>
+          <li>The viewport, when used together with the scissor test, is useful for drawing multiple images on to the same screen.</li>
+        </ul>
+      </li>
+    </ul>
     
     <hr>
     <div class="footnotes">
