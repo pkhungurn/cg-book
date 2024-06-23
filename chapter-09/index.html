@@ -1203,14 +1203,90 @@ void main() {
 
     <p>The only change is in the line</p>
 
-<pre><code class="language-javascript"></code>drawElements(self.gl, self.indexBuffer, self.gl.POINTS, 4, 0);</pre>
+<pre><code class="language-javascript">drawElements(self.gl, self.indexBuffer, self.gl.POINTS, 4, 0);</code></pre>
 
     <p>where we change the primitive type to <code>self.gl.POINTS</code> and the number of vertices to 4 because we want to draw exactly four points.</p>
 
     <p>In conclusion, drawing point primitives involves changing the primitive type when calling the <code>drawElements</code> method of the WebGL context. Moreover, we must also set the <code>gl_PointSize</code> to an appropriate value (which should be more than 1) in the vertex shader.</p>
 
-    <h2>9.7 &nbsp; Program 7: Specifying viewports</h2>
+    <h2>9.7 &nbsp; Program 7: Specifying the viewport</h2>
+
+    <p>The last program in this chapter is not about drawing primitives but about setting up the <code>viewport</code>. A viewport is a subrectangle of the canvas in which the primitives are drawn. It is expedient to see what a viewport can do by seeing screenshots of <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-09/program-07">Program 7</a> below.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-07-screenshot-base.png"><img src="images/program-07-screenshot-base.png" alt="" height="300"></a></td>
+          <td><a href="images/program-07-screenshot-viewport.png"><img src="images/program-07-screenshot-viewport.png" alt="" height="300"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 9.10</strong> Screenshots of Program 7 (a) after startup without any user interaction and (b) after the user checks the "Set viewport to bottom-left quadrant." checkbox.</figcaption>
+    </figure>
+
+    <p>We see that Program 7 is similar to Program 4. They both draw a single square in the middle of the screen. However, we changed the clear color of Program 7 to gray in order to distinguish between what the program does and does not do. (This will become cleaer later.) Underneath the canvas, there are two checkboxes. The first checkbox makes the program "sets the viewport to the bottom-left quadrant." If you check it, the screenshot becomes what you see in Figure 9.10(b).</p>
+
+    <h3>9.7.1 &nbsp; Setting and understanding the viewport</h3>
+
+    <p>Program 7 is Program 4 with viewport-related code added. The snippet of code that sets the viewport is in the <a href="https://github.com/pkhungurn/cg-book-code/blob/f8e5aa7e861bbdbcf8f672060a901306ad7f6265/chapter-09/program-07/src/index.js#L1"><code>index.js</code></a> file in the <a href="https://github.com/pkhungurn/cg-book-code/blob/f8e5aa7e861bbdbcf8f672060a901306ad7f6265/chapter-09/program-07/src/index.js#L38"><code>updateWebGL</code></a>  method of the <a href="https://github.com/pkhungurn/cg-book-code/blob/f8e5aa7e861bbdbcf8f672060a901306ad7f6265/chapter-09/program-07/src/index.js#L11"><code>WebGLApp</code></a> class. It is located after that part where we clear the screen and before the part where we render primitives. It reads:</p>
+
+<pre><code class="language-javascript">if ($("#viewportCheckbox").is(":checked")) {
+  this.gl.viewport(0, 0, 256, 256);
+} else {
+  this.gl.viewport(0, 0, 512, 512);
+}</code></pre>
+
+    <p>We can see that the viewport can be set through the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/viewport"><code>viewport</code></a> method of the WebGL context. It receives 4 arguments&mdash;<code>x</code>, <code>y</code>, <code>width</code>, and <code>height</code>&mdash;like the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/scissor"><code>scissor</code></a> method that we studied in <a href="../chapter-08/index.html">Section 8.5</a>. The meaning of the parametes are exactly the same. More specifically, the method sets the viewport to the rectangle specified by the 4 parameters. The coordinate system for the rectangle is such that the bottom-left corder is $(0,0)$, and the top right corner is $(W,H)$ where $W$ is the pixel width of the canvas, and $H$ is the height. See <a href="../chapter-08/index.html#scissor-parameter-semantics">Figure 8.6</a> for an illustration of the semantics.</p>
+
+    <p>From the code snippet above, we see that, when the first checkbox in the web page is checked, the viewport is set to the rectangle $(0,0,256,256)$, which is the bottom-left quadrant of the screen. Otherwise, it is set to the rectangle $(0,0,512,512)$, which is the whole screen. This is the default viewport that all the other programs so far have been using.</p>
+
+    <p>The effective of setting the viewport is this: <b>all the primitives are scaled to match the viewport's area.</b> In Figure 9.10(a), the viewport covers the whole screen, and the white rectangle is in the middle of the screen. In Figure 9.10(b), we set viewport to the bottom-left quadrant, and so the whole screen is effectively reduced to the bottom-left quadrant. As a result, the white rectangle appears in the middle of this downsized "screen," and it becomes smaller accordingly.</p>
+
+    <p>It is important to remember that what the viewports affects are the primitives. It does not affect clearing of the screen. So, even after we set the viewport, the background color is still gray because the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/clear"><code>clear</code></a> method of the WebGL context clears the whole screen by default. (See <a href="../chapter-08/index.html#clearing-the-screen">Section 8.3</a> for a review.)</p>
+
+    <h3>7.3.2 &nbsp; Viewport vs scissor test</h3>
+
+    <p>In <a href="../chapter-08/index.html#scissor-test">Section 8.5</a>, we learned about the scissor test, which is a concept quite similar to the viewport. To recap, the scissor test allows a fragment to be written to the framebuffer only if it falls inside the "scissor box" specified by the user. The scissor box is quite similar to the viewport because they both specify the area the screen where updates occur. However, they are different in two aspects.</p>
+
+    <ul>
+      <li><b>Primitive size.</b> Setting the viewport changes primitive size, but the scissor test does not.</li>
+      <li><b>Scope.</b> Setting the viewport only affects primitive drawings and not clearing the screen, but the scissor test affects both.</li>
+    </ul>
+
+    <p>To drive the points above home, let us now use Program 7's the second checkbox, which says that the program would "set scissor test to bottom-left quadrant" when checked. The code that carries out this logic is also in the <a href="https://github.com/pkhungurn/cg-book-code/blob/f8e5aa7e861bbdbcf8f672060a901306ad7f6265/chapter-09/program-07/src/index.js#L38"><code>updateWebGL</code></a> method, and it reads:</p>
   
+<pre><code class="language-javascript">if ($("#scissorTestCheckbox").is(":checked")) {
+  this.gl.enable(this.gl.SCISSOR_TEST);
+  this.gl.scissor(0, 0, 256, 256);
+} else {
+  this.gl.disable(this.gl.SCISSOR_TEST);
+}</code></pre>
+
+    <p>The effect of checking the second checkbox is shown in Figure 9.11.</p>
+    
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-07-screenshot-scissor-test.png"><img src="images/program-07-screenshot-scissor-test.png" alt="" height="300"></a></td>
+          <td><a href="images/program-07-screenshot-viewport-and-scissort-test.png"><img src="images/program-07-screenshot-viewport-and-scissort-test.png" alt="" height="300"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 9.11</strong> The effect of (a) using the scissor test without setting the viewport and (b) using both the viewport and the scissor test.</figcaption>
+    </figure>
+
+    <p>In Figure 9.11(a), we enable the scissor test but do not set the viewport. What happens is that the program is still trying to draw what we see in Figure 9.10(a), but all the fragments outside the scissor box, which is now the bottom-left quadrant, are dropped. Hence, three forths of the screen become black. The white square is still in the middle of the screen, but we only see the part of it that falls into the bottom-left quadrant. On the other hand, in Figure 9.11(b), we use both the scissor test and the viewport. The primitives are scaled down to match the smaller "screen," and the scissor test also throws out all the fragments outside the new screen. As a result, it is as if the whole screen is scaled down and pasted on the bottom-left quadrant.</p>
+
+    <h3>9.7.3 &nbsp; Usage</h3>
+
+    <p>What is the viewport and the scissor test good for? One clear use case is to use them to render multiple images on to the same screen. To do so, we partition the screen into subrectangles such that each would host one image. To render an image, we set the scissor test to throw out all fragments outside the image's subrectangle and set the viewport to the subrectangle as well. Then, we can follow the routine of clearing the screen and then rendering the primitives. This ensures that the rendering process would only affect the subrectangle we choose, and not the area outside of it. To reiterate, it is very important to use <b>both</b> the viewport and the scissor test when rendering multiple images on the same screen because they affect different parts of the rendering process: the viewport only affects the primitives, and the scissor test only affects the area where the fragments are written.</p>
+    
     <hr>
     <div class="footnotes">
     </div>

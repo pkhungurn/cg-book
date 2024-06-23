@@ -233,6 +233,7 @@ gl.getParameter(gl.MAX_VERTEX_ATTRIBS);</code></pre>
 
     <p>The rest of the section just converts the return value, which is a list of strings, into a bullet list and then inserts it to the web page at the <code>div</code> element under the "Extensions" section.</p>
         
+    <a name="clearing-the-screen"></a>
     <h2>8.3 &nbsp; Program 3: Clearing the screen</h2>
 
     <p>The third program covers the commands are used to clear the canvas used to display WebGL's output. From now on, we shall refer to this canvas as the "screen" as it acts as the display device in our context. Clearning the screen removes whatever the screen was displaying previously, giving us a clean slate to draw new images. It is almost always the first thing we do when we want to update WebGL's output. The program's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-08/program-03">chapter-08/program-03</a> directory. The screenshots of the program is given below.</p>
@@ -370,6 +371,7 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
     <p>It is very important to remember and familiarize yourself with the structure of Program 4 as it is the structure that we will be using in every program from now on.</p>
   
   
+    <a name="scissor-test"></a>
     <h2>8.5 &nbsp; Program 5: Scissor Test</h2>
 
     <p>Recall from <a href="../chapter-07/index.html#raster-operation">Section 7.2.5</a> that the "scrissor test" is one of the culling tests performed in the raster operation step of the graphics pipeline. What the scissor test does is quite simple. It discards all changes to that screen that are outside the rectangular area of the canvas that the user specifies. For example, we can see from the screenshots of Program 5 below that, by using the scissor test, we can "draw" a rectangle that is smaller than the whole screen whose color is determined by sliders that the user can manipulate. Under the hood, however, we are not drawing anything. Program 5 only clears the screen with the color specified by the sliders like Program 4 does, but it uses the scissor test to limit the affected area to a rectangle in the middle of the screen.</p>
@@ -406,6 +408,7 @@ gl.clear(gl.COLOR_BUFFER_BIT);</code></pre>
 
     <p>The <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/scissor"><code>scissor</code></a> method sets up the <b>scissor box</b>: the rectangle area inside the screen where the effects of all WebGL functions are limited to. The function takes 4 parameters: <code>x</code>, <code>y</code>, <code>width</code>, and <code>height</code>. Here, <code>x</code> and <code>y</code> are coordinates of top-left corner of the rectangle relative to the top-left corner of the canvas, and <code>width</code> and <code>height</code> are the horizontal length and the verical length of the rectangle, respectively. The unit of measurement for all parameters are "pixels." Figure 8.6 graphically describes the meaning of the parameters.</p>
 
+    <a name="scissor-parameter-semantics"></a>
     <figure class="figure">
       <a href="images/scissor-box-parameter-semantics.png"><img src="images/scissor-box-parameter-semantics.png" alt="" width="600"></a>
       <figcaption class="figure-caption"><strong>Figure 8.6</strong> Meaning of the parameters of WebGL context's <code>scissor</code> function.</figcaption>
