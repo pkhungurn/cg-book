@@ -200,11 +200,106 @@ precision lowp uint;
           <td>$0$ to $2^{9}-1$</td>
         </tr>
       </table>
-      <figcaption class="figure-caption"><strong>Table 9.1</strong> Effects of precision qualifiers on integer types.</figcaption>
+      <figcaption class="figure-caption"><strong>Table 10.1</strong> Effects of precision qualifiers on integer types.</figcaption>
     </figure>
     
-    <p>The effects of the qualifiers on <code>float</code> is more complicated because the GLSL ES 3.0 specification specifies the behavior of <code>highp</code> very precisely but only specifies minimum requirements of other qualifiers. In particular, <code>highp</code> means the IEEE 754 standard's single-precision floating point number, exactly the same as the <code>float</code> type in C, C++, and many other major programming languages.</p>
+    <p>The effects of the qualifiers on <code>float</code> is more complicated because the GLSL ES 3.0 specification specifies the behavior of <code>highp</code> very precisely but only specifies minimum requirements of other qualifiers. In particular, <code>highp</code> means the IEEE 754 standard's single-precision floating point number, exactly the same as the <code>float</code> type in C, C++, and many other major programming languages. The specification allows <code>mediump</code> and <code>lowp</code> to have different behavior from implementation to implementation, but they must satisfy certain minimum requirements below.</p>
+
+    <figure class="figure">
+      <table class="table table-striped">
+        <tr>
+            <th>Precision qualifier</th>
+            <th>Mininum/maximum values</th>
+            <th>Minimum/maximum magnitudes</th>
+            <th>Precision</th>
+        </tr>
+        <tr>
+          <td><code>mediump</code></td>
+          <td>($-2^{14}$, $2^{14}$)</td>
+          <td>$(2^{-14}, 2^{14})$</td>
+          <td>$2^{-10}$ relative to store value</td>
+        </tr>
+        <tr>
+          <td><code>lowp</code></td>
+          <td>(-2,2)</td>
+          <td>$(2^{-8},2)$</td>
+          <td>$2^{-8}$ absolute precision</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Table 10.2</strong> Minimum requirements for floating point types under <code>mediump</code> and <code>lowp</code> precision qualifiers.</figcaption>
+    </figure>
+    
+    <p>It is important to remember the default precision qualifiers for scalar types because they take effect whenever we don't explicitly specify anything. They are also quite troublesome because the defaults are different for vertex shaders and fragment shaders. For vertex shaders, the default qualifiers are:</p>
+
+<pre><code class="language-c">precition highp float;
+precision highp int;
+precision highp uint;</code></pre>
+
+    <p>For fragment shaders, the default values are:</p>
+
+<pre><code class="language-c">precision mediump int;
+precision mediump uint;</code></pre>
          
+    <p>In other words, in vertex shaders, integer types have 32 bits by default, but they have 16 bits by default in fragment shaders. Not being aware of this fact can cause subtle bugs that are hard to discover.</p>
+
+    <p>While there are default precision qualifiers for integer types in fragment shaders, there is no precision qualifier for the <code>float</code> type. This is why, in the last chapter, we have to declare a precision qualifier for it in every fragment shader.</p>
+
+    <p>We note in the passing that we can specify different precision qualifier to each variable, but we will not use this feature in this book. So, the precision statement is something we use at the beginning of a program once to change the default behavior of numerical types, and then we have to write the rest of the program accordingly.</p>
+
+    <h2>10.4 &nbsp; Vector types</h2>
+
+    <p>One feature of the GLSL language that is not commonly found in other languages is support for vector types at the language level. <b>Vector types</b> are data types that are indended to use to model mathematical vectors that we previously discussed in <a href="../chapter-03/index.html">Chapter 3</a>. In the last chapter, we used vector types to store points and colors although we did not discuss what they are in details.</p>
+
+    <p>For GLSL ES 3.0, a vector types can have 2, 3, or 4 components. This means that they can be used to represent 2D, 3D, and 4D vectors and points. They can also represent RGB colors (3 components) and RGBA colors (4 components). Recall from <a href="../chapter-04/index.html">Chapter 4</a> that homogeneous coordinates are also 4D vectors, and so we can use vectors types to store them too.</p>
+
+    <p>For each scalar type, there are three associated vectors types.</p>
+
+    <ul>
+      <li>For the <code>bool</code> type, there are <code>bvec2</code>, <code>bvec3</code>, and <code>bvec4</code>.</li>
+      <li>For the <code>int</code> type, there are <code>ivec2</code>, <code>ivec3</code>, and <code>ivec4</code>.</li>
+      <li>For the <code>uint</code> type, there are <code>uvec2</code>, <code>uvec3</code>, and <code>uvec4</code>.</li>
+      <li>For the <code>float</code> type, there are <code>vec2</code>, <code>vec3</code>, and <code>vec4</code>.</li>
+    </ul>
+
+    <p>The type of each of the above vetor type is the associated scalar type. The number at the end of each vector type's name is the number of components. The first letter of a vector type's name indicate the scalar type of its component, except for <code>vec2</code>, <code>vec3</code>, and <code>vec4</code>. Most programs use vectors with floating-points components most of the time, so it makes sense that the names for the types are short.</p>
+
+    <p>The precisions of the components of vectors types are the same as the precision of the associated scalar type. So, when we issue <code>precision float highp;</code> in a fragment shader, the associated vectors types (<code>vec2</code>, <code>vec3</code>, and <code>vec4</code>) will have the precision <code>highp</code> as well.</p>
+
+    <h3>10.4.1 &nbsp; Vector constructors</h3>
+
+    <p>Values of vector types can be constructed by <b>vector constructors</b>. These are expressions of the form</p>
+
+<pre><code class="language-c">&lt;vector-type&gt;(&lt;scalar-value-1&gt;, &lt;scalar-value-2&gt;, ..., &lt;scalar-value-n&gt;)</code></pre>
+
+    <p>where we can specify the value for each component individually. We can use vector constructors to initialize vector variables.</p>
+
+<pre><code class="language-c">vec2 a = vec2(1.0, 2.0);
+ivec3 b = vec3(4,5,6);
+bvec4 c = bvec4(true, false, true, false);</code></pre>
+
+    <p>We can also use constructors in variable assignments.</p>
+
+<pre><code class="language-c">vec3 p = vec3(0.0, 0.0, 0.0);
+p = vec3(1.0, 1.0, 1.0); // Now, all components of p is one.
+</code></pre>
+
+    <h3>10.4.2 &nbsp; Accessing vector components</h3>
+
+    <H3>10.4.3 &nbsp; Swizzling</H3>
+
+
+    <h2>10.5 &nbsp; Matrix types</h2>
+
+    <h2>10.6 &nbsp; Arrays</h2>
+
+    <h2>10.7 &nbsp; Structs</h2>
+
+    <h2>10.8 &nbsp; Control statements</h3>
+
+    <h2>10.9 &nbsp; Functions</h3>
+
+    <h2>10.10 &nbsp; Summary</h3>
+
     <hr>
     <div class="footnotes">      
     </div>
