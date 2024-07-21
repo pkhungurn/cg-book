@@ -280,25 +280,50 @@ bvec4 c = bvec4(true, false, true, false);</code></pre>
     <p>We can also use constructors in variable assignments.</p>
 
 <pre><code class="language-c">vec3 p = vec3(0.0, 0.0, 0.0);
-p = vec3(1.0, 1.0, 1.0); // Now, all components of p is one.
+p = vec3(1.0, 1.0, 1.0); // Now, all components of p is one.</code></pre>
+
+    <p>One feature that is not often found in other languages is that we can use vectors inside constructors too.</p>
+
+<pre><code class="language-c">vec2 a = vec2(1.0, 2.0);
+vec3 b = vec3(0.0, a); // b = (0.0, 1.0, 2.0)
+vec4 c = vec4(b, 3.0); // c = (0.0, 1.0, 2.0, 3.0)
+vec4 d = vec3(a, a);   // d = (1.0, 2.0, 1.0, 2.0)
 </code></pre>
 
     <h3>10.4.2 &nbsp; Accessing vector components</h3>
 
-    <H3>10.4.3 &nbsp; Swizzling</H3>
+    <p>Components of vectors types can be accessed in two ways. The first is the <b>bracket notion</b>, commonly used with arrays and lists in other programming languages.</p>
 
+<pre><code class="language-c">vec3 p = vec3(10.0, 20.0, 30.0);
+float x = p[0]; // x = 10
+float y = p[1]; // y = 20
+float z = p[2]; // z = 30
+float total = p[0] + p[1] + p[2]; // total = 60
+float temp = p[2] / (2*p[0]) * p[1]; // temp = 30
+</code></pre>
 
-    <h2>10.5 &nbsp; Matrix types</h2>
+    <p>The other ways is to use the <code>dot notation</code>, which treats the components as if it were fields. The field names that can be used to access the components are as follows:</p>
 
-    <h2>10.6 &nbsp; Arrays</h2>
+<ul>
+  <li>The first component can be accessed with either <code>.x</code>, <code>.r</code> or <code>.s</code>.</li>
+  <li>The second component can be accessed with either <code>.y</code>, <code>.g</code> or <code>.t</code>.</li>
+  <li>The third component can be accessed with either <code>.z</code>, <code>.b</code> or <code>.p</code>.</li>
+  <li>The fourth component can be accessed with either <code>.w</code>, <code>.a</code> or <code>.q</code>.</li>
+</ul>
 
-    <h2>10.7 &nbsp; Structs</h2>
+    <h3>10.4.3 &nbsp; Swizzling</h3>
 
-    <h2>10.8 &nbsp; Control statements</h3>
+    <h3>10.4.4 &nbsp; Vector arithmetic</h3>
 
-    <h2>10.9 &nbsp; Functions</h3>
+    <h2>10.5 &nbsp; Arrays</h2>
 
-    <h2>10.10 &nbsp; Summary</h3>
+    <h2>10.6 &nbsp; Structs</h2>
+
+    <h2>10.7 &nbsp; Control statements</h3>
+
+    <h2>10.8 &nbsp; Functions</h3>
+
+    <h2>10.9 &nbsp; Summary</h3>
 
     <hr>
     <div class="footnotes">      
