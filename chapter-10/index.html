@@ -78,6 +78,8 @@
     <p>GLSL stands for Open<b>GL</b> <b>S</b>hading <b>L</b>anguage. As the name indicates, it is a programming language designed specifically for writing shaders: small programs that are used to customize the behavior of the graphics pipeline. Because WebGL implements the graphics pipeline as a program that runs on the GPU, shaders also run on the GPU because they can be considered parts of the graphics pipeline.</p> 
     
     <p>Like other long living programming languages, GLSL has multiple versions. For this book, we will be using a version of GLSL called "<a href="https://registry.khronos.org/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf">GLSL ES 3.0</a>," which is the latest function of GLSL support by WebGL 2.0. It also supports other version, GLSL ES 1.0, but these two versions are not compatible with each other. Thus, is is important to note that what is written in this book only applies to OpenGL ES 3.0 and not any other versions of the language.</p>
+
+    <p>In this chapter, we discuss basic features of the GLSL languages such as its data types, control statements, and functional abstraction. These are not all the features that we will use in this book because covering all of them would make this chapter exceedingly long. We will discuss other features as we need them in later chapters.</p>
     
     <h3>10.1 &nbsp; Similarity with Javascript</h3>
     
@@ -157,7 +159,7 @@ int f = 99, g, h = 199; // Declaration with and without assignments and can be m
       <li><code>float</code> corresponds to floating point values.</li>
     </ul>
     
-    <p>Note that the type names, except for <code>uint</code>, are the same as those in the C language. However, the semantics of the types are not the same. In C, each type has a fixed associated size in memeory. For example, a variable of type <code>int</code> would occupy exactly 4 bytes in memory, so does a a variable of type <code>float</code>. For numerical types, their sizes indicate how much information they can store. For types store real numbers, more storage means more <a href="https://en.wikipedia.org/wiki/Significant_figures">signficant figures</a> or <a href="https://en.wikipedia.org/wiki/Significand">matissa</a> in the represented numbers. For examples, C's <code>float</code> type can store 24 significant figures in base 2, while C's <code>double</code> type can store 53. As a result, the bigger the size, the more precise the numbers that can be represented. Even though this fact does not quite apply to integer types, we may say that each type has an associated "precision," and this precision is fixed in C.</p>
+    <p>Note that the type names, except for <code>uint</code>, are the same as those in the C language. However, the semantics of the types are not the same. In C, each type has a fixed associated size in memeory. For example, a variable of type <code>int</code> would occupy exactly 4 bytes in memory, so does a a variable of type <code>float</code>. For numerical types, their sizes indicate how much information they can store. For types that store real numbers, more storage means more <a href="https://en.wikipedia.org/wiki/Significant_figures">signficant figures</a> or <a href="https://en.wikipedia.org/wiki/Significand">matissa</a> in the represented numbers. For examples, C's <code>float</code> type can store 24 significant figures in base 2, while C's <code>double</code> type can store 53. As a result, the bigger the size, the more precise the numbers that can be represented. Even though this fact does not quite apply to integer types, we may say that each type has an associated "precision," and this precision is fixed in C.</p>
     
     <p>In GLSL, the precisions of the three numerical types (<code>int</code>, <code>uint</code>, and <code>float</code>) can be changed. This is done through the <code>precision</code> statement.</p>
     
@@ -240,7 +242,11 @@ precision highp uint;</code></pre>
 <pre><code class="language-c">precision mediump int;
 precision mediump uint;</code></pre>
          
-    <p>In other words, in vertex shaders, integer types have 32 bits by default, but they have 16 bits by default in fragment shaders. Not being aware of this fact can cause subtle bugs that are hard to discover.</p>
+    <p>In other words, in vertex shaders, integer types have 32 bits by default, but they have 16 bits by default in fragment shaders. Not being aware of this fact can cause subtle bugs that are hard to discover. For example, consider the following seemlingly innocuous statement.</p>
+
+<pre><code class="language-c">int n = 40000;</code></pre>
+    
+    <p>Inside a vectex shader, the variable <code>n</code> will store the value of $40\,000$. However, inside a fragment shader, the value will not be $40\,000$ because, by default, an <code>int</code> only has 16 bits, so the largest positive value it can store is $2^{15}-1 = 32\,767$. The stored value will a negative value, and any subsequent code that uses <code>n</code> will behave in unspected way unless we set the predision of <code>int</code> inside a fragment shader to <code>highp</code>.</p>
 
     <p>While there are default precision qualifiers for integer types in fragment shaders, there is no precision qualifier for the <code>float</code> type. This is why, in the last chapter, we have to declare a precision qualifier for it in every fragment shader.</p>
 
@@ -295,14 +301,14 @@ vec4 d = vec3(a, a);   // d = (1.0, 2.0, 1.0, 2.0)
     <p>Components of vectors types can be accessed in two ways. The first is the <b>bracket notion</b>, commonly used with arrays and lists in other programming languages.</p>
 
 <pre><code class="language-c">vec3 p = vec3(10.0, 20.0, 30.0);
-float x = p[0]; // x = 10
-float y = p[1]; // y = 20
-float z = p[2]; // z = 30
-float total = p[0] + p[1] + p[2]; // total = 60
+float x = p[0];                      // x = 10
+float y = p[1];                      // y = 20
+float z = p[2];                      // z = 30
+float total = p[0] + p[1] + p[2];    // total = 60
 float temp = p[2] / (2*p[0]) * p[1]; // temp = 30
 </code></pre>
 
-    <p>The other ways is to use the <code>dot notation</code>, which treats the components as if it were fields. The field names that can be used to access the components are as follows:</p>
+    <p>The other ways is to use the <b>dot notation</b>, which treats the components as if it were fields. The field names that can be used to access the components are as follows:</p>
 
 <ul>
   <li>The first component can be accessed with either <code>.x</code>, <code>.r</code> or <code>.s</code>.</li>
@@ -311,9 +317,106 @@ float temp = p[2] / (2*p[0]) * p[1]; // temp = 30
   <li>The fourth component can be accessed with either <code>.w</code>, <code>.a</code> or <code>.q</code>.</li>
 </ul>
 
+    <p>The above lists can be rewritten as a table, which is shown below. Through naming conventions, GLSL provides us 3 ways to look at a vector: as a point/vector in the Euclidean space, as a representation for color, as a texture coordiate (more on this in a later chapter).</p>
+    
+    <figure class="figure">
+      <table class="table table-striped">
+        <tr>
+          <th>Naming convention</th>
+          <th>1st comp</th>
+          <th>2nd comp</th>
+          <th>3rd comp</th>
+          <th>4th comp</th>
+        </tr>
+        <tr>
+          <td>Point/vector in Euclidean space</td>
+          <td><code>.x</code></td>
+          <td><code>.y</code></td>
+          <td><code>.z</code></td>
+          <td><code>.w</code></td>
+        </tr>
+        <tr>
+          <td>Color</td>
+          <td><code>.r</code></td>
+          <td><code>.g</code></td>
+          <td><code>.b</code></td>
+          <td><code>.a</code></td>
+        </tr>
+        <tr>
+          <td>Texture coordinate</td>
+          <td><code>.s</code></td>
+          <td><code>.t</code></td>
+          <td><code>.p</code></td>
+          <td><code>.q</code></td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Table 10.3</strong> Dot notations for accesing vector components, grouped by naming conventions.</figcaption>
+    </figure>    
+
+    <p>Let look at some examples on how the dot notations can be used.</p>
+
+<pre><code class="language-c">vec4 F = vec4(10.0, 20.0, 30.0, 40.0);
+float f = (F.x + F.y * F.z) / F.w;               // f = 7/4
+float temp = (F.r + F.g + F.b) * F.a;            // temp = 2400
+vec2 G = vec2((F.s + F.t)/2.0, (F.p + F.q)/2.0); // G = (15,35)
+F.x = 0.0;                                       // F = (0,20,30,40)
+F.a = F.r*F.r + F.g*F.b + F.a*F.a;               // F = (0,20,30,2200)
+</code></pre>
+
+    <p>Before we move on to the next section, I would like to comment on the field names. I recommend that the reader not mix the naming conventions together. More specifically, the reader should decide the naming covention to use for each variable based on its meaning and stick to this naming convention. For example, if <code>p</code> is <code>vec3</code> that is used to represent the position of a point in space, then we should not access its components like it represents a color or a texture coordinate. In other words, <code>p.x</code>, <code>p.y</code>, and <code>p.z</code> are OK, but <code>p.r</code>, <code>p.g</code>, and <code>p.b</code> are not. As a another example, let <code>color</code> be a <code>vec4</code> that is used to represent an RGBA color. Then, we should access its components with <code>color.r</code>, <code>color.g</code>, <code>color.b</code>, and <code>color.a</code>, not <code>color.s</code>, <code>color.y</code>, and so on. Maintaining this rule makes the code easier to understand and will prevent bugs that are hard to discover from materializing.</p>
+
     <h3>10.4.3 &nbsp; Swizzling</h3>
 
+    <p>Swizzling is the unique feature of GLSL where we can construct vectors by stringing together field names in the last section. It is easier to see in action than to explain.</p>
+    
+<pre><code class="language-c">vec4 p = vec4(1.0, 2.0, 3.0, 4.0);
+vec3 a = p.xyz;                    // a = (1, 2, 3)
+vec2 b = p.ww;                     // b = (4,4)
+vec4 c = vec4(p.zxx, 5.0);         // c = (3, 1, 1, 5)
+</code></pre>
+
+    <p>GLSL only have up 4-component vectors, so an expression like <code>p.xxyyzzww</code> would not work because it would create an 8-component vector. Vector that is referred to by swizzling can appear on the left side of the assignment operator, and it behaves as you would expect from reading the code.</p>
+
+<pre><code class="language-c">vec4 q = vec4(9.0, 8.0, 7.0, 6.0);
+q.xy = 1.0;                        // q = (1,1,7,6)
+q.yzw = vec3(2.0,3.0,4.0);         // q = (1,2,3,4)
+q.xyzw = q.wxyz;                   // q = (4,1,2,3)
+</code></pre>
+
+    <p>Note that, when a swizzled vector appear on the LHS of an assignment, the same component cannot be used twice. For example <code>q.yy = 1.0;</code> is not allowed.</p>
+
     <h3>10.4.4 &nbsp; Vector arithmetic</h3>
+
+    <p>We can do arithmetic operations on vector types, and this capability allows us to perform the operations we studied in <a href="../chapter-03/index.html">Chapter 3</a> and <a href="../chapter-04/index.html">Chapter 4</a>. First, vectors types support addition, subtraction, and multiplication/division by scalars.</p>
+
+<pre><code class="language-c">vec3 u = vec3(0.0, 1.0, 2.0);
+vec3 v = vec3(40.0, 50.0, 60.0);
+vec3 a = u + v;                   // a = (40,51,62)
+vec3 b = u - v;                   // b = (-40,-49,-58)
+vec3 c = 2.0 * u;                 // c = (0,2,4)
+vec3 d = u * -1.0;                // d = (0,-1,-2)
+vec3 e = v / 10.0;                // e = (4,5,6)
+</code></pre>
+
+    <p>Vector types can also multiply and divide each other. Like addition and subtraction, these operations are apply the arithmetic operation on a per-component basis. It is important to keep in mind that they are not the same as the dot product or the cross product that we studied in <a href="../chapter-03/index.html">Chapter 3</a>.</p>
+
+<pre><code class="language-c">vec3 f = u * v;                   // u = (0,50,120)
+vec3 g = v / vec3(5.0,10.0,15.0); // g = (8,5,4)
+</code></pre>
+    
+    <p>On the other hand, the dot product and the cross product can be computed using the <code>dot</code> and <code>cross</code> built-in functions. Note that we can use <code>dot</code> with all vector types, but we can only use <code>cross</code> with only vector types that have 3 components. This is because the cross product as a mathematical operation is only defined on vectors in $\mathbb{R}^3$.</p>
+
+<pre><code class="language-c">float temp = dot(u,v);            // temp = 50+120 = 170
+
+vec3 X = vec3(1.0, 0.0, 0.0);                    
+vec3 Y = vec3(0.0, 1.0, 0.0);
+vec3 Z = vec3(0.0, 0.0, 1.0);
+vec3 XcY = cross(X,Y);           // XcY = (0,0,1)
+vec3 YcX = cross(Y,X);           // YcX = (0,0,-1)
+vec3 XcX = cross(X,X);           // XcX = (0,0,0)
+vec3 ZcY = cross(Z,Y);           // ZcY = (-1,0,0)
+</code></pre>
+      
 
     <h2>10.5 &nbsp; Arrays</h2>
 
