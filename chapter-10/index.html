@@ -531,7 +531,35 @@ vec3 newPosition = p.position + 0.1 * newVelocity;
 
     <h2>10.7 &nbsp; Control statements</h3>
 
-    <p></p>
+    <p>GLSL has similar control statements to Javascript. The following control statements are exactly the same as those in Javascript.</p>
+
+    <ul>
+      <li><code>if</code></li>
+      <li><code>switch</code></li>
+      <li><code>while ... do</code></li>
+      <li><code>do ... while</code></li>
+    </ul>
+
+    <p>So, we will not discuss these statements for brevity. The only statement that is different is the <code>for</code> statement, and the difference is minimal. In Javascript, we can declare a new counter variable in the first clause of the <code>for</code> statement. For examples, we may write </p>
+
+<pre><code class="language-javascript">for (let i=0; i&lt;10; i++) {
+  :
+  :
+}</code></pre>
+
+    <p>or</p>
+
+<pre><code class="language-javascript">for (var i=0; i&lt;10; i++) {
+  :
+  :
+}</code></pre>
+
+    <p>However, GLSL has neither the <code>let</code> nor the <code>var</code> keyword, so the above pieces of code are not valid GLSL code. The only change we need to do is to replace <code>let</code> and <code>var</code> with the type that the counter variable is supposed to have. In our case, because the counter is an integer, we shall use <code>int</code> instead of <code>let</code> and <code>var</code>. So, the following is a valid GLSL <code>for</code> statement.</p>
+
+<pre><code class="language-javascript">for (int i=0; i&lt;10; i++) {
+  :
+  :
+}</code></pre>
 
     <h2>10.8 &nbsp; Functions</h3>
 
