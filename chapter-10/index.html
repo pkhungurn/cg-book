@@ -474,6 +474,48 @@ float[4] b = float[4](90.0, 80.0, 70.0, 60.0);</code></pre>
 
     <h2>10.6 &nbsp; Structs</h2>
 
+    <p>A <b>struct</b> is a data type whose values are collections of different values, which can have different types. Each of such values is called a <b>field</b> and is identified by a specific <b>field name</b>. The struct type is a staple of the C, and the most similar feature in Javascript to struct is probably the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a> type. However, GLSL structs do not have methods, and fields cannot be added or removed after declaration. Moreover, each field has a specific type that cannot be changed.</p>
+
+    <p>A struct type can be declared with the <code>struct</code> keyword, followed by the name of the type and a code block, delineated by curly braces. Inside the block, we declare the fields like we declare variables. Lastly, <i>we must put a semi-colon after the closing curly brace to make the declaration syntactically correct.</i></p>
+
+<pre><code class="language-c">struct &lt;type-name&gt; {
+  &lt;field-declaration-1&gt;
+  &lt;field-declaration-2&gt;
+    :
+    :
+  &lt;field-declaration-n&gt;
+};</code></pre>
+
+    <p>The following in an example of a struct that represents a particle moving in 3D space.</p>
+ 
+<code><pre class="language-c">
+struct Particle {
+  float mass;
+  vec3 position;  
+  vec3 velocity;
+};</code></pre>
+
+    <p>After the struct type has been declared, we can use it to declare variables like other type names such as <code>int</code>, <code>float</code>, or <code>vec3</code>. This means that arrays of structs can be declared.</p>
+
+<pre><code class="language-c">Particle a;
+Particle[10] particles;
+</code></pre>
+
+    <p>Similar to Javascript objects, fields of a struct can be accessed with the dot notation.</p>
+
+<pre><code class="language-c">Particle p;
+p.mass = 10.0;
+p.position = vec3(1,2,-1);
+p.velocity = vec3(1,0,0);
+vec3 force = vec3(0,-98,0);
+vec3 acceleration = force / p.mass;                 
+//   acceleration = (0,-9.8,0)
+vec3 newVelocity = p.velocity + 0.1 * acceleration; 
+//   newVelocity  = (1,-0.98,0)
+vec3 newPosition = p.position + 0.1 * newVelocity;  
+//   newPosition  = (1.1,1.902,-1)
+</code></pre>
+
     <h2>10.7 &nbsp; Control statements</h3>
 
     <h2>10.8 &nbsp; Functions</h3>
