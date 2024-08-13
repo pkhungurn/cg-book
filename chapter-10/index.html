@@ -537,7 +537,10 @@ vec3 newPosition = p.position + 0.1 * newVelocity;
       <li><code>if</code></li>
       <li><code>switch</code></li>
       <li><code>while ... do</code></li>
-      <li><code>do ... while</code></li>
+      <li><code>do ... while</code></li>      
+      <li><code>continue</code></li>
+      <li><code>break</code></li>
+      <li><code>return</code></li>
     </ul>
 
     <p>So, we will not discuss these statements for brevity. The only statement that is different is the <code>for</code> statement, and the difference is minimal. In Javascript, we can declare a new counter variable in the first clause of the <code>for</code> statement. For examples, we may write </p>
@@ -562,6 +565,17 @@ vec3 newPosition = p.position + 0.1 * newVelocity;
 }</code></pre>
 
     <h2>10.8 &nbsp; Functions</h3>
+
+    <p>Functions in GLSL are different from functions in Javascript in two major ways.</p>
+
+    <ol>
+      <li>GLSL requires us to specify types of a function's return value and all of its arguments while Javascript does not.</li>
+      <li>All function arguments in GLSL are <b>passed by value</b> while, in Javascript, some arguments are passed by values and some are passed by reference.</li>
+    </ol>
+
+    <h3>10.8.1 &nbsp; Function Declaration</h3>
+
+    <h3>10.8.2 &nbsp; Argument Passing Semantics</h3>
 
     <h2>10.9 &nbsp; Summary</h3>
 
