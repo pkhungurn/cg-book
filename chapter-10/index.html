@@ -472,6 +472,11 @@ float dotProd = dot(p[1][1], p[0][0]); // dotProd = 6
 <pre><code class="language-c">int[3] a = int[3](1,2,3);
 float[4] b = float[4](90.0, 80.0, 70.0, 60.0);</code></pre>
 
+    <p>Alternatively, one can use curly braces to surround the values and avoid writing down the type name and the size.</p>
+
+<pre><code class="language-c">int[3] a = {1, 2, 3};
+float[4] b = {90.0, 80.0, 70.0, 60.0};</code></pre>
+
     <h2>10.6 &nbsp; Structs</h2>
 
     <p>A <b>struct</b> is a data type whose values are collections of different values, which can have different types. Each of such values is called a <b>field</b> and is identified by a specific <b>field name</b>. The struct type is a staple of the C, and the most similar feature in Javascript to struct is probably the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a> type. However, GLSL structs do not have methods, and fields cannot be added or removed after declaration. Moreover, each field has a specific type that cannot be changed.</p>
@@ -516,7 +521,17 @@ vec3 newPosition = p.position + 0.1 * newVelocity;
 //   newPosition  = (1.1,1.902,-1)
 </code></pre>
 
+    <p>Structs can also be initalized with constructors in a similar way to vector types.</p>
+
+<pre><code class="language-c">Particle q = Particle(20.0, vec3(0,0,0), vec3(1,-1,1));</code></pre>
+
+    <p>Curly brace notations can also be used to shorten the constructor.</p>
+
+<pre><code class="language-c">Particle q = {20.0, {0,0,0}, {1,-1,1}};</code></pre>
+
     <h2>10.7 &nbsp; Control statements</h3>
+
+    <p></p>
 
     <h2>10.8 &nbsp; Functions</h3>
 
