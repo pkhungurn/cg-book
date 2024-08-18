@@ -573,9 +573,102 @@ vec3 newPosition = p.position + 0.1 * newVelocity;
       <li>All function arguments in GLSL are <b>passed by value</b> while, in Javascript, some arguments are passed by values and some are passed by reference.</li>
     </ol>
 
-    <h3>10.8.1 &nbsp; Function Declaration</h3>
+    <h3>10.8.1 &nbsp; Function declaration</h3>
 
-    <h3>10.8.2 &nbsp; Argument Passing Semantics</h3>
+    <p>The GLSL syntax for function declaration is as follows.</p>
+
+<pre><code class="language-c">&lt;return-type&gt; &lt;function-name&gt;(
+    &lt;parameter-type&gt; &lt;parameter-name&gt;, 
+    &lt;parameter-type&gt; &lt;parameter-name&gt;,
+        : 
+    &lt;parameter-type&gt; &lt;parameter-name&gt;) {
+  &lt;statement&gt;
+  &lt;statement&gt;
+      :
+      :
+  &lt;statement&gt;
+}
+</code></pre>
+
+    <p>If the function does not take any parameters, the declaration becomes:</p>
+
+<pre><code class="language-c">&lt;return-type&gt; &lt;function-name&gt;() {
+  &lt;statement&gt;
+  &lt;statement&gt;
+    :
+    :
+  &lt;statement&gt;
+}
+</code></pre>
+  
+
+    <p>Like in Javascript, we can exit a function with the <code>return</code> statement. When we use it, we must specify a return value that has the same type as the one we declare as the return type of the function. (There is an exception to this, which we will talk about momentarily.)</p>
+
+    <p>For example, here is a GLSL function that takes in a <code>float</code> and returns the square of it.</p>
+
+<pre><code class="language-c">float squareFloat(float x) {
+  return x*x;
+}
+</code></pre>
+
+    <p>This function is different from the following function, which does the same thing but the types of the input and the output are integers.</p>
+
+<pre><code class="language-c">int squareInt(int x) {
+  return x*x;
+}
+</code></pre>
+
+    <p>Notice how the return types and parameter types make functions that peform the same mathematical operation different.</p>
+
+    <h3>10.8.2 &nbsp; Functions that do not return a value</h3>
+
+    <p>Like in Javascript, a function does not have to return a value. In this case, the return type in the function declaration must be <code>void</code>. We have seen functions that have this return type before. In particular, all the <code>main</code> functions of the GLSL shaders in the last chaper all have <code>void</code> return type. For example, the <code>main</code> function of most vertex shaders in the last chapter are:</p>
+    
+<pre><code class="language-c">void main() {
+  gl_Position = vec4(position, 1);
+}
+</code></pre>
+
+    <p>Moreover, most <code>main</code> functions of the fragment shaders are:</p>
+  
+<pre><code class="language-c">void main() {
+  fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+</code></pre>
+
+    <p>Notice that, when a function does not return a value, it should somehow have a side effect. Otherwise, there is no point in writing the function in the first place. We can see that the <code>main</code> functions above modify global variables that are not declared inside the function. For the vertex shader's <code>main</code> function, it modifies the <code>gl_Position</code> variable, which stores the vertex position that is to be processed by the next step of the graphics pipeline. For the fragment shader's <code>main</code> function, it modified the <code>fragColor</code> variable that was declared just above the function. There is another way to have side effects, but we will discuss it when we shall need it in a future chapter.</p>
+
+    <p>While one must use the <code>return</code> statement if the function is declared to return a value. The return statement is optional in a <code>void</code> function. When it is used, though, we do not have to specify a return value. For example, we can modify the vertex shader so that its outputs are different based on the input position as follows.</p>
+
+<pre><code class="language=c">void main() {
+  if (position.x &lt; 0) {
+    gl_Position = vec4(0,0,0,1);
+    return;
+  }
+  gl_Position  vec4(position, 1);
+}
+</code></pre>
+    
+    <h3>10.8.3 &nbsp; Parameter Passing Semantics</h3>
+
+    <p>A major difference between Javascript and GLSL is their function parameter passing semantics. First, let us remind ourselves that Javascript variables are references to values. The values are stored somewhere in the computer's memory, and a variable simply holds the memory address. When we do an assignment statement in Javascript, say <code>b = a;</code>, we simply make sure that <code>b</code> would store the address of the value that <code>a</code> refers to, so that <code>b</code> would refer to the same value after the statement finishes. If we make any modification to the value that <code>b</code> refers to, we would also see the change through <code>a</code> as well because the variables refer to exactly the same value. For example, consider the following Javascript code.</p>
+
+<pre><code class="language-javascript">let a = {x:1, y:2, z:3};
+let b = a;
+b.x = 0;
+console.log(a.x);
+</code></pre>
+
+    <p>We would see that the value 0 is printed by the console.</p>
+
+    <p>On the other hand, GLSL variables are not references. A GLSL variable can be thought of as a fixed area in GPU with a definite size and address that remains unchanged inside the variable's scope. Two different variables in GLSL are thus completely independent. When the statement <code>b = a;</code> is executed, what happens is that the value in <code>a</code> is copied to <code>b</code>, and what happends to what is stored in <code>b</code> afterwards would not be reflected on what is stored in <code>a</code>. Let us following GLSL that looks pretty similar to the Javascript code above.</p>
+
+<pre><code class language="javascript">vec3 a = vec3(1,2,3);
+vec3 b = a;
+b.x = 0;
+</code></pre>
+
+    <p>We can deduce that, after the last statement ends, <code>b</code> would hold the value $(0,2,3)$ while <code>a</code> holds $(1,2,3)$. This behavior is the complete opposite of Javascript's behavior, and it is worth keeping this in mind to avoid subtle programming errors.</p>
 
     <h2>10.9 &nbsp; Summary</h3>
 
