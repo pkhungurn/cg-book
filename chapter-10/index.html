@@ -529,7 +529,30 @@ vec3 newPosition = p.position + 0.1 * newVelocity;
 
 <pre><code class="language-c">Particle q = {20.0, {0,0,0}, {1,-1,1}};</code></pre>
 
-    <h2>10.7 &nbsp; Control statements</h3>
+    <h2>10.7 &nbsp; GLSL Variable Semantics</h2>
+    
+    <p>A major difference between Javascript and GLSL is behavior of variables. First, let us remind ourselves that Javascript variables are references to values. The values are stored somewhere in the computer's memory, and a variable simply holds the memory address. When we do an assignment statement in Javascript, say <code>b = a;</code>, we simply make sure that <code>b</code> would store the address of the value that <code>a</code> refers to. As a result, <code>b</code> would refer to the same value after the statement finishes. If we make any modification to the value that <code>b</code> refers to, we would also see the change through <code>a</code> as well. For example, consider the following Javascript code.</p>
+
+<pre><code class="language-javascript">let a = {x:1, y:2, z:3};
+let b = a;
+b.x = 0;
+console.log(a.x);
+</code></pre>
+    
+    <p>We would see that the value 0 is printed by the console.</p>
+
+    <p>On the other hand, GLSL variables are not references. A GLSL variable can be thought of as a fixed area in GPU memory with a definite size and a definite address that remains unchanged until the variable goes out of scope. Two different variables in GLSL are thus completely independent. When the statement <code>b = a;</code> is executed, what happens is that the value in <code>a</code> is copied to <code>b</code>, and what happends to what is stored in <code>b</code> afterwards would not be reflected on what is stored in <code>a</code>. Let us following GLSL that looks pretty similar to the Javascript code above.</p>
+    
+<pre><code class language="javascript">vec3 a = vec3(1,2,3);
+vec3 b = a;
+b.x = 0;
+</code></pre>
+    
+    <p>We can deduce that, after the last statement ends, <code>b</code> would hold the value $(0,2,3)$ while <code>a</code> holds $(1,2,3)$. This behavior is the complete opposite of Javascript's behavior, and it is worth keeping this in mind to avoid subtle programming errors.</p>
+
+    <p>Note also that the behavior we just discussed applies to <i>all GLSL types</i> of variables, and these include primitives, arrays, vectors, and structs. Javascript also have arrays, and Javascript objects are similar in appearance to GLSL vectors and structs. Again, it is important to remember that these similar concepts have totally different behavior in their respective languages.</p>
+
+    <h2>10.8 &nbsp; Control statements</h3>
 
     <p>GLSL has similar control statements to Javascript. The following control statements are exactly the same as those in Javascript.</p>
 
@@ -564,7 +587,7 @@ vec3 newPosition = p.position + 0.1 * newVelocity;
   :
 }</code></pre>
 
-    <h2>10.8 &nbsp; Functions</h3>
+    <h2>10.9 &nbsp; Functions</h3>
 
     <p>Functions in GLSL are different from functions in Javascript in two major ways.</p>
 
@@ -573,7 +596,7 @@ vec3 newPosition = p.position + 0.1 * newVelocity;
       <li>All function arguments in GLSL are <b>passed by value</b> while, in Javascript, some arguments are passed by values and some are passed by reference.</li>
     </ol>
 
-    <h3>10.8.1 &nbsp; Function declaration</h3>
+    <h3>10.9.1 &nbsp; Function declaration</h3>
 
     <p>The GLSL syntax for function declaration is as follows.</p>
 
@@ -620,7 +643,7 @@ vec3 newPosition = p.position + 0.1 * newVelocity;
 
     <p>Notice how the return types and parameter types make functions that peform the same mathematical operation different.</p>
 
-    <h3>10.8.2 &nbsp; Functions that do not return a value</h3>
+    <h3>10.9.2 &nbsp; Functions that do not return a value</h3>
 
     <p>Like in Javascript, a function does not have to return a value. In this case, the return type in the function declaration must be <code>void</code>. We have seen functions that have this return type before. In particular, all the <code>main</code> functions of the GLSL shaders in the last chaper all have <code>void</code> return type. For example, the <code>main</code> function of most vertex shaders in the last chapter are:</p>
     
@@ -649,26 +672,43 @@ vec3 newPosition = p.position + 0.1 * newVelocity;
 }
 </code></pre>
     
-    <h3>10.8.3 &nbsp; Parameter Passing Semantics</h3>
+    <h3>10.9.3 &nbsp; Parameter Passing Semantics</h3>
 
-    <p>A major difference between Javascript and GLSL is their function parameter passing semantics. First, let us remind ourselves that Javascript variables are references to values. The values are stored somewhere in the computer's memory, and a variable simply holds the memory address. When we do an assignment statement in Javascript, say <code>b = a;</code>, we simply make sure that <code>b</code> would store the address of the value that <code>a</code> refers to, so that <code>b</code> would refer to the same value after the statement finishes. If we make any modification to the value that <code>b</code> refers to, we would also see the change through <code>a</code> as well because the variables refer to exactly the same value. For example, consider the following Javascript code.</p>
+    <p>Function parameters are just variables that are receptacles of data that are supposed to be processed by the function. Because Javascript and GLSL have different variable semantics, the two languages' parameter passing semantics are different as well. Javascript variables are references, so function parameters are <b>passed by reference</b>. This means that a function parameter would hold a memory address to a value. Any modification made to the value would thus be visible through any other variables that also refer to it, and these include variables that are not in the function's scope.</p>
 
-<pre><code class="language-javascript">let a = {x:1, y:2, z:3};
-let b = a;
-b.x = 0;
-console.log(a.x);
+    <p>For example, consider the following Javascript function that receives an array, extract its first element, and then replaces it by 0.</p>
+
+<pre><code class="language-javascript">function f(arr) {
+  let output = arr[0];
+  arr[0] = 0;
+  return output;
+}
 </code></pre>
 
-    <p>We would see that the value 0 is printed by the console.</p>
+    <p>If we call this function with an array, we would see that the array's first element would become zero after the function exits.</p>
 
-    <p>On the other hand, GLSL variables are not references. A GLSL variable can be thought of as a fixed area in GPU with a definite size and address that remains unchanged inside the variable's scope. Two different variables in GLSL are thus completely independent. When the statement <code>b = a;</code> is executed, what happens is that the value in <code>a</code> is copied to <code>b</code>, and what happends to what is stored in <code>b</code> afterwards would not be reflected on what is stored in <code>a</code>. Let us following GLSL that looks pretty similar to the Javascript code above.</p>
-
-<pre><code class language="javascript">vec3 a = vec3(1,2,3);
-vec3 b = a;
-b.x = 0;
+<pre><code class="language-javascript">let a = [1,2,3];
+let b = f(a);
+console.log(b);  // This would print 1.
+console.log(a);  // This would print [0,2,3];
 </code></pre>
 
-    <p>We can deduce that, after the last statement ends, <code>b</code> would hold the value $(0,2,3)$ while <code>a</code> holds $(1,2,3)$. This behavior is the complete opposite of Javascript's behavior, and it is worth keeping this in mind to avoid subtle programming errors.</p>
+    <p>On the other hand, a GLSL variable is a fixed area in GPU memory that stores a particular type of values. Thus, parameters are <b>passed by value</b>. This means that, when a function is called, the program would first allocate new areas of memory to store all the parameters. It would then copy the values that the user specify to the new memory areas and then execute the function's command. After the function exists, these memory areas would be free. This means that, in side the function, parameters are independent to any values or variables are specified to be the parmaeters. Any changes made to the parameters will not have any effect on any variables outside the function's scope. As an example, consider a GLSL function that is modeled after the Javascript function above.</p>
+
+<pre><code class="language-c">int f(int[3] arr) {
+  int output = arr[0];
+  arr[0] = 0;
+  return output;
+}
+</code></pre>
+
+    <p>If we execute the function, its modification to the first element of the array would not affect the array that was passed in as the parameter.</p>
+
+<pre><code class="language-c">int[3] a = {1,2,3};
+int b = f(a);
+</code></pre>
+
+    <p>We would see that <code>b</code> would be 1, but the first element of <code>a</code> would still be 1. Again, we stress that the reader remembers this crucial difference in order to avoid bugs.</p>
 
     <h2>10.9 &nbsp; Summary</h3>
 
