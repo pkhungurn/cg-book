@@ -712,9 +712,55 @@ int b = f(a);
 
     <h2>10.9 &nbsp; Summary</h3>
 
-    <hr>
-    <div class="footnotes">      
-    </div>
+    <ul>
+      <li>We program shaders with the Open<b>GL</b> <b>S</b>hading <b>L</b>anguage (GLSL). WebGL 2.0 uses a version called GLSL ES 3.0.</li>
+      
+      <li>GLSL is a language derived from the C language. Its syntax is similar to that of Javascript.</li>
+
+      <li>However, the most significant difference between GLSL and Javascript is the variables.
+        <ul>
+          <li>In Javascript, we do not have to declare each variable's type. On the other hand, in GLSL, we have to explicitly declare the type of each variable.</li>
+
+          <li>In Javascript, variables are references. If you modify a value referred to by two difference variables, the change is visible through both. In GLSL, a variable is synnonymous to an independent value. Modifications made to different variables never mix.</li>
+        </ul>
+      </li>
+
+      <li>GLSL has 4 scalar types: <code>int</code>, <code>uint</code>, <code>float</code>, and <code>bool</code>.
+        <ul>
+          <li><code>bool</code> type is the same as Javascript boolean type.</li>
+          
+          <li>Numerical types (<code>int</code>, <code>uint</code>, and <code>float</code>) have precision that can be set throught the <code>precision</code> statement.</li>
+          
+          <li>It is important to remember that the vertex shader and different defaulit settings from those of the fragment shaders.</li>
+        </ul>
+      </li>
+
+      <li>Vectors types such as <code>vec2</code>, <code>vec3</code>, <code>vec4</code>, and so on are unique features of GLSL that make 3D progarmming simple and pleasant.
+        <ul>
+          <li>Vector components can be accessed through bracket (<code>[...]</code>) or the dot (<code>.x</code>, <code>.y</code>, <code>.z</code>) notations.</li>
+          
+          <li>Vectors can be constructed through constructors or swizzling. Swizzling is convenient, concise, very readable, and we recommend using it when it applies.</li>
+        </ul>
+      </li>
+
+      <li>GLSL has array types, but array lengths must be known at compile time.</li>
+
+      <li>GLSL has struct types that are similar to objects. However, structs do not have methods like Javascript objects.</li>
+
+      <li>Most control statements in GLSL are similar to those of Javascripts, except for the <code>for</code> loop where the type of the index variable must be exclitly declared.</li>
+
+      <li>Function is another area where Javascript and GLSL differ significantly.
+        <ul>
+          <li>In GLSL, the return type and the type of each function parameter must be explicitly declared.</li>
+
+          <li>A function that does not return a value must have the <code>void</code> type. This is the return type of all <code>main</code> functions of all shaders.</li>
+
+          <li>GLSL pass function parameters by values. Modifications made to these parameters values inside the functions will not be seen outside the function.</li>
+
+          <li>As a result, in order for a GLSL function to be useful, it must either return a value or have a side effect; i.e., modifying a value that is outside of its scope.</li>
+        </ul>
+      </li>
+    </ul>
 
     <hr>
     <p>
