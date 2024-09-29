@@ -79,6 +79,82 @@
 
     <p>In this chapter, we focus on the vertex shader and the fancier things we can do with it. Recall from <a href="../chapter-07/index.html#vertex-shader">Section 7.3.2</a> that a vertex shader's main responsibility is to transform vertex attributes into clip space coordinates of the vertices. Because clip space coordinates dictates the shapes that the user see, we can draw more complicated shapes by putting more work into the vertex shaders. The programs in this chaper are examples on how to do exactly this.</p>
 
+    <h2>11.1 &nbsp; Program 1: Drawing a Sine Wave</h2>
+
+    <p>The source code of the program is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-11/program-01">chapter-11/program-01</a> directory of the source code repoository. Running it, you would see a sine wave on a blank cnavas. Underneath the canvas, there are two radio buttons, one with the label "Fancy vertex shader" and another with the label "Simple vertex shader." When you click on the second radio button, the sine wave becomes a straight line.</p>
+
+    <figure class="figure">
+      <b>TODO: Create the figure.</b>
+      <figcaption class="figure-caption"><strong>Figure 11.1</strong> Screenshots of Program 1.</figcaption>
+    </figure>
+  
+    <p>In Chapter 9, we studied vertex shaders that just pass a vertex attribute as its output. The "simple vertex shader" that is emplobyed when the second radio button is clicked is just like one of these shaders. The source code in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-01/src/vertex-shader-simple.vert"><code>vertex-shader-simple.vert</code></a> file is reproduced below.</p>
+
+<pre><code class="language-javascript">#version 300 es
+
+in float t;
+
+void main() {
+  gl_Position = vec4(t, 0.0, 0.0, 1.0);
+}</code></pre>
+
+    <p>The main difference between the above shader and the ones in Chapter 9 is the vertex attribute. In Chapter 9, the vertex attribute is a <code>vec3</code> called <code>position</code>. Here, the attribute is a <code>float</code> called <code>t</code>. Because the attribute is different, the Javascript that prepares it is different too. The <a href="https://github.com/pkhungurn/cg-book-code/blob/d400a3407dece293ecbbe8d8a0afd5b0139fbd78/chapter-11/program-01/src/index.js#L26"><code>createBuffers</code></a> method reads:</p>
+
+<pre><code class="language-javascript">createBuffers() {
+  this.numVertices = 256;
+
+  let vertexData = [];      
+  for (let i=0; i&lt;this.numVertices; i++) {
+      vertexData.push(-1.0 + 2.0*i / (this.numVertices-1));
+  }      
+  this.vertexBuffer = createVertexBuffer(
+    this.gl, new Float32Array(vertexData));
+  
+  let indexData = [];
+  for (let i=0;i&lt;this.numVertices-1;i++) {
+    indexData.push(i);
+    indexData.push(i+1);
+  }      
+  this.indexBuffer = createIndexBuffer(
+    this.gl, new Int32Array(indexData));
+}</code></pre>
+
+    <p>We see that the vertex buffer is filled with 256 equally-spaced real numbers from $-1$ to $1$. The index buffer contains $255$ pairs of consecutive indices from $(0,1)$ to $(254,255)$, which means it has $510$ numbers. The buffers are used in the <a href="https://github.com/pkhungurn/cg-book-code/blob/d400a3407dece293ecbbe8d8a0afd5b0139fbd78/chapter-11/program-01/src/index.js#L43"><code>updateWebGL</code></a> method as follows.</p>
+
+<pre><code class="language-javascript">useProgram(this.gl, program, () => {
+  setupVertexAttribute(
+    self.gl, program, "t", self.vertexBuffer, 1, 4, 0);
+  drawElements(
+    self.gl, self.indexBuffer, self.gl.LINES, (self.numVertices-1)*2, 0);
+});</code></pre>
+
+    <p>The <code>steupVertexAttribute</code> method deals with the attribute variable called "<code>t</code>," which has one component because it is a <code>float</code> and has stride of $4$ because a floating-point number is represented by 4 bytes. The <code>drawElements</code> function draws <code>LINES</code> primitives using $255 * 2 = 510$ elements in the index buffer, thus using everything inside and resulting in 255 line segments. The simple vertex shader in Listing 11.1 transforms attribute $t$ into clip space coordinates $(t,0,0,1)$. As a result, we get a straight line segment that goes from the $xy$-coordinates of $(-1,0)$ to $(1,0)$, and so we see a horizontal line in Figure 11.1(b) when the simple shader is used.</p>
+
+    <p>The "fancy vertex shader" uses the exact same vertex data as the simple shader but transform them so that we get a sine wave instead of a straight horizontal line. Its source code in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-01/src/vertex-shader-fancy.vert"><code>vertex-shader-fancy.vert</code></a> reads:</p>
+
+<pre><code class="language-javascript">#version 300 es
+
+  const float PI = 3.14159265359;
+  
+  in float t;
+  
+  void main() {
+      gl_Position = vec4(t, 0.1*sin(2.0*5.0*PI*t), 0.0, 1.0);
+  }</code></pre>
+
+    <p>We see that the shader transforms $t$ into clip space coordinate $$(t, 0.1 \sin (10\pi t), 0, 1),$$ which means that the $x$- and $y$-coordinates of the output is given by: 
+    \begin{align*}
+      x &= t, \\
+      y &= 0.1 \sin(2\pi \times 5 \times t) = 0.1 \sin(2\pi \times 5 \times x).
+    \end{align*}
+    In other words, we are plotting the graph $y = 0.1 \sin(2\pi \times 5 \times x)$, which is a sine wave of amplitude $0.1$ and period of $1 / 5 = 0.2$ from $x = -1$ to $x = 1$. Because the screen's range of $x$-coordinates is from $-1$ to $1$, we see exactly $((1 - (-1)) / 0.2) = 10$ repetitions of the sine wave form.</p>
+
+    <p>The fancy vertex shader shaders demonstrates that we can draw curves by transforming vertex data appropriately. By rewriting the fancy vertex shader appropriately, we can draw any functions of the form $y = f(x)$ that we can code into GLSL.</p>
+
+    <h2>11.2 &nbsp; Program 2: Drawing a Plane Curve (the Cardioid)</h2>
+
+    <h2>11.3 &nbsp; Program 3: Drawing a Circle</h2>
+
     <hr>
     <p>
       <a href="../chapter-10/index.html"><<</a>
