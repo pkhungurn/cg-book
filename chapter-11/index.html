@@ -142,16 +142,76 @@ void main() {
       gl_Position = vec4(t, 0.1*sin(2.0*5.0*PI*t), 0.0, 1.0);
   }</code></pre>
 
-    <p>We see that the shader transforms $t$ into clip space coordinate $$(t, 0.1 \sin (10\pi t), 0, 1),$$ which means that the $x$- and $y$-coordinates of the output is given by: 
+    <p>The shader uses a GLSL feature we did not cover in the last chapter: the <code>const</code> keyword. It can be added in front of a variable declaration such as <code>float PI = 3.14159265359;</code> to make sure that the value of the variable remains <b>constant</b>, i.e. unchanged, during the scope of the program. It is especially useful in the case where we need a name for well-known mathematical constants such as $\pi$ and $e$. Unfortunately, GLSL does not have them defined as a part of the language, so we have to code them ourselves when needed.</p>
+
+    <p>It also uses another undiscussed feature: the function <code>sin</code>, which computes the sine function from trigonometry. This function is one of GLSL's <b>built-in functions</b> that comes automatically with the language itself. The list of built-in functions can be found in the <a href="https://www.khronos.org/files/opengles3-quick-reference-card.pdf">GLSL ES 3.0 reference card</a>, and it has a lot of well-known mathematical functions that can also be found in C's <code>math.h</code> library such as <code>abs</code>, <code>pow</code>, <code>exp</code>, <code>sqrt</code>, <code>log</code>, <code>cos</code>, <code>tan</code>, <code>asin</code>, <code>acos</code>, and <code>atan2</code>. </p>
+
+    <p>From the code, we see that the shader transforms $t$ into clip space coordinate $$(t, 0.1 \sin (10\pi t), 0, 1),$$ which means that the $x$- and $y$-coordinates of the output is given by: 
     \begin{align*}
       x &= t, \\
       y &= 0.1 \sin(2\pi \times 5 \times t) = 0.1 \sin(2\pi \times 5 \times x).
     \end{align*}
     In other words, we are plotting the graph $y = 0.1 \sin(2\pi \times 5 \times x)$, which is a sine wave of amplitude $0.1$ and period of $1 / 5 = 0.2$ from $x = -1$ to $x = 1$. Because the screen's range of $x$-coordinates is from $-1$ to $1$, we see exactly $((1 - (-1)) / 0.2) = 10$ repetitions of the sine wave form.</p>
 
-    <p>The fancy vertex shader shaders demonstrates that we can draw curves by transforming vertex data appropriately. By rewriting the fancy vertex shader appropriately, we can draw any functions of the form $y = f(x)$ that we can code into GLSL.</p>
+    <p>The fancy vertex shader demonstrates that we can draw curves by transforming vertex data appropriately. By rewriting the fancy vertex shader appropriately, we can draw any functions of the form $y = f(x)$ that we can code into GLSL.</p>
 
-    <h2>11.2 &nbsp; Program 2: Drawing a Plane Curve (the Cardioid)</h2>
+    <h2>11.2 &nbsp; Program 2: Drawing a 2D Parameteric Curve (the Cardioid)</h2>
+
+    <p>In this sample program, we show that we can use the vertex shader to draw parametric curves of the form
+    \begin{align*}
+      \begin{bmatrix}
+        x \\ y
+      \end{bmatrix}
+      = \begin{bmatrix}
+        f(t) \\
+        g(t) 
+      \end{bmatrix}
+    \end{align*}
+    where $y$ is not directly related to $x$. Many curves such as circles and ellipses are of this form. Program 2 draws a curved called the "cardioid:"
+    \begin{align*}
+      \begin{bmatrix}
+        x \\
+        y
+      \end{bmatrix}
+      &= \begin{bmatrix}
+        2r \big(1 - \cos t) \cos t \\
+        2r \big(1 - \cos t) \sin t
+      \end{bmatrix}
+    \end{align*}
+    where $t \in [0, 2\pi]$, and $r$ is the "size" of the curve, which controls how large the curve is. We can see what it looks like in Program 2's screenshots.
+    </p>
+
+    <figure class="figure">
+      <b>TODO: Create the figure.</b>
+      <figcaption class="figure-caption"><strong>Figure 11.2</strong> Screenshots of Program 2.</figcaption>
+    </figure>
+
+    <p>Like Program 1, Program 2 draws <code>LINES</code> primitives and has two vertex shaders, the simple and the fancy ones. The simple one, located in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-02/src/vertex-shader-simple.vert"><code>vertex-shader-simple.vert</code></a> is exactly the same as that of Program 1. However, it draws a slightly different picture because the vertex data are prepared differently. The <a href="https://github.com/pkhungurn/cg-book-code/blob/d400a3407dece293ecbbe8d8a0afd5b0139fbd78/chapter-11/program-02/src/index.js#L26"><code>createBuffers</code></a> function of the <a href="https://github.com/pkhungurn/cg-book-code/blob/d400a3407dece293ecbbe8d8a0afd5b0139fbd78/chapter-11/program-02/src/index.js#L11"><code>WebGLApp</code></a> class contains the snippet:</p>
+
+<pre><code class="language-c">let vertexData = [];      
+for (let i=0; i&lt;this.numVertices; i++) {
+    vertexData.push(1.0 * i / (this.numVertices-1));
+}      
+this.vertexBuffer = createVertexBuffer(is.gl, new Float32Array(vertexData));</code></pre>
+
+    <p>This means that the vertex data contains 256 number s from $0$ to $1$ instead of the same numbers from $-1$ to $1$ like in Program 1. As a result, what you see is a horizontal straight line that occupies only the right half of the screen, which corresponds the range where $0 \leq x \leq 1$, instead of a horizontal line that occupies the whole width.</p>
+
+    <p>The fancy vertex shader, located in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-02/src/vertex-shader-fancy.vert"><code>vertex-shader-fancy.vert</code></a>, simply calculates the $x$- and $y$-coordinates according to the formula of the cardioid curve.</p>
+
+<pre><code class="language-c">#version 300 es
+
+const float PI = 3.14159265359;
+
+in float t;
+
+void main() {
+    float theta = 2.0 * PI * t;
+    float x = 2.0 * 0.2 * (1.0 - cos(theta)) * cos(theta);
+    float y = 2.0 * 0.2 * (1.0 - cos(theta)) * sin(theta);
+    gl_Position = vec4(x, y, 0.0, 1.0);
+}</code></pre>
+
+    <p>We can see that the vertex shader uses $a = 0.2$, and this results in the cardioid being of the size you see in Figure 11.2(a). To make the program brief, we define the variable <code>theta</code> to store the value $2\pi t$, and the rest of the code is straightforward.</p>
 
     <h2>11.3 &nbsp; Program 3: Drawing a Circle</h2>
 
