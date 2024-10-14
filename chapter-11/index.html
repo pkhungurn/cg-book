@@ -84,8 +84,17 @@
     <p>The source code of the program is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-11/program-01">chapter-11/program-01</a> directory of the source code repoository. Running it, you would see a sine wave on a blank cnavas. Underneath the canvas, there are two radio buttons, one with the label "Fancy vertex shader" and another with the label "Simple vertex shader." When you click on the second radio button, the sine wave becomes a straight line.</p>
 
     <figure class="figure">
-      <b>TODO: Create the figure.</b>
-      <figcaption class="figure-caption"><strong>Figure 11.1</strong> Screenshots of Program 1.</figcaption>
+      <table>
+        <tr>
+          <td><a href="images/program-01-screenshot-00.png"><img src="images/program-01-screenshot-00.png" alt="" height="300"></a></td>
+          <td><a href="images/program-01-screenshot-01.png"><img src="images/program-01-screenshot-01.png" alt="" height="300"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 11.1</strong> Screenshots of Program 1 (a) when the fancy vertex shader is selected and (b) when the simple vertex shader is selected.</figcaption>
     </figure>
   
     <p>In Chapter 9, we studied vertex shaders that just pass a vertex attribute as its output. The "simple vertex shader" that is emplobyed when the second radio button is clicked is just like one of these shaders. The source code in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-01/src/vertex-shader-simple.vert"><code>vertex-shader-simple.vert</code></a> file is reproduced below.</p>
@@ -182,8 +191,17 @@ void main() {
     </p>
 
     <figure class="figure">
-      <b>TODO: Create the figure.</b>
-      <figcaption class="figure-caption"><strong>Figure 11.2</strong> Screenshots of Program 2.</figcaption>
+      <table>
+        <tr>
+          <td><a href="images/program-02-screenshot-00.png"><img src="images/program-02-screenshot-00.png" alt="" height="300"></a></td>
+          <td><a href="images/program-02-screenshot-01.png"><img src="images/program-02-screenshot-01.png" alt="" height="300"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 11.2</strong> Screenshots of Program 2 (a) when the fancy vertex shader is selected and (b) when the simple vertex shader is selected.</figcaption>
     </figure>
 
     <p>Like Program 1, Program 2 draws <code>LINES</code> primitives and has two vertex shaders, the simple and the fancy ones. The simple one, located in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-02/src/vertex-shader-simple.vert"><code>vertex-shader-simple.vert</code></a> is exactly the same as that of Program 1. However, it draws a slightly different picture because the vertex data are prepared differently. The <a href="https://github.com/pkhungurn/cg-book-code/blob/d400a3407dece293ecbbe8d8a0afd5b0139fbd78/chapter-11/program-02/src/index.js#L26"><code>createBuffers</code></a> function of the <a href="https://github.com/pkhungurn/cg-book-code/blob/d400a3407dece293ecbbe8d8a0afd5b0139fbd78/chapter-11/program-02/src/index.js#L11"><code>WebGLApp</code></a> class contains the snippet:</p>
@@ -214,6 +232,24 @@ void main() {
     <p>We can see that the vertex shader uses $a = 0.2$, and this results in the cardioid being of the size you see in Figure 11.2(a). To make the program brief, we define the variable <code>theta</code> to store the value $2\pi t$, and the rest of the code is straightforward.</p>
 
     <h2>11.3 &nbsp; Program 3: Drawing a Circle</h2>
+
+    <p>In the last program for this chapter, we will how we can use a vertex shader to transform a mesh from a square to a circle. The resulting circle can be seen in Figure 11.3(a). It is not a result of preparing a mesh whose vertex positions form a circular shape, but it is the result of rendering the square mesh in Figure 11.3(b) and having the vertex shader transforming the vertex positions so that they form a circle instead.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-03-screenshot-00.png"><img src="images/program-03-screenshot-00.png" alt="" height="300"></a></td>
+          <td><a href="images/program-03-screenshot-01.png"><img src="images/program-03-screenshot-01.png" alt="" height="300"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 11.3</strong> Screenshots of Program 3 (a) when the fancy vertex shader is selected and (b) when the simple vertex shader is selected.</figcaption>
+    </figure>
+
+    <p>The first thing to study is how the square mesh is prepared. This is in the <a href="https://github.com/pkhungurn/cg-book-code/blob/76940d1f2a6d968dafca4e14426424971748665c/chapter-11/program-03/src/index.js#L26"><code>createBuffers</code></a> method of the <a href="https://github.com/pkhungurn/cg-book-code/blob/76940d1f2a6d968dafca4e14426424971748665c/chapter-11/program-03/src/index.js#L11"><code>WebGLApp</code></a> class in Program 3's <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-03/src/index.js"></a><code>index.js</code> file. The method has two parts: the first part prepares the vertex buffer, and the second part prepares the index buffer.</p>    
 
     <hr>
     <p>
