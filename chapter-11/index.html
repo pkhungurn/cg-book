@@ -183,11 +183,11 @@ void main() {
         y
       \end{bmatrix}
       &= \begin{bmatrix}
-        2r \big(1 - \cos t) \cos t \\
-        2r \big(1 - \cos t) \sin t
+        2r \big(1 - \cos (2\pi t)\big) \cos (2\pi t) \\
+        2r \big(1 - \cos (2\pi t)\big) \sin (2\pi t)
       \end{bmatrix}
     \end{align*}
-    where $t \in [0, 2\pi]$, and $r$ is the "size" of the curve, which controls how large the curve is. We can see what it looks like in Program 2's screenshots.
+    where $t \in [0, 1]$, and $r$ is the "size" of the curve, which controls how large the curve is. We can see what it looks like in Program 2's screenshots.
     </p>
 
     <figure class="figure">
@@ -249,7 +249,46 @@ void main() {
       <figcaption class="figure-caption"><strong>Figure 11.3</strong> Screenshots of Program 3 (a) when the fancy vertex shader is selected and (b) when the simple vertex shader is selected.</figcaption>
     </figure>
 
-    <p>The first thing to study is how the square mesh is prepared. This is in the <a href="https://github.com/pkhungurn/cg-book-code/blob/76940d1f2a6d968dafca4e14426424971748665c/chapter-11/program-03/src/index.js#L26"><code>createBuffers</code></a> method of the <a href="https://github.com/pkhungurn/cg-book-code/blob/76940d1f2a6d968dafca4e14426424971748665c/chapter-11/program-03/src/index.js#L11"><code>WebGLApp</code></a> class in Program 3's <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-03/src/index.js"></a><code>index.js</code> file. The method has two parts: the first part prepares the vertex buffer, and the second part prepares the index buffer.</p>    
+    <h3>11.3.1 &nbsp; Preparing the Square Mesh</h3>
+
+    <p>The first thing to study is how the square mesh is prepared. This is in the <a href="https://github.com/pkhungurn/cg-book-code/blob/76940d1f2a6d968dafca4e14426424971748665c/chapter-11/program-03/src/index.js#L26"><code>createBuffers</code></a> method of the <a href="https://github.com/pkhungurn/cg-book-code/blob/76940d1f2a6d968dafca4e14426424971748665c/chapter-11/program-03/src/index.js#L11"><code>WebGLApp</code></a> class in Program 3's <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-03/src/index.js"></a><code>index.js</code> file. The method has two parts: the first part prepares the vertex buffer, and the second part prepares the index buffer. The method is quite long, so we summarize it, commenting out the long <code>for</code> loops below.</p>
+    
+<pre><code class="language-c">createBuffers() {
+  let N = 17;
+
+  this.numVertices = N * N;
+  let vertexData = [];
+  /***** Prepare vertexData. *****/
+  this.vertexBuffer = createVertexBuffer(
+    this.gl, new Float32Array(vertexData));
+
+  this.numEdges = 0;
+  let indexData = [];
+  /***** Prepare indexData. *****/
+  this.indexBuffer = createIndexBuffer(
+    this.gl, new Int32Array(indexData));
+}
+</code></pre>
+
+    <p>We see in Figure 11(b) that the square mesh is actually divided into $16 \times 16$ smaller squares, so its width and its height are divided into 16 equal intervals. If you divide an interval into 16 subintervals, you need 17 distinct points to mark the starts and the ends of the intervals. Setting the variable <code>N</code> to $17$ reflects this fact. This also means that, in order to create a $16 \times 16$ wireframe, we need $17 \times 17 = N \times N$ vertices, and this is reflected in setting <code>this.numVertices = N *  N</code>. The code that is abbreviated as <code>/***** Prepare vertexData. *****/</code> is reproduced below.</p>
+
+<pre><code class="language-c">for (let i = 0; i &lt; N; i++) {
+    let y = i * 1.0 / (N - 1);
+    for (let j = 0; j &lt; N; j++) {
+        let x = j * 1.0 / (N - 1);
+        vertexData.push(x);
+        vertexData.push(y);
+    }
+}</code></pre>    
+
+    <p>We have two-level <code>for</code> loops where the first level iterates through $17$ $y$-coordinate values: $\frac{0}{16}, \frac{1}{16}, \cdots, \frac{16}{16}$.  For each of these $y$-coordinate value, the second-level <code>for</code> loop iterates through $17$ $x$-coordinate values: again, $\frac{0}{16}, \frac{1}{16}, \cdots, \frac{16}{16}$. Then, for each of these $x$-coordinate and $y$-coordinate value pairs, the coordinates are inserted into <code>vertexData</code> in that order, forming a complete vertex.</p>
+
+    <p>A few lines below this <code>for</code> loop, we create the index buffer, and we need to identify the vertices by their indices, i.e., the order they were inserted into <code>vertexData</code> if we were to start counting from $0$. We have that the vertex on the $i$th row (starting from $0$) from below and $j$th column (again, starting from $0$) from the left has index $iN + j$. This is a result of (1) inserting the vertices from bottom to top and left to right and (2) each row having $N$ vertices. The layout of the vertex indices are as follows.</p>
+
+    <figure class="figure">
+      <a href="images/program-03-vertex-indices.png"><img src="images/program-03-vertex-indices.png" alt="" width="450"></a>
+      <figcaption class="figure-caption"><strong>Figure 11.4</strong> Vertices of the square mesh with their indices.</figcaption>
+    </figure>
 
     <hr>
     <p>
