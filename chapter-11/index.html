@@ -290,6 +290,26 @@ void main() {
       <figcaption class="figure-caption"><strong>Figure 11.4</strong> Vertices of the square mesh with their indices.</figcaption>
     </figure>
 
+    <p>The next section of the method creates the index buffer. As we can see in the screenshots in Figure 11.3, Program 3 draws line segments, and it uses the <code>LINES</code> primtives to do so. A line segment that connects two vertices are often called an "edge." The <code>numEdges</code> field is supposed to store the number of edges for later reference. It is initialized to zero, and we will increment it as we add an edge to the index buffer in the <code>for</code> loop that follows. After initializing <code>numEdges</code>, we initialize the array <code>indexData</code> that serves as a temporary storage for vertex indices before they will be transfered to the GPU.</p>
+
+    <p>The most complicated part of the <code>createBuffers</code> method is the second nested <code>for</code> loops, which populates the <code>indexData</code> with vertex indices that form edges of the mesh we see in Figure 11.3(b). The mesh is made of $16 \times 16 = 256$ squares. Because each square 4 sides, and each side is an edge that connects two vertices, we will be adding $16 \times 16 \times 2 = 512$ vertex indices to <code>indexData</code>. We process the squares from bottom to top and left to right. Here, the counter <code>i</code> represents the index of the row, and the counter <code>j</code> indicates the index of the column.</p>
+
+<pre><code class="language-c">for (let i = 0; i &lt; N - 1; i++) {
+  for (let j = 0; j &lt; N - 1; j++) {
+    &lt; Body of the 2nd for loop. &gl;
+  }
+}</code></pre>
+
+    <p>In the body of the 2nd for loop, we first calculate 4 vertex indices: <code>i00</code>, <code>i01</code>, <code>i10</code>, and <code>i11</code>. The character <code>i</code> is a shorthand for "index." The second character in the name reflects whether $1$ is added to <code>i</code> in the calculation or not, and the second number reflects whether $1$ is added to <code>j</code>.</p>
+
+<pre><code class="language-c">let i00 = i * N + j;
+let i10 = i * N + (j + 1);
+let i11 = (i + 1) * N + (j + 1);
+let i01 = (i + 1) * N + j;
+</code></pre>
+
+    <p>The indices are calculate in such a way that they correspond to the indices of the four vertices of the square that are on the $i$th (zero-based) row from the bottom and the $j$th (zero-based) column from the left.</p>
+
     <hr>
     <p>
       <a href="../chapter-10/index.html"><<</a>
