@@ -249,7 +249,7 @@ void main() {
       <figcaption class="figure-caption"><strong>Figure 11.3</strong> Screenshots of Program 3 (a) when the fancy vertex shader is selected and (b) when the simple vertex shader is selected.</figcaption>
     </figure>
 
-    <h3>11.3.1 &nbsp; Preparing the Square Mesh</h3>
+    <h3>11.3.1 &nbsp; Preparing the square mesh</h3>
 
     <p>The first thing to study is how the square mesh is prepared. This is in the <a href="https://github.com/pkhungurn/cg-book-code/blob/76940d1f2a6d968dafca4e14426424971748665c/chapter-11/program-03/src/index.js#L26"><code>createBuffers</code></a> method of the <a href="https://github.com/pkhungurn/cg-book-code/blob/76940d1f2a6d968dafca4e14426424971748665c/chapter-11/program-03/src/index.js#L11"><code>WebGLApp</code></a> class in Program 3's <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-03/src/index.js"></a><code>index.js</code> file. The method has two parts: the first part prepares the vertex buffer, and the second part prepares the index buffer. The method is quite long, so we summarize it, commenting out the long <code>for</code> loops below.</p>
     
@@ -292,7 +292,7 @@ void main() {
 
     <p>The next section of the method creates the index buffer. As we can see in the screenshots in Figure 11.3, Program 3 draws line segments, and it uses the <code>LINES</code> primtives to do so. A line segment that connects two vertices are often called an "edge." The <code>numEdges</code> field is supposed to store the number of edges for later reference. It is initialized to zero, and we will increment it as we add an edge to the index buffer in the <code>for</code> loop that follows. After initializing <code>numEdges</code>, we initialize the array <code>indexData</code> that serves as a temporary storage for vertex indices before they will be transfered to the GPU.</p>
 
-    <p>The most complicated part of the <code>createBuffers</code> method is the second nested <code>for</code> loops, which populates the <code>indexData</code> with vertex indices that form edges of the mesh we see in Figure 11.3(b). The mesh is made of $16 \times 16 = 256$ squares. Because each square 4 sides, and each side is an edge that connects two vertices, we will be adding $16 \times 16 \times 2 = 512$ vertex indices to <code>indexData</code>. We process the squares from bottom to top and left to right. Here, the counter <code>i</code> represents the index of the row, and the counter <code>j</code> indicates the index of the column.</p>
+    <p>The most complicated part of the <code>createBuffers</code> method is the second nested <code>for</code> loops, which populates the <code>indexData</code> with vertex indices that form edges of the mesh we see in Figure 11.3(b). The mesh is made of $16 \times 16 = 256$ squares. Because each square 4 sides, and each side is an edge that connects two vertices, we will be adding $16 \times 16 \times 4 \times 2 = 2048$ vertex indices to <code>indexData</code>. We process the squares from bottom to top and left to right. Here, the counter <code>i</code> represents the index of the row, and the counter <code>j</code> indicates the index of the column.</p>
 
 <pre><code class="language-c">for (let i = 0; i &lt; N - 1; i++) {
   for (let j = 0; j &lt; N - 1; j++) {
@@ -309,6 +309,81 @@ let i01 = (i + 1) * N + j;
 </code></pre>
 
     <p>The indices are calculate in such a way that they correspond to the indices of the four vertices of the square that are on the $i$th (zero-based) row from the bottom and the $j$th (zero-based) column from the left.</p>
+
+    <figure class="figure">
+      <b>TODO: Add a figure to explain the indices.</b>
+      <figcaption class="figure-caption"><strong>Figure 11.5</strong> The indices computed in the body of the 2nd for loop.</figcaption>
+    </figure>
+
+    <p>Then, we add 4 edges to <code>indexData</code>.</p>
+
+<pre><code class="language-c">indexData.push(i00);
+indexData.push(i01);
+
+indexData.push(i01);
+indexData.push(i11);
+
+indexData.push(i11);
+indexData.push(i10);
+
+indexData.push(i10);
+indexData.push(i00);</code></pre>
+
+    <p>The edges the bottom, right, top, and left edge of the squares, respectively.</p>
+
+    <figure class="figure">
+      <b>TODO: Add a figure to explain the indices.</b>
+      <figcaption class="figure-caption"><strong>Figure 11.6</strong> The edges added to <code>indexData</code> in the body of the 2nd <code>for</code> loop.</figcaption>
+    </figure>
+
+    <p>After we add the vertex indices, we update the <code>numEdges</code> field by adding 4 to it. The next command then creates an index buffer out of the array, and this complete our prepartion of the index buffer.</p>
+
+    <h3>11.3.2 &nbsp; Drawing the mesh</h3>
+
+    <p>As usual, the mesh is drawn in the <code>updateWebGL</code> method. However, this time, a vertex's data consists of 2 numbers, so we need to the arguments to the <code>setupVertexAttribute</code> function appropriately. We also use the <code>numEdges</code> field to compute the number of vertices in the index buffer.</p>
+
+<pre><code class="language-c">useProgram(this.gl, program, () => {
+  setupVertexAttribute(self.gl, program, "position", self.vertexBuffer, 2, 2 * 4, 0);
+  drawElements(self.gl, self.indexBuffer, self.gl.LINES, self.numEdges * 2, 0);
+});</code></pre>
+
+    <p>The vertex shader used to draw the mesh is chosen according to the radio button. The simple vertex shader is, again, located in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-03/src/vertex-shader-simple.vert"><code>vertex-shader-simple.vert</code></a>, and it reads:</p>
+
+<pre><code class="language-c">#version 300 es
+
+in vec2 position;
+
+void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+}</code></pre>
+
+    <p>The shader simply copies the vertex data to the first two components of the output clip space coordinates. This results in the square mesh in Figure 11.3(b) because the vertex buffer and the index buffer were prepared so yield such a result.</p>
+
+    <p>The intesting thing about Program 3 is that, when the fancy shader is used, the square becomes as circle without the need to alter the underlying mesh data. The source code of the fancy shader is located in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-11/program-03/src/vertex-shader-fancy.vert"><code>vertex-shader-fancy.vert</code></a>, and we reproduce it below.</p>
+
+<pre><code class="language-c">#version 300 es
+
+const float PI = 3.14159265359;
+
+in vec2 position;
+
+void main() {
+  float s = position.s;
+  float t = position.t;
+  float r = sqrt(s) * 0.8;
+  float x = r * cos(2.0 * PI * t);
+  float y = r * sin(2.0 * PI * t);
+  gl_Position = vec4(x, y, 0.0, 1.0);
+}</code></pre>
+
+    <p>We see that the shader first reads the vertex position's first and second coordinates into the <code>s</code> and <code>t</code> variables, respectively. It then transforms the coordinates $(s,t)$ into $(x,y)$ as follows:</p>
+
+    \begin{align*}
+      x &= 0.8 \sqrt{s} \cos(2\pi t) \\
+      y &= 0.8 \sqrt{s} \sin(2\pi t)
+    \end{align*}
+
+    <p>We can see that we convert $t$, which has values in the interval $[0,1]$, into an angle $2 \pi t$, which has value in the range $[0,2\pi]$. The shape of the circle comes from the fact that the $x$-coordinate contains $\cos(2\pi t)$ and that the $y$-coordinate contains $\sin(2\pi t)$. We then use the angle $2\pi t$ to compute the $x$- and $y$-coordinates of the unit circle: $\big( \cos(2\pi t), \sin(2\pi t) \big)$. Next, we scale the unit circle coordinates with the radius $0.8 \sqrt{s}$ to calculate $(x,y)$. Because there are $17$ different values for $s$ in the range $[0,1]$, we end up creating $17$ levels of circles whose radii range from $0$ to $0.8$. We then copy $(x,y)$ into the first two components of the output clip space coordinates in the last line of the <code>main</code> function. As a result, the square in Figure 11.3(b) becomes the circle in Figure 11.3(a).</p>
 
     <hr>
     <p>
