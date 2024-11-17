@@ -385,6 +385,50 @@ void main() {
 
     <p>We can see that we convert $t$, which has values in the interval $[0,1]$, into an angle $2 \pi t$, which has value in the range $[0,2\pi]$. The shape of the circle comes from the fact that the $x$-coordinate contains $\cos(2\pi t)$ and that the $y$-coordinate contains $\sin(2\pi t)$. We then use the angle $2\pi t$ to compute the $x$- and $y$-coordinates of the unit circle: $\big( \cos(2\pi t), \sin(2\pi t) \big)$. Next, we scale the unit circle coordinates with the radius $0.8 \sqrt{s}$ to calculate $(x,y)$. Because there are $17$ different values for $s$ in the range $[0,1]$, we end up creating $17$ levels of circles whose radii range from $0$ to $0.8$. We then copy $(x,y)$ into the first two components of the output clip space coordinates in the last line of the <code>main</code> function. As a result, the square in Figure 11.3(b) becomes the circle in Figure 11.3(a).</p>
 
+    <h2>11.4 &nbsp; Summary</h2>
+
+    <ul>
+      <li>A vertex shader's function is to transform vertex data. 
+        
+      <li>An important piece of vertex data is a vertex's position. This means that a vertex shader can move vertices around and transform one shape to another.</li>
+
+      <li>In Program 1, we use a vertex shader to graph a 1D function. In our case, a sine function.
+      <ul>
+        <li>This is done by preparing a vertex buffer that contains equally spaced real numbers inside an interval. In our case, we prepare numbers in the $[-1,1]$ interval.</li>
+
+        <li>Let $t$ be a number in the above interval. Having the vertex shader outputs an NDC of the form $(t, f(t))$ allows us to plot any 1D function.</li>
+      </ul>
+      </li>
+
+      <li>In Program 2, we use a vertex shader to graph a plane curve that is a function of a single variable.
+      <ul>
+        <li>The program works similar to Program 1. We prepare equally spaced real number from in an interval. In Program 2's case, we prepare numbers in the $[0,1]$ interval.</li>
+
+        <li>Again, let $t$ be a number in the above interval. Having the vertex shdaer outputs an NDC of the form $(f(t), g(t))$ allows us to plot any plane curve of a single variable.</li>
+      </ul>
+      </li>
+
+      <li>In Program 3, we use a vertex shader to transform one shape (a square) to another shape (a circle).
+      <ul>
+        <li>We prepare a mesh of the square $[0,1] \times [0,1]$ where each side is divided into 16 equal intervals, resulting in $16 \times 16$ smaller squares.</li>
+
+        <li>Let a $(s,t)$ be a vertex of the square above. We interpret $t$ as an angle of rotation $$\theta = 2\pi t$$ and $s$ the radius of a circle $$r = 0.8 \sqrt{s}.$$ We then use the polar coordinate transform
+        \begin{align*}
+          \begin{bmatrix}
+            x \\ y
+          \end{bmatrix}
+          = \begin{bmatrix}
+            r \cos \theta \\
+            r \sin
+          \end{bmatrix}
+        \end{align*}
+        to construct the circle.
+        </li>
+      </ul>
+      </li>
+
+      <li>The programs in this chapter gives an example on how a vertex shader can be used to render complex shadpes.</li>
+    </ul>
     <hr>
     <p>
       <a href="../chapter-10/index.html"><<</a>
