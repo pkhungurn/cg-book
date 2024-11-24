@@ -74,6 +74,11 @@
     <h1>12 &nbsp; Uniform variables</h1>
     <hr>
 
+    <p>In this last chapter, we saw examples on how vertex shaders can be used to render more complex shapes by transforming simple shapes. One thing that should become clear is that a GLSL program can only transform shapes that are passed to them through vertex and index buffers. The data that are to be stored in these buffers are prepared first by the Javascript part of our application, which we shall call the <b>host program</b>. They are then stored in the computer's main memory (i.e., RAM). Then, the host program transfers the data to the buffers, which reside in GPU memory. As a result, communication between the host program and the GLSL program is a crucial part of 3D application development with OpenGL.</p>
+
+    <p>So far, we have been using only one mechanism for communication between a host program and a GLSL program: buffers. Buffers are specialized for communicating vertex and index data, and they have many restrictions. GLSL programs do not have direct access to data inside index buffers. A vertex shader can access data inside vertex buffers, but a fragment shader cannot. However, there are two more such mechanisms: uniform variables and textures. This chapter discuss the former, but the reader would have to wait until Chapter XXX for a discussion of the latter.</p>
+
+    <p>A <b>uniform variable</b> is a piece of GPU memory for storing a small piece of information, which can be directly set by the host program. Unlike buffers, both vertex shaders and fragment shaders have access to uniform variables. As a result, uniform variables can serve as "global" variables for GLSL programs.</p>
     
     <hr>
     <p>
