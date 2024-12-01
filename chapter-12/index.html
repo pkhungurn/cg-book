@@ -78,7 +78,70 @@
 
     <p>So far, we have been using only one mechanism for communication between a host program and a GLSL program: buffers. Buffers are specialized for communicating vertex and index data, and they have many restrictions. GLSL programs do not have direct access to data inside index buffers. A vertex shader can access data inside vertex buffers, but a fragment shader cannot. However, there are two more such mechanisms: uniform variables and textures. This chapter discuss the former, but the reader would have to wait until Chapter XXX for a discussion of the latter.</p>
 
-    <p>A <b>uniform variable</b> is a piece of GPU memory for storing a small piece of information, which can be directly set by the host program. Unlike buffers, both vertex shaders and fragment shaders have access to uniform variables. As a result, uniform variables can serve as "global" variables for GLSL programs.</p>
+    <p>A <b>uniform variable</b> is a piece of GPU memory for storing a small piece of information, which can be directly set by the host program. Unlike buffers, both vertex shaders and fragment shaders have access to uniform variables. Both shaders would see the same value when referencing the same uniform variable, and this is why it is called "uniform." Moreover, the shaders cannot change the value themsevles, so this value would remain constant until the host program rewrites the variable. As a result, uniform variables can serve as "global" variables for GLSL programs.</p>
+
+    <p>In this chapter, we will how to declare and manipulate uniform variables with both GLSL and Javascript. We start with a simple program where uniform variables are used to communicate user inputs to GLSL programs. We will then see how to manipulate uniform variables so that they change with time, and this would allow use to create simple animations. Lastly, we will study uniform variables that have array types, which would allow us to transfer a larger chunk of data to GLSL programs.</p>
+
+    <h2>12.1 &nbsp; Program 1: Basic usage of uniform variables</h2>
+
+    <p>Program 1's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-12/program-01"><tt>chapter-12/program-01</tt></a> directory of the code repository. Its screenshots are shown in Figure 12.1.</p>
+
+    <figure class="figure">
+      <b>TODO: Capture screenshots of Program 1</b>
+      <figcaption class="figure-caption"><strong>Figure 12.1</strong> Screenshots of Program 1 (a) when it is started afresh (b) when the color sliders are manipulated, and (c) when the "phase," "peroid," and "amplitude" sliders are manipulated.</figcaption>
+    </figure>
+
+    <p>Program 1 draws a sine curve on its canvas. The curve's color and shape can be control by the 6 sliders in the web page. The first three sliders are used to pick the RGB color of the sine curve. The next three sliders control the phase, period, and amplitude of the curve, respectively.</p>
+
+    <p>Recall that this is not the first time we control what appears on the screen with UI elements. In Program 4 of Chapter 8, we control the color of the canvas through sliders. Moreover, just in the last chapter, we choose what shapes appear in canvases through radio boxes. However, the mechanism used to change the canvas in these programs do not require any information to be passed from the host program to the GLSL shader. In Program 4 of Chapter 8, we use the slider values as arguments to <code>gl.clearColor</code>, a Javascript method. In the last chapters, we use the radio boxes' values to choose which GLSL program to use, and this process is carried out entirely in Javascript. In this chapter, though, we explicitly pass information from UI elements (i.e., the sliders) to the GLSL program, and let the program process the information itself.</p>
+
+    <h3>12.1.1 &nbsp; Declaring and using uniform variables in GLSL</h3>
+
+    <p>As said earlier, the mechanism we use to pass information from host to GLSL in this chapter is the uniform variable. Let's see first hand how they are declared and used in the shaders of our program. We will start with the easier one, the fragment shader, whose source code is reproduced in full below.</p>
+
+<pre><code class="language-c">#version 300 es
+
+precision highp float;
+
+out vec4 fragColor;
+
+uniform vec3 color;
+
+void main() {
+    fragColor = vec4(color, 1.0);
+}</code></pre>
+
+    <p>The code above is very similar to those of the fragment shaders in the last chapter. There are two main differences. The first is that there is a new variable called <code>color</code> declared with the <code>uniform</code> keyword.</p>
+
+<pre><code class="language-c">uniform vec3 color;</code></pre>
+
+    <p>As you may guess, this is the uniform variable in question. It is just a variable declared with the keyword <code>uniform</code> in front of the data type of the variable. One important thing to note is that a uniform variable <b>must be declared outside any functions</b>. This makes sense because a uniform variable is supposed to be a global variable that should be accessible from any functions, so its scope should be the entire program, not just inside a particular function. Once declared, the uniform variable can be used inside any functions. However, remember that a uniform variable is read only, so one should not assign any value to it. In our fragment shader, we use the RGB values stored in the <code>color</code> variable to fill the first 3 components of the output fragment color.</p>
+
+    <p>Next, we look at the vertex shader, which is a little more complicated because it has three uniform variables instead of one.</p>
+
+<pre><code class="language-c">#version 300 es
+
+const float PI = 3.14159265359;
+
+in float t;
+
+uniform float amplitude;
+uniform float period;
+uniform float phase;
+
+void main() {
+    float x = t;
+    float y = amplitude * sin(2.0 * PI * t /period + phase);
+    gl_Position = vec4(x, y, 0.0, 1.0);    
+}</code></pre>
+
+    <h3>12.1.2 &nbsp; Manipulating uniform variables in Javascript</h3>
+
+    <h2>12.2 &nbsp; Program 2: Using a uniform variable to create a rotating pentagon</h2>
+
+    <h2>12.3 &nbsp; Program 3: Using uniform variables to animate a boucing ball</h2>
+
+    <h3>12.4 &nbsp; Program 4: Using an array of uniform variables to animate multiple boucing balls</h3>
     
     <hr>
     <p>
