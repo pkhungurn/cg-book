@@ -177,6 +177,26 @@ let amplitudeLocation = self.gl.getUniformLocation(self.program, "amplitude");
 self.gl.uniform1f(amplitudeLocation, amplitude);
 </code></pre>
 
+    <p>Assigning value to a uniform variable involves two steps. The first is to find the "location" of the uniform variable. Here, a location is just a unique identifier that can be used to refer to the variable at a later time. It can be fetched by the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getUniformLocation"><code>getUniformLocation</code></a> method of the WebGL context. The method requires two inputs. The first is the object representing the GLSL program that contains the uniform variable, and the second is the name of the variable as declared in either the vertex and/or fragment shader.</p>
+
+    <p>The second step is to assign the value with a method of the WebGL context whose name is of the form <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/uniform"><code>uniformXXX</code></a> where <code>XXX</code> depends on the type of the uniform variable in question. For non-array types, the rule for the name is quite simple. <code>XXX</code> has two characters.</p>
+
+    <ul>
+      <li>The first character is either <code>1</code>, <code>2</code>, <code>3</code>, or <code>4</code>, and it indicates how many numbers the data type can store.</li>
+      <li>The second character is either <code>i</code> or <code>f</code>, and it indicates the type of each number stored in the data type: <code>i</code> is for integer, and <code>f</code> is for floating point.</li>
+    </ul>
+
+    <p>In our case, the <code>amplitude</code> uniform variable is of type <code>float</code>, which means the type can only hold one floating point number. Thus, the appropriate method to use is <code>uniform1f</code>. This method takes two arguments. The first is the location of the uniform variable, which we just fetched in the last step, and the second is the floating point value we want to assign.</p>
+
+    <p>Because the <code>period</code> and <code>phase</code> uniform variables are also of type <code>float</code>, we deal with these variables the same way we deal with <code>amplitude</code>.</p>
+
+<pre><code class="language-c">let periodLocation = self.gl.getUniformLocation(self.program, "period");
+self.gl.uniform1f(periodLocation, period);
+
+let phaseLocation = self.gl.getUniformLocation(self.program, "phase");
+self.gl.uniform1f(phaseLocation, phase);
+</code></pre>
+
     <h2>12.2 &nbsp; Program 2: Using a uniform variable to create a rotating pentagon</h2>
 
     <h2>12.3 &nbsp; Program 3: Using uniform variables to animate a boucing ball</h2>
