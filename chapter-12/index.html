@@ -115,7 +115,7 @@ void main() {
 
 <pre><code class="language-c">uniform vec3 color;</code></pre>
 
-    <p>As you may guess, this is the uniform variable in question. It is just a variable declared with the keyword <code>uniform</code> in front of the data type of the variable. One important thing to note is that a uniform variable <b>must be declared outside any functions</b>. This makes sense because a uniform variable is supposed to be a global variable that should be accessible from any functions, so its scope should be the entire program, not just inside a particular function. Once declared, the uniform variable can be used inside any functions. However, remember that a uniform variable is read only, so one should not assign any value to it. In our fragment shader, we use the RGB values stored in the <code>color</code> variable to fill the first 3 components of the output fragment color.</p>
+    <p>As you may guess, this is the uniform variable in question. It is just a variable declared with the keyword <code>uniform</code> in front of the data type of the variable. One important thing to note is that a uniform variable <b>must be declared outside any functions</b>. This makes sense because a uniform variable is supposed to be a global variable that should be accessible from any functions. So, its scope should be the entire program, not just inside a particular function. However, remember that a uniform variable is read only, so one should not assign any value to it. In our fragment shader, we use the RGB values stored in the <code>color</code> variable to fill the first 3 components of the output fragment color.</p>
 
     <p>Next, we look at the vertex shader, which is a little more complicated because it has three uniform variables instead of one.</p>
 
@@ -135,7 +135,47 @@ void main() {
     gl_Position = vec4(x, y, 0.0, 1.0);    
 }</code></pre>
 
+    <p>We can see creates a sine curve by plotting points $(x,y)$ where
+    \begin{align*}
+      x &= t, \\
+      y &= \mathrm{amplitude} \times \sin\bigg(\frac{2\pi t}{\mathrm{period}} + \mathrm{phase}\bigg).
+    \end{align*}
+    Here the <code>amplitude</code>, <code>period</code>, and <code>phase</code> variables are uniform variables whose types are <code>float</code>. The names of the variables speak for themselves. The <code>amplitude</code> controls how tall the sine curve is. The <code>period</code> controls with width of one copy of the sine wave. Lastly, the <code>phase</code> controls the horizontal position of where a copy of the sine curve begins.
+    </p>
+
     <h3>12.1.2 &nbsp; Manipulating uniform variables in Javascript</h3>
+
+    <p>It is not enough to modify the GLSL code to declare and use uniform variables. We must change our Javascript code so that it becomes aware of them and assign their values. The code that manipulates uniform variables is in the <a href="https://github.com/pkhungurn/cg-book-code/blob/d06742a0902d97fd738fbc969a2e2c0f077338f3/chapter-12/program-01/src/index.js#L72"><code>updateWebGL</code></a> method in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-12/program-01/src/index.js"><code>index.js</code></a> file. Let us start with how to assign a value to the <code>amplitude</code> uniform variable. The first thing we do is to fetch the value to assign from a slider.</p>
+
+<pre><code class="language-c">let amplitude = this.amplitudeSlider.slider("value") / 1000.0;</code></pre>
+
+    <p>Here, the <code>amplitudeSlider</code> is a JQuery UI slider that was prepared in the <a href="https://github.com/pkhungurn/cg-book-code/blob/d06742a0902d97fd738fbc969a2e2c0f077338f3/chapter-12/program-01/src/index.js#L21"><code>createUi</code></a> method. How the slider came about is not important as the important thing is that we need a way to figure out what to assign to the uniform variable.</p>
+
+    <p>Before we can assign a value to a uniform variable, we need to use the GLSL program that the uniform variable is a part of. So, next part of the <code>updateWebGL</code> method looks like the following.</p>
+
+<pre><code class="language-c">useProgram(this.gl, this.program, () => {
+  //
+  // Assigning values to uniform variables.
+  //
+
+  setupVertexAttribute(
+    self.gl, self.program, "t", self.vertexBuffer, 1, 4, 0);
+  drawElements(
+    self.gl, self.indexBuffer, self.gl.LINES, (self.numVertices-1)*2, 0);
+});</code></pre>
+
+    <p>We see that the code uses the <code>useProgram</code> function that we learned about in <a href="../chapter-09/index.html#resource-management">Section 9.4.1</a>. All the manipulation of the uniform variables are done inside the closure that we give the <code>useProgram</code> function as an input. Moreover, notice that the segment that assign uniform variable comes before the last two statements, which draw primitives. This makes sense because uniform variables can affect the shape and appearance of the primitives being drawn, so we must assign them before drawing.</p>
+
+    <p>The segment that assigns values to uniform variables is quite long because we have four variables (<code>rgb</code>, <code>amplitude</code>, <code>period</code>, and <code>phase</code>) to take care of. However, assigning a uniform variable only involves two lines of code. We reproduce the piece of code that assigns the <code>amplitude</code> variable below.</p>
+
+<pre><code class="language-c">// ******************
+// * Using uniforms *
+// ******************
+// Step 1: Get its location.
+let amplitudeLocation = self.gl.getUniformLocation(self.program, "amplitude");
+// Step 2: Set its value using the right function.
+self.gl.uniform1f(amplitudeLocation, amplitude);
+</code></pre>
 
     <h2>12.2 &nbsp; Program 2: Using a uniform variable to create a rotating pentagon</h2>
 

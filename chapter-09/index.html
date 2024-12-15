@@ -110,7 +110,7 @@
 
     <p>What happen under the hood is that, at any given time, a WebGL application either "use" a WebGL program or does not use any. Here, when a GLSL program is used, the graphics pipeline is customized according to what is written in the program's code. Our WebGL application starts up, it creates two WebGL programs called "program0" and "program1." It then immediately uses "program0," and it changes the program it uses according to the value of the combo box, which can be changed by the user. However, the application only uses the program, but it does not draw any primitives. So, we cannot see anything on the canvas at all. (We will start putting things on the canvas from Program 2 onward. Please be patient.)</p>
 
-    <a name="#glsl-programs"></a>
+    <a name="glsl-programs"></a>
     <h3>9.1.1 &nbsp; GLSL programs</h3>
 
     <p>As previously discussed in Chapter 7, A GLSL program in the context of WebGL 2.0 is made up of two shaders: a vertex shader and a fragment shaders. Program 1 has three shaders: a vertex shaders whose source code is in <a href="https:/https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/vertex-shader.vert"><code>vertex-shader.vert</code></a> and two fragment shaders whose source code is in <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/fragment-shader-0.frag"><code>fragment-shader-0.frag</code></a> and <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-09/program-01/src/fragment-shader-1.frag"><code>fragment-shader-1.frag</code></a>.  The two GLSL programs are created from the shaders as follows:</p>
@@ -827,6 +827,7 @@ gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);</code></pre>
 
     <p>In this section, we take a break from learning new WebGL functionality and take time to reorganize the code of Program 3 so that we can program more easily later. The code we have been studying so far has been written to be pedagogical. It is simple and has all relevant steps in the same place for easy reading. However, it has problems with resource management, abstraction, and variable management. We refactor Program 3 into Program 4 to solve these problems. Let us discuss what the problems are and solve them one by one.</p>
 
+    <a name="resource-management"></a>
     <h3>9.4.1 &nbsp; Resource management</h3>
 
     <p>You may have noticed that, in the previous three programs, there are many WebGL commands that come in pairs.</p>
