@@ -186,6 +186,69 @@ self.gl.uniform1f(amplitudeLocation, amplitude);
       <li>The second character is either <code>i</code> or <code>f</code>, and it indicates the type of each number stored in the data type: <code>i</code> is for integer, and <code>f</code> is for floating point.</li>
     </ul>
 
+    <p>As a result, the right methods to use for a number of types of uniform variables are as follows.</p>
+
+    <figure>
+      <table class="table table-bordered" style="border-color: black">
+        <tr>
+          <td><b>Uniform variable type</b></td>
+          <td><b>Element type</b></td>
+          <td><b>Number of elements</b></td>
+          <td><b>Method name</b></td>
+        </tr>
+        <tr>
+          <td><code>int</code></td>
+          <td><code>int</code></td>
+          <td>1</td>
+          <td><code>uniform1i</code></td>
+        </tr>
+        <tr>
+          <td><code>ivec2</code></td>
+          <td><code>int</code></td>
+          <td>2</td>
+          <td><code>uniform2i</code></td>
+        </tr>
+        <tr>
+          <td><code>ivec3</code></td>
+          <td><code>int</code></td>
+          <td>3</td>
+          <td><code>uniform3i</code></td>
+        </tr>
+        <tr>
+          <td><code>int</code></td>
+          <td><code>int</code></td>
+          <td>4</td>
+          <td><code>uniform4i</code></td>
+        </tr>
+        <tr>
+          <td><code>float</code></td>
+          <td><code>float</code></td>
+          <td>1</td>
+          <td><code>uniform1f</code></td>
+      </tr>
+      <tr>
+        <td><code>vec2</code></td>
+        <td><code>float</code></td>
+        <td>2</td>
+        <td><code>uniform2f</code></td>
+      </tr>
+      <tr>
+        <td><code>vec3</code></td>
+        <td><code>float</code></td>
+        <td>3</td>
+        <td><code>uniform3f</code></td>
+      </tr>
+      <tr>
+        <td><code>vec4</code></td>
+        <td><code>float</code></td>
+        <td>4</td>
+        <td><code>uniform4f</code></td>
+      </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Table 12.1</strong> Names of the <code>uniformXXX</code> method to be used for certain types of uniform variables.</figcaption>
+    </figure>
+
+
     <p>In our case, the <code>amplitude</code> uniform variable is of type <code>float</code>, which means the type can only hold one floating point number. Thus, the appropriate method to use is <code>uniform1f</code>. This method takes two arguments. The first is the location of the uniform variable, which we just fetched in the last step, and the second is the floating point value we want to assign.</p>
 
     <p>Because the <code>period</code> and <code>phase</code> uniform variables are also of type <code>float</code>, we deal with these variables the same way we deal with <code>amplitude</code>.</p>
@@ -197,7 +260,32 @@ let phaseLocation = self.gl.getUniformLocation(self.program, "phase");
 self.gl.uniform1f(phaseLocation, phase);
 </code></pre>
 
-    <h2>12.2 &nbsp; Program 2: Using a uniform variable to create a rotating pentagon</h2>
+    <p>We deal with the <code>color</code> uniform variable slightly differently because it is of type <code>vec3</code> instead of <code>float</code>. As <code>vec3</code> stores 3 floating point numbers, the WebGL context method used to assign its value is <code>uniform3f</code> instead of <code>uniform1f</code>.</p>
+
+<pre><code class="language-c">let colorLocation = self.gl.getUniformLocation(self.program, "color");
+self.gl.uniform3f(colorLocation, color[0], color[1], color[2]);
+</code></pre>
+
+    <p>We can see that <code>uniform3f</code> takes 4 parameters instead of 2. The first parameter is still the location of the uniform variable, but 3 floating point values have to be supplied instead of 1. Here, we feed the three values in the <code>color</code> array that was prepared earlier in the <code>updateWebGL</code> function.</p>
+
+<pre><code class="language-c">let color = this.rgbSliders.map(s => s.slider("value") / 255);</code></pre>
+
+    <p>This line of code computes the <code>color</code> array by applying the closure that extracts the slider value and divides it by $255$ to the three sliders that correspond to the R, G, and B values that the user can specify.</p>
+
+    <p>There are 6 other methods in Table 12.1 that we have not seen actual usage. However, their usage follows the same rule that applies to <code>uniform1f</code> and <code>uniform3f</code>. The first argument is the location of the uniform variable. The method then takes $N$ extra arguments where $N$ is the number in the method name, and these are arguments are the values to be assigned to the components of the uniform variable.</p>
+
+    <h2>12.2 &nbsp; Program 2: Using a uniform variable to create a moving square</h2>
+
+    <p>In this section, we are going to study another important way to use uniform variables: animation. This principle is simple. We can use Javascript to keep track of how much time have passed since our program started. Then, we can use this information to change how primitives are rendered. This is done by passing the time or other information derived from it to GLSL programs. This section's program renders a square moving in a circular path at a constant angular speed. This source code of the program is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-12/program-02"><code>chapter-12/program-02</code></a> directory of the book's Github repository. Screenshots of the program are available below.</p>
+  
+    <figure class="figure">
+      <b>TODO: Capture screenshots of Program 2</b>
+      <figcaption class="figure-caption"><strong>Figure 12.2</strong> Screenshots of Program 2.</figcaption>
+    </figure>
+
+    <h3>12.2.1 &nbsp; The shaders</h3>
+
+    <h3>12.2.2 &nbsp; Time-dependent displacement</h3>
 
     <h2>12.3 &nbsp; Program 3: Using uniform variables to animate a boucing ball</h2>
 
