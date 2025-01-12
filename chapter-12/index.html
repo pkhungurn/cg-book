@@ -87,7 +87,18 @@
     <p>Program 1's source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-12/program-01"><tt>chapter-12/program-01</tt></a> directory of the code repository. Its screenshots are shown in Figure 12.1.</p>
 
     <figure class="figure">
-      <b>TODO: Capture screenshots of Program 1</b>
+      <table>
+        <tr>
+          <td><a href="images/program-01-screenshot-00.png"><img src="images/program-01-screenshot-00.png" alt="" width="200"></a></td>
+          <td><a href="images/program-01-screenshot-01.png"><img src="images/program-01-screenshot-01.png" alt="" width="200"></a></td>
+          <td><a href="images/program-01-screenshot-02.png"><img src="images/program-01-screenshot-02.png" alt="" width="200"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+          <td align="center">(c)</td>
+        </tr>
+      </table
       <figcaption class="figure-caption"><strong>Figure 12.1</strong> Screenshots of Program 1 (a) when it is started afresh (b) when the color sliders are manipulated, and (c) when the "phase," "peroid," and "amplitude" sliders are manipulated.</figcaption>
     </figure>
 
@@ -279,13 +290,44 @@ self.gl.uniform3f(colorLocation, color[0], color[1], color[2]);
     <p>In this section, we are going to study another important way to use uniform variables: animation. This principle is simple. We can use Javascript to keep track of how much time have passed since our program started. Then, we can use this information to change how primitives are rendered. This is done by passing the time or other information derived from it to GLSL programs. This section's program renders a square moving in a circular path at a constant angular speed. This source code of the program is available in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-12/program-02"><code>chapter-12/program-02</code></a> directory of the book's Github repository. Screenshots of the program are available below.</p>
   
     <figure class="figure">
-      <b>TODO: Capture screenshots of Program 2</b>
-      <figcaption class="figure-caption"><strong>Figure 12.2</strong> Screenshots of Program 2.</figcaption>
+      <table>
+        <tr>
+          <td><a href="images/program-02-screenshot-00.png"><img src="images/program-02-screenshot-00.png" alt="" width="300"></a></td>
+          <td><a href="images/program-02-screenshot-01.png"><img src="images/program-02-screenshot-01.png" alt="" width="300"></a></td>
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 12.2</strong> Screenshots of Program 2. The square moves in a circular path.</figcaption>
     </figure>
 
-    <h3>12.2.1 &nbsp; The shaders</h3>
+    <h3>12.2.1 &nbsp; How to keep track of time</h3>
 
-    <h3>12.2.2 &nbsp; Time-dependent displacement</h3>
+    <p>An animation is an image that moves. This means that it changes with time. Creating animation thus requires us to draw different images at different time. As a r esult, a program that creates an animation must be aware of time. In our case, we need to keep track of how much time has passed since the program begins because the exact time (say, 10:10AM) does not matter.</p>
+
+    <p>We keep track of time through the use of the method <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now"><code>performance.now</code> in the host Javascript code.</a> Here, <code>performance</code> is a global variable that comes with the Javascript language. The <code>now</code> method takes no arguments and returns the number of milliseconds since a time which is always before our Javascript program starts. The program has an infinite loop that keeps calling the <code>updateWebGL</code> method in order to repeatedly draw something on the WebGL canvas. As a result, if we call <code>performance.now</code> inside the <code>updateWebGL</code>, we can easily know the time (since the start time) that each interation of the loop is run.</p>
+
+    <p>As stated earlier, we will not use the time directly, but we will keep track of how much time has passed since the program started. To do so, we keep track of the last time the <code>updateWebGL</code> was called. This is stored in the <code>lastTime</code> field of the <code>WebGLApp</code> object that represents our application. We initialize the field in the constructor as follows.</p>
+
+<pre><code class="language-c">this.lastTime = performance.now();</code></pre>
+
+    <p>When an instance of <code>WebGLApp</code> is constructed, its <code>updateWebGL</code> method has not been called yet. As a result, we set <code>lastTime</code> field to a time returned from <code>performance.now</code> to get an arbitrary starting point. This point in time is not exactly where the program starts, but it should be pretty close. <p>We use another field called <code>elaspedTime</code> to store the time since the <code>lastTime</code> field was initialized. We initialize the field to $0$.</p>
+
+    <p>Inside the <code>updateWebGL</code> method, we need to update both fields so that <code>elapsedTime</code> has the correct value. The code to do so is as follows.</p>
+    
+<pre><code class="language-c">let currentTime = performance.now();
+let delta = currentTime - this.lastTime;   
+this.elaspedTime += delta;
+this.lastTime = currentTime;
+</code></pre>
+
+    <p>The logic of the above code is quite simple. We call <code>performance.now</code> to get the current time. We then subtract from it the <code>lastTime</code> field to get the number of milliseconds since last time the <code>updateWebGL</code> method was called. We add this value to the <code>elapsedTime</code> field to update its value. Then, we set the <code>lastTime</code> field to the current time so that we can use this value in the next iteration. The <code>elapsedTime</code> field now stores the number of milliseconds since the program starts, and it gets updated every time the <code>updateWebGL</code> method is executed.</p>
+
+    <h3>12.2.3 &nbsp; Time-dependent displacement</h3>
+
+    <p>One of the simplest form of animation is when an object continuously moves withouth changing its shape. The animation Program 2 shows is exactly this: a white square that moves in a circular path. To move is to change position. A <b>displacement</b> is a vector that represents a change in position. It is defined as:
+    \begin{align*}
+      \mathrm{displacement} = (\mathrm{new\ position}) - (\mathrm{old\ position}).
+    \end{align*}
+    </p>
 
     <h2>12.3 &nbsp; Program 3: Using uniform variables to animate a boucing ball</h2>
 
