@@ -327,7 +327,68 @@ this.lastTime = currentTime;
     \begin{align*}
       \mathrm{displacement} = (\mathrm{new\ position}) - (\mathrm{old\ position}).
     \end{align*}
+    Now, an object in our context is a mesh. A mesh is a collection of vertices that are connected together. Each vertex has a position, and it is stored in the mesh's vertex buffer. We often think of these positions as the vertices' "rest position" as they are the positions that define the shape of the object when it is not move or deformed. To move an object without changing its shape, we just have to move all vertices by the same displacement. In this way, all the relative distances between the vertices will be preserved. Mathematically, this is done by adding the displacement to the position of each vertex, and this is exactly what is done in the vertex shader of Program 2.
     </p>
+
+<pre><code class="language-c">#version 300 es
+
+in vec2 position;
+
+uniform vec2 displacement;
+
+void main() {
+    gl_Position = vec4(position + displacement, 0, 1);
+}</code></pre>
+
+    <p>Much like many GLSL programs have seen before, we use the <code>position</code> attribute variable to store vertex positions. What is new is the <code>displacement</code> uniform variable, which represents the displacement. We can see that what the vertex shader does is to add the displacement to the vertex position and output the result.</p>
+
+    <p>Now that we know how to move an object from its rest position to another position, we now need to figure out how to make the object's position change over time. This is easy: we only need to make the displacement changes over time. So, every time the screen is update, we need to set the <code>displacement</code> uniform variable to a new value. Let's look at the part of the <a href="https://github.com/pkhungurn/cg-book-code/blob/d334f114da0f590cb4c04e200604e45979a0e706/chapter-12/program-02/src/index.js#L45"><code>updateWebGL</code></a> method that does this.</p>
+
+<pre><code class="language-c">let angularPosition = 0.001 * this.elaspedTime;
+        
+let displacementX = 0.5 * Math.cos(angularPosition);
+let displacementY = 0.5 * Math.sin(angularPosition);
+
+useProgram(this.gl, this.program, () => {
+  let displacementLocation = self.gl.getUniformLocation(
+    self.program, "displacement");
+  self.gl.uniform2f(
+    displacementLocation, displacementX, displacementY);
+  
+    :
+    :
+    :
+});</code></pre>
+
+    <p>Because we want our square to move in a circular path, the displacement should be vectors from the center of a circle to points on the circumference of the circle. In case of unit circles, the vectors are given by
+    \begin{align*}
+      \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} \cos \theta \\ \sin \theta \end{bmatrix}
+    \end{align*}
+    where $\theta$ is an angle. As a result, we can our square to move in a circular path by changing the angle over time. This is basically what the Javascript code do in this code line:    
+    </p>
+
+<pre><code class="language-c">let angularPosition = 0.001 * this.elaspedTime;</code></pre>
+
+    <p>Here, <code>angularPosition</code> is the variable we use to represent the angle. As discussed in the last section, the field <code>elapsedTime</code> changes every time the <code>updateWebGL</code> method is called. The factor <code>0.001</code> is applied because <code>elapsedTime</code>'s unit is milliseconds, which means that using the value directly would make the square move 1 radian (about one sixth of a circle) per millisecond, which is too fast for our naked eyes to see. From <code>angularPosition</code>, the code computes the $x$- and $y$-componets of the displacement with:
+    \begin{align*}
+      \begin{bmatrix}
+        \mathrm{displacementX} \\ \mathrm{displacementY}
+      \end{bmatrix}
+      &= \begin{bmatrix}
+        0.5 \cos(\mathrm{angularPosition}) \\
+        0.5 \sin(\mathrm{angularPosition}) 
+      \end{bmatrix}.
+    \end{align*}
+    The number $0.5$ here is the radius of the circle we want our square to move on. Because the canvas corresponds to the rectangle $[-1,1] \times [-1,1]$, choosing the radius of $0.5$ will make the square's path fit inside the screen.
+    </p>
+
+    <p>Lastly, after the $x$- and $y$-components have been computed, we set the uniform variable <code>displacement</code> to these values with <code>glUniform2f</code>.</p>
+
+<pre><code language-c></code>let displacementLocation = self.gl.getUniformLocation(
+  self.program, "displacement");
+self.gl.uniform2f(
+  displacementLocation, displacementX, displacementY);
+</pre>
 
     <h2>12.3 &nbsp; Program 3: Using uniform variables to animate a boucing ball</h2>
 
