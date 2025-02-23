@@ -392,6 +392,30 @@ self.gl.uniform2f(
 
     <h2>12.3 &nbsp; Program 3: Using uniform variables to animate a boucing ball</h2>
 
+    <p>In the last section, we animate a rotating square that does not move, so we will create a more sophisticated animation in this section: one that involves a ball bouncing around the canvas. The source code of the program is availble in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-12/program-03"></a><code>chapter-12/program3</code> directory of the book's Github repository. Once you run the program, you will see a white circle moving along straight line paths and changing direction when it hits any one of the side of the screen.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-03-screenshot-00.png"><img src="images/program-03-screenshot-00.png" alt="" width="200"></a></td>
+          <td><a href="images/program-03-screenshot-01.png"><img src="images/program-03-screenshot-01.png" alt="" width="200"></a></td>
+          <td><a href="images/program-03-screenshot-02.png"><img src="images/program-03-screenshot-02.png" alt="" width="200"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+          <td align="center">(c)</td>
+        </tr>
+      </table
+      <figcaption class="figure-caption"><strong>Figure 12.3</strong> Screenshots of Program 3, showing a circular ball moving through the screen.</figcaption>
+    </figure>
+
+    <h3>12.3.1 &nbsp; Drawing a circle</h3>
+
+    <p>The animation in this section is more advanced that that in the last section because of two reasons. The first is that the movement is more complex: the ball moves and bounces of walls instead of rotating in place. The second is that the shape is more complex: a circle instead of a square. We shall deal with the shape in this section.</p>
+
+    <p>You may recall that we have written a program that draw a circle before in the last chapter. However, we will usea different method here. The idea is to approximate a circle with a collection of triangles. Each triangle has two of its vertices on the circumference of the circle, and the circle's center serves as the third vertex.</p>
+
     <h3>12.4 &nbsp; Program 4: Using an array of uniform variables to animate multiple boucing balls</h3>
     
     <hr>
