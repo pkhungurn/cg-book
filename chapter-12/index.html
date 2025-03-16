@@ -414,7 +414,55 @@ self.gl.uniform2f(
 
     <p>The animation in this section is more advanced that that in the last section because of two reasons. The first is that the movement is more complex: the ball moves and bounces of walls instead of rotating in place. The second is that the shape is more complex: a circle instead of a square. We shall deal with the shape in this section.</p>
 
-    <p>You may recall that we have written a program that draw a circle before in the last chapter. However, we will usea different method here. The idea is to approximate a circle with a collection of triangles. Each triangle has two of its vertices on the circumference of the circle, and the circle's center serves as the third vertex.</p>
+    <p>You may recall that we have written a program that draw a circle before in the last chapter. However, we will usea different method here. The idea is to approximate a circle with a collection of triangles. We call such a triangle a "slice," much like a slice of pizza or a slice of pie.  Each slice has two of its vertices on the circumference of the circle, and the circle's center serves as the third vertex.</p>
+
+    <figure class="figure">
+      <b>TODO: Create this figure.</b>
+      <figcaption class="figure-caption"><strong>Figure 12.4</strong> How to approximate a circle by breaking it down to triangular slices.</figcaption>
+    </figure>    
+
+    <p>You can see that the more slices we have, the more rounded our approximated circle will seem to the viewer. Here, we set the number of slices to 128 in the constructure of the <code>WebGLApp</code> class, and this is quite enough for the ball of radius $0.1$ that we will be drawing.</p>
+
+<pre class="language-c"><code>this.numSlices = 128;
+this.radius = 0.1;
+</code></pre>
+
+    <p>We need to write the <code>createBuffers</code> method, which creates the vertex and index buffers to be used later in the rendering loop. This means that we have to think about these vertices' positions and how they are ordered inside a vertex buffer. Because there are 128 slices, there will be 128 vertices that are on the circumference of the circle. Then, there is another vertex which is at the center, so there are 129 vertices in total. We should arrange their positions inside a vertex buffer so that it becomes easier to construct the index buffer later. The author found that packing the vertices on the circumference as the first 128 vertices (Verticex #0 to #127) and putting the center as the last vertex (Vertex #128) makes index buffer construction easy. For the first 128 vertices, the $i$th vertex should have position $$ \mbox{position of the $i$th vertex} = \begin{bmatrix}  r \cos ( 2\pi i / 128) \\ r \sin (2\pi i / 128)  \end{bmatrix}$$ where $r$ is the radius of the circle, which is 0.1. What are seeing here is that we are dividing the $2\pi$ complete angles into 128 intervarls, and this gives us 128 angles at the beginning of each intervals: $\frac{2\pi\times 0}{128}$, $\frac{2\pi\times 1}{128}$, $\dotsc$, $\frac{2\pi \times 127}{128}$. We then insert a vertex at each of these angles to the vertex buffer as done in the code below, which is located inside the <code>createBuffers</code> function.</p>
+
+<pre class="language-c"><code>let vertexData = [];
+for(let i=0; i&lt;this.numSlices; i++) {
+    let angle = 2 * Math.PI * i / this.numSlices;
+    vertexData.push(
+      this.radius * Math.cos(angle), this.radius * Math.sin(angle));
+}  
+</code></pre>
+
+    <p>Then, we insert the circle's center $(0,0)$ at the end.</p>
+
+<pre class="language-c"><code>vertexData.push(0.0);
+vertexData.push(0.0);
+</code>
+</pre>
+
+    <p>We can now specify the index buffer. Because each primitive is a triangle, we add three vertex indices at a time. Because there are 128 triangles, we do that 128 times. For the $i$th triangle, we use two adjacent vertices on the circumference&mdash;Vertex $i$ and $(i+1) \% 128$&mdash;and then add the center, Vertex 128.</p>
+
+<pre class="language-c"><code>let indexData = [];
+for(let i=0; i&lt;this.numSlices; i++) {
+    indexData.push(i);
+    indexData.push((i+1) % this.numSlices);
+    indexData.push(this.numSlices);
+}
+this.indexBuffer = createIndexBuffer(this.gl, new Int32Array(indexData));</code></pre>
+
+    <p>It's important that the second index we add is $(i+1) \% 128$ rather than $i+1$. This is because we cause we want the last slice&mdash;when $i=127$&mdash; to loop back to the first vertex. More specifically, it should use Vertex 127 and then Vertex 0. Adding 1 and then modulo by 128 accomplishes this.</p>
+
+    <p>After we are done with constructing the buffers, we can use them inside the <code>updateWebGL</code> method as we have done before.</p>
+
+<pre class="language-c"><code>setupVertexAttribute(
+  self.gl, self.program, "position", self.vertexBuffer, 2, 8, 0);
+drawElements(
+  self.gl, self.indexBuffer, self.gl.TRIANGLES, 3*this.numSlices, 0);</code></pre>
+    
 
     <h3>12.4 &nbsp; Program 4: Using an array of uniform variables to animate multiple boucing balls</h3>
     
