@@ -484,13 +484,82 @@ drawElements(
 <pre><code class="language-c">this.displacementX = 0.0;
 this.displacementY = 0.0;</code></pre>
 
-    <p>The variables are called "<code>displacement</code>" rather than "<code>position</code>." There are two reasons for naming them this way. The first is that, recall from the last section that $$\mbox{displacement} = (\mbox{new position}) - (\mbox{old position}).$$ If "old position" is $(0,0)$, then it follows that $$\mbox{displacement} = \mbox{new position}.$$ So, for simplicity of Program 3, we simply say that the position of the ball at the start of the problem is $(0,0)$. This mkeans that its position any time afterwards is equal to its displacement with respect to $(0,0)$. The second reason is that this displacement can be thought of as the displacement to be applied to the positions of the vertices of the circle defined in the last section, much like the displacement we applied to the vertices of the square in Section <a href="#time-dependent-displacement">12.2.2</a>. It is quite commmon in computer graphics programming to interchange position with displacement.</p>
+    <p>The variables are called "<code>displacement</code>" rather than "<code>position</code>." There are two reasons for naming them this way. The first is that, recall from the last section that $$\mbox{displacement} = (\mbox{new position}) - (\mbox{old position}).$$ If "old position" is $(0,0)$, then it follows that $$\mbox{displacement} = \mbox{new position}.$$ So, for simplicity of Program 3, we simply say that the position of the ball at the start of the program is $(0,0)$. This means that its position any time afterwards is equal to its displacement with respect to $(0,0)$. The second reason is that this displacement can be thought of as the displacement to be applied to the positions of the vertices of the circle defined in the last section, much like the displacement we applied to the vertices of the square in Section <a href="#time-dependent-displacement">12.2.2</a>. It is quite commmon in computer graphics programming to interchange position with displacement.</p>
 
     <p>We also need variables to keep track of the ball's velocity because it changes over time as well. Again, these variables are defined and initialized in the constructor as follow.</p>
 
 <pre><code class="language-c">let angle = 2 * Math.PI * Math.random();
 this.velocityX = Math.cos(angle) * 0.001;
 this.velocityY = Math.sin(angle) * 0.001;</code></pre>
+
+    <p>The first thing that the piece of code above does is to generate a random angle from the interval $[0, 2\pi)$. This angle is used to determined the direction of our vector. Because we randomize the direction, you will see that the ball moves differently every time you refresh the browser.  The velocity itself is defined in the two lines below where we set the <code>velocityX</code> and <code>velocityY</code> fields to the cosine and the sine of the angle, respectively, times $0.001$. Recall that we also used $0.001$ in Program 2 to account for the fact that time in our programs have the unit of milliseconds.</p>
+
+    <p>Now that we have variables and fields to store every relevant piece of information, we are ready to make the ball move by updaing its position. Recall from physics that
+    \begin{align*}
+      \mbox{velocity} = \frac{\mbox{displacemet}}{\mbox{time}} = \frac{(\mbox{new position}) - (\mbox{old position})}{\mbox{time}}.
+    \end{align*}
+    As a result,
+    \begin{align*}
+      \mbox{new position} = (\mbox{old position}) + \mbox{time} \times velocity. 
+    \end{align*}
+    As a result, the first thing we do is to update the ball's position (confusingly represented by the fields <code>displacementX</code> and <code>displacementY</code>) according to the above equation. The piece of code that does this is in the <code>updateWebGL</code> method and is reproduced below.
+    </p>
+
+<pre><code class="language-c">this.displacementX = this.displacementX + delta * this.velocityX;
+this.displacementY = this.displacementY + delta * this.velocityY;
+</code></pre>
+
+    <p>The code above will make the ball move along a straight line along the direction of the velocity vector. However, this is not the end of the story because, if it continues doing that, the ball will go out of the frame and become invisible afterwards. We instead want the ball to bounces off the screen's border. To do so, we must check when the ball touches a border, force it to stay inside the screen, and change its velocity.</p>
+
+    <p>So, how do we check for when the ball hits a border? Let's consider the right screen border, which is the line $x = 1$. The ball hits the right border if any part of it, especially its rightmost part, is to the right of the line $x = 1$. Recall that the ball's position is the position of its center, and the ball's position is stored in the <code>displacementX</code> and <code>displacementY</code> field. So, the $x$-position of the ball's rightmost part is given by
+    \begin{align*}
+      \mbox{$x$-position of the ball's rightmost part} = \texttt{displacementX} + \mbox{radius}
+    \end{align*}
+    So, the ball hits the right border if the $x$-position of its rightmost part is greater than $1$:
+    \begin{align*}
+      \texttt{displacementX} + \mbox{radius} > 1.
+    \end{align*}
+    In other words,
+    \begin{align*}
+      \texttt{displacementX} > 1 - \mbox{radius}.
+    \end{align*}
+    As a result, we can check for this condition and do the necessary updates. This is done by the <code>if</code> statement below.
+    </p>
+
+<pre><code class="language-c">if (this.displacementX > 1.0 - this.radius) {
+  :
+  :
+}</code></pre>
+    
+    <p>The next thing to figure out is what updates we want to perform when the ball hits the right wall; i.e., what the code should we right inside the <code>if</code> clause. First, when the ball hits the well, part of it is already outside the screen, and we don't want that. So, the first thing to do is to keep the call inside the screen. This is quite easy. We just set the ball's $x$-position to that of the moment it "touches" the wall but not going over it.</p>
+
+<pre><code class="language-c">this.displacementX = 1.0 - this.radius;
+</code></pre>
+
+    <p>The next thing is to change the ball's velocity so that, instead of moving to the right, the ball would move to the left. This can be done simply by negating the $x$-component of the velocity vector.</p>
+
+<pre><code class="language-c">this.velocityX *= -1.0;</code></pre>
+
+    <p>Putting the updates and the checks for wall collision togther, we have the following code that deals with collision with the right wall.</p>
+
+<pre><code class="language-c">if (this.displacementX > 1.0 - this.radius) {
+  this.displacementX = 1.0 - this.radius;
+  this.velocityX *= -1.0;
+}</code></pre>
+
+    <p>We are done with the right wall, but there are 3 more walls left. The <code>updateWebGL</code> method contains three more if statements that deal with the left wall, the top wall, and the bottom wall. They call if the same structure: check if the ball is over the wall, keep the ball inside the wall, and negate the relevant component of the velocity to make the ball move in the opposite direction.</p>
+
+    <p>Now that we have updated the ball's position and dealt with collision against the walls, we can use the ball's position by feeding it as the displacement to the circle rendering command as shown below.</p>
+
+<pre><code class="language-c">useProgram(this.gl, this.program, () => {
+  let displacementLocation = self.gl.getUniformLocation(self.program, "displacement");
+  self.gl.uniform2f(displacementLocation, this.displacementX, this.displacementY);
+  
+  setupVertexAttribute(self.gl, self.program, "position", self.vertexBuffer, 2, 8, 0);
+  drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 3*this.numSlices, 0);
+});</code></pre>
+
+    <p>This piece of code is nothing new. We did something very similar in Program 2. What is different in Program 3 is the way we compute the displacement and the shape that we draw.</p>
 
     <h2>12.4 &nbsp; Program 4: Using an array of uniform variables to animate multiple boucing balls</h2>
     
