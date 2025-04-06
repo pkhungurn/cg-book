@@ -299,6 +299,7 @@ self.gl.uniform3f(colorLocation, color[0], color[1], color[2]);
       <figcaption class="figure-caption"><strong>Figure 12.2</strong> Screenshots of Program 2. The square moves in a circular path.</figcaption>
     </figure>
 
+    <a name="time-tracking"></a>
     <h3>12.2.1 &nbsp; How to keep track of time</h3>
 
     <p>An animation is an image that moves. This means that it changes with time. Creating animation thus requires us to draw different images at different time. As a r esult, a program that creates an animation must be aware of time. In our case, we need to keep track of how much time has passed since the program begins because the exact time (say, 10:10AM) does not matter.</p>
@@ -321,7 +322,8 @@ this.lastTime = currentTime;
 
     <p>The logic of the above code is quite simple. We call <code>performance.now</code> to get the current time. We then subtract from it the <code>lastTime</code> field to get the number of milliseconds since last time the <code>updateWebGL</code> method was called. We add this value to the <code>elapsedTime</code> field to update its value. Then, we set the <code>lastTime</code> field to the current time so that we can use this value in the next iteration. The <code>elapsedTime</code> field now stores the number of milliseconds since the program starts, and it gets updated every time the <code>updateWebGL</code> method is executed.</p>
 
-    <h3>12.2.3 &nbsp; Time-dependent displacement</h3>
+    <a name="time-dependent-displacement"></a>
+    <h3>12.2.2 &nbsp; Time-dependent displacement</h3>
 
     <p>One of the simplest form of animation is when an object continuously moves withouth changing its shape. The animation Program 2 shows is exactly this: a white square that moves in a circular path. To move is to change position. A <b>displacement</b> is a vector that represents a change in position. It is defined as:
     \begin{align*}
@@ -391,6 +393,104 @@ self.gl.uniform2f(
 </code></pre>
 
     <h2>12.3 &nbsp; Program 3: Using uniform variables to animate a boucing ball</h2>
+
+    <p>In the last section, we animate a rotating square that does not move, so we will create a more sophisticated animation in this section: one that involves a ball bouncing around the canvas. The source code of the program is availble in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-12/program-03"></a><code>chapter-12/program3</code> directory of the book's Github repository. Once you run the program, you will see a white circle moving along straight line paths and changing direction when it hits any one of the side of the screen.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-03-screenshot-00.png"><img src="images/program-03-screenshot-00.png" alt="" width="200"></a></td>
+          <td><a href="images/program-03-screenshot-01.png"><img src="images/program-03-screenshot-01.png" alt="" width="200"></a></td>
+          <td><a href="images/program-03-screenshot-02.png"><img src="images/program-03-screenshot-02.png" alt="" width="200"></a></td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+          <td align="center">(c)</td>
+        </tr>
+      </table
+      <figcaption class="figure-caption"><strong>Figure 12.3</strong> Screenshots of Program 3, showing a circular ball moving through the screen.</figcaption>
+    </figure>
+
+    <h3>12.3.1 &nbsp; Drawing a circle</h3>
+
+    <p>The animation in this section is more advanced that that in the last section because of two reasons. The first is that the movement is more complex: the ball moves and bounces of walls instead of rotating in place. The second is that the shape is more complex: a circle instead of a square. We shall deal with the shape in this section.</p>
+
+    <p>You may recall that we have written a program that draw a circle before in the last chapter. However, we will usea different method here. The idea is to approximate a circle with a collection of triangles. We call such a triangle a "slice," much like a slice of pizza or a slice of pie.  Each slice has two of its vertices on the circumference of the circle, and the circle's center serves as the third vertex.</p>
+
+    <figure class="figure">
+      <b>TODO: Create this figure.</b>
+      <figcaption class="figure-caption"><strong>Figure 12.4</strong> How to approximate a circle by breaking it down to triangular slices.</figcaption>
+    </figure>    
+
+    <p>You can see that the more slices we have, the more rounded our approximated circle will seem to the viewer. Here, we set the number of slices to 128 in the constructure of the <code>WebGLApp</code> class, and this is quite enough for the ball of radius $0.1$ that we will be drawing.</p>
+
+<pre class="language-c"><code>this.numSlices = 128;
+this.radius = 0.1;
+</code></pre>
+
+    <p>We need to write the <code>createBuffers</code> method, which creates the vertex and index buffers to be used later in the rendering loop. This means that we have to think about these vertices' positions and how they are ordered inside a vertex buffer. Because there are 128 slices, there will be 128 vertices that are on the circumference of the circle. Then, there is another vertex which is at the center, so there are 129 vertices in total. We should arrange their positions inside a vertex buffer so that it becomes easier to construct the index buffer later. The author found that packing the vertices on the circumference as the first 128 vertices (Verticex #0 to #127) and putting the center as the last vertex (Vertex #128) makes index buffer construction easy. For the first 128 vertices, the $i$th vertex should have position $$ \mbox{position of the $i$th vertex} = \begin{bmatrix}  r \cos ( 2\pi i / 128) \\ r \sin (2\pi i / 128)  \end{bmatrix}$$ where $r$ is the radius of the circle, which is 0.1. What are seeing here is that we are dividing the $2\pi$ complete angles into 128 intervarls, and this gives us 128 angles at the beginning of each intervals: $\frac{2\pi\times 0}{128}$, $\frac{2\pi\times 1}{128}$, $\dotsc$, $\frac{2\pi \times 127}{128}$. We then insert a vertex at each of these angles to the vertex buffer as done in the code below, which is located inside the <code>createBuffers</code> function.</p>
+
+<pre class="language-c"><code>let vertexData = [];
+for(let i=0; i&lt;this.numSlices; i++) {
+    let angle = 2 * Math.PI * i / this.numSlices;
+    vertexData.push(
+      this.radius * Math.cos(angle), this.radius * Math.sin(angle));
+}  
+</code></pre>
+
+    <p>Then, we insert the circle's center $(0,0)$ at the end.</p>
+
+<pre class="language-c"><code>vertexData.push(0.0);
+vertexData.push(0.0);
+</code>
+</pre>
+
+    <p>We can now specify the index buffer. Because each primitive is a triangle, we add three vertex indices at a time. Because there are 128 triangles, we do that 128 times. For the $i$th triangle, we use two adjacent vertices on the circumference&mdash;Vertex $i$ and $(i+1) \% 128$&mdash;and then add the center, Vertex 128.</p>
+
+<pre class="language-c"><code>let indexData = [];
+for(let i=0; i&lt;this.numSlices; i++) {
+    indexData.push(i);
+    indexData.push((i+1) % this.numSlices);
+    indexData.push(this.numSlices);
+}
+this.indexBuffer = createIndexBuffer(this.gl, new Int32Array(indexData));</code></pre>
+
+    <p>It's important that the second index we add is $(i+1) \% 128$ rather than $i+1$. This is because we cause we want the last slice&mdash;when $i=127$&mdash; to loop back to the first vertex. More specifically, it should use Vertex 127 and then Vertex 0. Adding 1 and then modulo by 128 accomplishes this.</p>
+
+    <p>After we are done with constructing the buffers, we can use them inside the <code>updateWebGL</code> method as we have done before.</p>
+
+<pre class="language-c"><code>setupVertexAttribute(
+  self.gl, self.program, "position", self.vertexBuffer, 2, 8, 0);
+drawElements(
+  self.gl, self.indexBuffer, self.gl.TRIANGLES, 3*this.numSlices, 0);</code></pre>
+    
+    <h3>12.3.2 &nbsp; Animating a bouncing ball</h3>
+
+    <p>A bouncing ball moves in a straight line until it hits one of the borders of the screen. At that point, it changes direction and continues moving in that direction. So, in order to program our bouncing ball, we need to be able to do three things.</p>
+
+    <ol>
+      <li>Make the ball move in a straight line.</li>
+      <li>Detect when the ball hits a wall.</li>
+      <li>Change the ball's direction once it hits a wall.</li>
+    </ol>
+
+    <p>Let's first deal with how to make a ball move in a straight line. From physics, the rate at which a particle moves in a straight line is called its <b>velocity</b>, and it is typically denoted by a vector $\ve{v}$. Let us say that, at the time $t_{\mrm{last}}$, the particle was at position $\ve{p}_{\mrm{last}}$. Moreover, from time $t_{\mrm{last}}$, time has advanced to $t_{\mrm{current}}$. Then, the position of the ball at $t_{\mrm{current}}$ would be given by $$p_{\mrm{current}} = p_{\mrm{last}} + (t_{\mrm{current}} - t_{\mrm{last}}) \ve{v} = p_{\mrm{last}} + \Delta t \times \ve{v}.$$ Here, $\Delta t$ stands for $t_{\mrm{current}} - t_{\mrm{last}}$.</p>
+
+    <p>Note that we have learned how to keep track of time in Section <a href="#time-tracking">12.2.1</a>, and we shall use the code of Program 2 again in Program 3 for convenience. In particular, in the <code>updateWebGL</code> method, we have access to the variable <code>delta</code>, which stores the amount of time between $t_{\mrm{last}}$, the last time <code>updateWebGL</code> was called, and $t_{\mrm{current}}$, the current time.</p>
+
+    <p>Next, we need to think about how to keep track of the ball's position as this will change over time. Here, we shall say that the ball's position is the position of its center. We choose to do so because, in the last section, we create a circle mesh as a collection of sectors radiating from the center, so the center becomes a natural reference point. Quite counterintuitively, we store the position of the ball in the following two variables defined in the constructor of Program 3.</p>
+
+<pre><code class="language-c">this.displacementX = 0.0;
+this.displacementY = 0.0;</code></pre>
+
+    <p>The variables are called "<code>displacement</code>" rather than "<code>position</code>." There are two reasons for naming them this way. The first is that, recall from the last section that $$\mbox{displacement} = (\mbox{new position}) - (\mbox{old position}).$$ If "old position" is $(0,0)$, then it follows that $$\mbox{displacement} = \mbox{new position}.$$ So, for simplicity of Program 3, we simply say that the position of the ball at the start of the problem is $(0,0)$. This mkeans that its position any time afterwards is equal to its displacement with respect to $(0,0)$. The second reason is that this displacement can be thought of as the displacement to be applied to the positions of the vertices of the circle defined in the last section, much like the displacement we applied to the vertices of the square in Section <a href="#time-dependent-displacement">12.2.2</a>. It is quite commmon in computer graphics programming to interchange position with displacement.</p>
+
+    <p>We also need variables to keep track of the ball's velocity because it changes over time as well. Again, these variables are defined and initialized in the constructor as follow.</p>
+
+<pre><code class="language-c">let angle = 2 * Math.PI * Math.random();
+this.velocityX = Math.cos(angle) * 0.001;
+this.velocityY = Math.sin(angle) * 0.001;</code></pre>
 
     <h2>12.4 &nbsp; Program 4: Using an array of uniform variables to animate multiple boucing balls</h2>
     
