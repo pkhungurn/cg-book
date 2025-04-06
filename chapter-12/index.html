@@ -384,15 +384,15 @@ useProgram(this.gl, this.program, () => {
 
     <p>Lastly, after the $x$- and $y$-components have been computed, we set the uniform variable <code>displacement</code> to these values with <code>glUniform2f</code>.</p>
 
-<pre><code language-c></code>let displacementLocation = self.gl.getUniformLocation(
+<pre><code class="language-c">let displacementLocation = self.gl.getUniformLocation(
   self.program, "displacement");
 self.gl.uniform2f(
   displacementLocation, displacementX, displacementY);
-</pre>
+</code></pre>
 
     <h2>12.3 &nbsp; Program 3: Using uniform variables to animate a boucing ball</h2>
 
-    <h3>12.4 &nbsp; Program 4: Using an array of uniform variables to animate multiple boucing balls</h3>
+    <h2>12.4 &nbsp; Program 4: Using an array of uniform variables to animate multiple boucing balls</h2>
     
     <hr>
     <p>
