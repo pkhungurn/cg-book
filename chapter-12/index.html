@@ -80,7 +80,7 @@
 
     <p>A <b>uniform variable</b> is a piece of GPU memory for storing a small piece of information, which can be directly set by the host program. Unlike buffers, both vertex shaders and fragment shaders have access to uniform variables. Both shaders would see the same value when referencing the same uniform variable, and this is why it is called "uniform." Moreover, the shaders cannot change the value themsevles, so this value would remain constant until the host program rewrites the variable. As a result, uniform variables can serve as "global" variables for GLSL programs.</p>
 
-    <p>In this chapter, we will how to declare and manipulate uniform variables with both GLSL and Javascript. We start with a simple program where uniform variables are used to communicate user inputs to GLSL programs. We will then see how to manipulate uniform variables so that they change with time, and this would allow use to create simple animations. Lastly, we will study uniform variables that have array types, which would allow us to transfer a larger chunk of data to GLSL programs.</p>
+    <p>In this chapter, we will how to declare and manipulate uniform variables with both GLSL and Javascript. We start with a simple program where uniform variables are used to communicate user inputs to GLSL programs. We will then see how to manipulate uniform variables so that they change with time, and this would allow use to create simple animations. We will then study uniform variables that have <code>struct</code> type, which allow us to systematically manage related variables.</p>
 
     <h2>12.1 &nbsp; Program 1: Basic usage of uniform variables</h2>
 
@@ -561,8 +561,168 @@ this.displacementY = this.displacementY + delta * this.velocityY;
 
     <p>This piece of code is nothing new. We did something very similar in Program 2. What is different in Program 3 is the way we compute the displacement and the shape that we draw.</p>
 
-    <h2>12.4 &nbsp; Program 4: Using an array of uniform variables to animate multiple boucing balls</h2>
+    <h2>12.4 &nbsp; Program 4: Using <code>struct</code> to animate multiple balls</h2>
+
+    <p>In this section, we expand the program in the last section so that we can animate multiple balls at once. We want these balls to have different sizes, different colors, and move at different velocities. The source code of this section's program can be found in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-12/program-04"><code>chapter-12/program-04</code></a> directory of the book's code repository. The screenshot of the program can be seen below.</p>
     
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td align="center">(a)</td>
+          <td align="center">(b)</td>
+          <td align="center">(c)</td>
+        </tr>
+      </table
+      <figcaption class="figure-caption"><strong>Figure 12.4</strong> Screenshots of Program 4, showing multiple balls of various sizes and colors moving through the screen at different directions.</figcaption>
+    </figure>
+
+    <h3>12.4.1 &nbsp; Modeling balls with a Javascript class</h3>
+
+    <p>Because our goal is to animate multiple balls, each having different properties, we need to a good way to represent these properties inside our program. A standard way to do this under object-oriented programming (OOP) is to represent the concept of a ball a class, so that we can create multiple instances of it to represent different balls at run time. So, what should our ball class should store? The answer is all the data we have used before in the last program.</p>
+
+    <ul>
+      <li>The 2D displacement of the center of the ball.</li>
+      <li>The velocity vector of the ball.</li>
+    </ul>
+
+    <p>We also need the following new pieces data.</p>
+
+    <ul>
+      <li>The radius of the ball.</li>
+      <li>The RGB color of the ball.</li>
+    </ul>
+
+    <p>Because, in this section, we allow these properties to vary between instances. The Javascript class for balls is the <a href="https://github.com/pkhungurn/cg-book-code/blob/8372f7b82d025b30aae297129ab69198e725c3b3/chapter-12/program-04/src/index.js#L16"><code>Ball</code></a> class. Its fields are declared in its constructor, which is reproduced below.</p>
+
+<pre><code class="language-c">class Ball {
+  constructor(displacement, radius, velocity, color) {
+    this.displacement = displacement;
+    this.velocity = velocity;
+    this.radius = radius;
+    this.color = color;
+  }
+
+  :
+  :
+}</code></pre>
+
+    <p>In the last section, we represent the displacement by two variables, <code>displacementX</code> and <code>displacementY</code>, and the same is true for the velocity. However, in this section, we will represent vectors by Javascript arrays so that in order to reduce the number of fields and make the code easier to read. Here, <code>displacement</code> is supposed to be an array of size 2, so that <code>displacement[0]</code> represents the $x$-component of the displacement, and <code>displacement[1]</code> represents the $y$-component. The same is also true for <code>velocity</code>. The field <code>radius</code> is obviously a single floating point number, but <code>color</code> should be an array of size 3 so that <code>color[0]</code>, <code>color[1]</code>, and <code>color[2]</code> represent the R, G, and B components of the color, respectively.</p>
+
+    <p>After we have decided what fields the class should have, we need to decide what methods it should have. We know that Program 3 has to update the ball's displacement and velocity every frame in order to animate it. This piece of code is used repetitively, and it has to be executed for every ball we put on the screen. This makes it a good candidate to be refactored into a method so that we can refer to the whole process by a name. Let us call this method <code>update</code>.</p>
+
+<pre><code class="language-c">update(delta) {
+  this.displacement[0] += this.velocity[0] * delta;
+  this.displacement[1] += this.velocity[1] * delta;
+  
+  if (this.displacement[0] < -1.0 + this.radius) {
+      this.displacement[0] = -1.0 + this.radius;
+      this.velocity[0] *= -1.0;
+  }
+  if (this.displacement[0] > 1.0 - this.radius) {
+      this.displacement[0] = 1.0 - this.radius;
+      this.velocity[0] *= -1.0;
+  }
+  if (this.displacement[1] < -1.0 + this.radius) {
+      this.displacement[1] = -1.0 + this.radius;
+      this.velocity[1] *= -1.0
+  }
+  if (this.displacement[1] > 1.0 - this.radius) {
+      this.displacement[1] = 1.0 - this.radius;
+      this.velocity[1] *= -1.0;
+  }
+}</code></pre>
+
+    <p>We see that the method looks similar to the piece of code in Program 3 that updates the ball's displacement and velocity. The main difference with the old code is that many fields are now arrays instead of floating points, so the components of the vectors are now accessed differently. The variable <code>delta</code> is now an argument of the method instead of being a function variable like in the last program.</p>
+
+    <p>Now that we have a comlete description of the <code>Ball</code> class, let us see how it is used in the program. The first thing we have to do is to create all the balls we want to animate, and this is done inside the constructor of the <code>WebGLApp</code> class.</p>
+
+<pre><code class="language-c">
+class WebGLApp {
+  constructor() {
+    :
+    :
+
+    this.balls = [];
+    for (let i = 0; i < 16; i++) {
+        let radius = 0.01 + (0.09) * Math.random();
+    
+        let displacement = [
+            -1.0 + radius + (2.0 - 2 * radius) * Math.random(), 
+            -1.0 + radius + (2.0 - 2 * radius) * Math.random()
+        ];
+        
+        let angle = 2 * Math.PI * Math.random();
+        let velocity = [
+            Math.cos(angle) * 0.001,
+            Math.sin(angle) * 0.001
+        ];
+    
+        let color = [
+            0.5 + 0.5 * Math.random(),
+            0.5 + 0.5 * Math.random(),
+            0.5 + 0.5 * Math.random()
+        ];
+    
+        let ball = new Ball(displacement, radius, velocity, color);
+    
+        this.balls.push(ball);
+    }
+
+    :
+    :
+  }
+}
+</code></pre>
+
+    <p>The above piece of code basically creates an array <code>balls</code> to store the instances of the <code>Ball</code> class. We then create 16 balls, randomizing their radii, initial displacement, initial velocity, and color. Because the background is black, we choose the RGB components to be in the range $[0.5, 1.0]$ to make all the balls easy to see.</p>
+
+    <p>Inside the <code>updateWebGL</code> method, we need to call the <code>update</code> method to move each ball. This is quite easy now that we have refactored the updating code.</p>
+
+<p>updateWebGL() {
+  :
+  :
+
+  for (let i=0; i < this.balls.length; i++) {
+    this.balls[i].update(delta);
+  }
+
+  :
+  :
+}
+</p>
+
+    <h3>12.4.2 &nbsp; <code>struct</code> uniform variables</h3>
+  
+    <p>Since we went through the trouble of grouping all variables related to a ball into a class in Javascript, we should do the same in GLSL because the code is easier to undestand if it mirrors the Javascript host code. As we said earlier in <a href="../chapter-10/index.html">Chapter 10</a>, the GLSL language does not have classes. The closest construct to a class is a <code>struct</code>, which can be thought of as class that have only fields but no methods. In both the vertex shader (<a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-12/program-03/src/vertex-shader.vert"><code>vertex-shader.vert</code></a>) and the fragment shader (<a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-12/program-03/src/fragment-shader.frag"><code>fragment-shader.frag</code></a>), we define a <code>struct</code> called <code>Ball</code> as follows:</p>
+
+<pre><code class="language-c">struct Ball {
+  vec2 displacement;
+  float radius;
+  vec3 color;
+};</code></pre>
+
+    <p>Note that, unlike the <code>Ball</code> class in Javasript, the <code>struct</code> does not have the <code>velocity</code> fields because, as we shall see, it is not used in GLSL. We also define a uniform variable <code>ball</code> of type <code>Ball</code> inside both the vertex and fragment shaders.</p>
+
+<pre><code class="language-c">uniform Ball ball;</code></pre>
+
+    <p>Let us see how this uniform variable is used insider the shaders. The easier usage is in the fragment shader, where we just set the output color to the color of the ball.</p>
+
+<pre><code class="language-c">void main() {
+  fragColor = vec4(ball.color, 1.0);
+}</code></pre>
+
+    <p>The vertex shader is a little more complicated.</p>
+
+<pre><code>void main() {
+  gl_Position = vec4(position * ball.radius + ball.displacement, 0, 1);
+}</code></pre>
+
+
     <hr>
     <p>
       <a href="../chapter-11/index.html"><<</a>
