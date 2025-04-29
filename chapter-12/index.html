@@ -334,15 +334,15 @@ this.lastTime = currentTime;
 
 <pre><code class="language-c">#version 300 es
 
-in vec2 position;
+in vec2 vert_position;
 
 uniform vec2 displacement;
 
 void main() {
-    gl_Position = vec4(position + displacement, 0, 1);
+    gl_Position = vec4(vert_position + displacement, 0, 1);
 }</code></pre>
 
-    <p>Much like many GLSL programs have seen before, we use the <code>position</code> attribute variable to store vertex positions. What is new is the <code>displacement</code> uniform variable, which represents the displacement. We can see that what the vertex shader does is to add the displacement to the vertex position and output the result.</p>
+    <p>Much like many GLSL programs have seen before, we use the <code>vert_position</code> attribute variable to store vertex positions. What is new is the <code>displacement</code> uniform variable, which represents the displacement. We can see that what the vertex shader does is to add the displacement to the vertex position and output the result.</p>
 
     <p>Now that we know how to move an object from its rest position to another position, we now need to figure out how to make the object's position change over time. This is easy: we only need to make the displacement changes over time. So, every time the screen is update, we need to set the <code>displacement</code> uniform variable to a new value. Let's look at the part of the <a href="https://github.com/pkhungurn/cg-book-code/blob/d334f114da0f590cb4c04e200604e45979a0e706/chapter-12/program-02/src/index.js#L45"><code>updateWebGL</code></a> method that does this.</p>
 
@@ -429,7 +429,11 @@ self.gl.uniform2f(
 this.radius = 0.1;
 </code></pre>
 
-    <p>We need to write the <code>createBuffers</code> method, which creates the vertex and index buffers to be used later in the rendering loop. This means that we have to think about these vertices' positions and how they are ordered inside a vertex buffer. Because there are 128 slices, there will be 128 vertices that are on the circumference of the circle. Then, there is another vertex which is at the center, so there are 129 vertices in total. We should arrange their positions inside a vertex buffer so that it becomes easier to construct the index buffer later. The author found that packing the vertices on the circumference as the first 128 vertices (Verticex #0 to #127) and putting the center as the last vertex (Vertex #128) makes index buffer construction easy. For the first 128 vertices, the $i$th vertex should have position $$ \mbox{position of the $i$th vertex} = \begin{bmatrix}  r \cos ( 2\pi i / 128) \\ r \sin (2\pi i / 128)  \end{bmatrix}$$ where $r$ is the radius of the circle, which is 0.1. What are seeing here is that we are dividing the $2\pi$ complete angles into 128 intervarls, and this gives us 128 angles at the beginning of each intervals: $\frac{2\pi\times 0}{128}$, $\frac{2\pi\times 1}{128}$, $\dotsc$, $\frac{2\pi \times 127}{128}$. We then insert a vertex at each of these angles to the vertex buffer as done in the code below, which is located inside the <code>createBuffers</code> function.</p>
+    <p>We need to write the <code>createBuffers</code> method, which creates the vertex and index buffers to be used later in the rendering loop. This means that we have to think about these vertices' positions and how they are ordered inside a vertex buffer. To allow ourselves to change the circle's radius if we so desire, we will create the vertex buffer so that it represents a circle of radius $1$ instead of $0.1$, and we will resize the circle inside the vertex shader.</p>
+      
+    <p>Because there are 128 slices, there will be 128 vertices that are on the circumference of the circle. Then, there is another vertex which is at the center, so there are 129 vertices in total. We should arrange their positions inside a vertex buffer so that it becomes easier to construct the index buffer later. The author found that packing the vertices on the circumference as the first 128 vertices (Verticex #0 to #127) and putting the center as the last vertex (Vertex #128) makes index buffer construction easy. For the first 128 vertices, the $i$th vertex should have position 
+    $$ \mbox{position of the $i$th vertex of circle of radius $1$} = \begin{bmatrix}  \cos ( 2\pi i / 128) \\ \sin (2\pi i / 128)  \end{bmatrix}$$ 
+    where $r$ is the radius of the circle. What are seeing here is that we are dividing the $2\pi$ complete angles into 128 intervarls, and this gives us 128 angles at the beginning of each intervals: $\frac{2\pi\times 0}{128}$, $\frac{2\pi\times 1}{128}$, $\dotsc$, $\frac{2\pi \times 127}{128}$. We then insert a vertex at each of these angles to the vertex buffer as done in the code below, which is located inside the <code>createBuffers</code> function.</p>
 
 <pre class="language-c"><code>let vertexData = [];
 for(let i=0; i&lt;this.numSlices; i++) {
@@ -458,12 +462,33 @@ this.indexBuffer = createIndexBuffer(this.gl, new Int32Array(indexData));</code>
 
     <p>It's important that the second index we add is $(i+1) \% 128$ rather than $i+1$. This is because we cause we want the last slice&mdash;when $i=127$&mdash; to loop back to the first vertex. More specifically, it should use Vertex 127 and then Vertex 0. Adding 1 and then modulo by 128 accomplishes this.</p>
 
-    <p>After we are done with constructing the buffers, we can use them inside the <code>updateWebGL</code> method as we have done before.</p>
+    <p>Our vertex and index buffers are now complete. Nevertheless, they represent a circle of radius $1$ centered at $(0,0)$. However, what we want to render is a circle of radius $0.1$ that moves around the screen. How do we actually accomplish this? Notice that there are two problems here. The first is that the circle is too large, and the second is that it is fixed in space. To solve the first problem, we just have to realize that if we multiply all the vertex positions by $r$, the circle becomes $r$ times larger/smaller, which means it becomes the circle of radius $r$ centered at $(0,0)$.
+    \begin{align*}
+    &\mbox{vertex of circle of radius $r$ centered at $(0,0)$} \\
+    &= r \times \Big(\mbox{vertex of circle of radius $1$ centered at $(0,0)$}\Big).
+    \end{align*}
+    To solve the second problem, we use what we learned in the last section. If we want the circle to move around the screen, we just have to move all of its vertex by the same amount of "displacement." More specifically, we need to add a 2D displacement vector $\ve{d}$ to all vertex positions, and the circle will be centered at point $\ve{d}$ instead of $(0,0)$.
+    \begin{align*}
+    &\mbox{vertex of circle of radius $r$ centered at $\ve{d}$} \\
+    &= \mbox{vertex of circle of radius $r$ centered at $(0,0)$} + \ve{d} \\ 
+    &= r \times \Big(\mbox{vertex of circle of radius $1$ centered at $(0,0)$}\Big) + \ve{d}.
+    \end{align*}
+    </p>
 
-<pre class="language-c"><code>setupVertexAttribute(
-  self.gl, self.program, "position", self.vertexBuffer, 2, 8, 0);
-drawElements(
-  self.gl, self.indexBuffer, self.gl.TRIANGLES, 3*this.numSlices, 0);</code></pre>
+    <p>We write the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-12/program-03/src/vertex-shader.vert">vertex shader</a> to carry out the last equation above. To do this, we need two uniform varibles, one to store the radius of the circle, and the other to store the displacement applied to all vertices.</p>
+
+<pre><code class="language-c">#version 300 es
+
+in vec2 vert_position;
+
+uniform vec2 displacement;
+uniform float radius;
+
+void main() {
+    gl_Position = vec4(radius * vert_position + displacement, 0, 1);
+}</code></pre>
+
+    <p>To draw the moving ball, we need to figure out how to set the <code>displacement</code> uniform variable, which is the subject of the next section.</p>
     
     <h3>12.3.2 &nbsp; Animating a bouncing ball</h3>
 
@@ -479,12 +504,12 @@ drawElements(
 
     <p>Note that we have learned how to keep track of time in Section <a href="#time-tracking">12.2.1</a>, and we shall use the code of Program 2 again in Program 3 for convenience. In particular, in the <code>updateWebGL</code> method, we have access to the variable <code>delta</code>, which stores the amount of time between $t_{\mrm{last}}$, the last time <code>updateWebGL</code> was called, and $t_{\mrm{current}}$, the current time.</p>
 
-    <p>Next, we need to think about how to keep track of the ball's position as this will change over time. Here, we shall say that the ball's position is the position of its center. We choose to do so because, in the last section, we create a circle mesh as a collection of sectors radiating from the center, so the center becomes a natural reference point. Quite counterintuitively, we store the position of the ball in the following two variables defined in the constructor of Program 3.</p>
+    <p>Next, we need to think about how to keep track of the ball's position as this will change over time. Here, we shall say that the ball's position is the position of its center, which is the displacement vector $\ve{d}$ in the last section. So, quite counterintuitively, we store the position of the ball in the following two variables defined in the constructor of Program 3.</p>
 
 <pre><code class="language-c">this.displacementX = 0.0;
 this.displacementY = 0.0;</code></pre>
 
-    <p>The variables are called "<code>displacement</code>" rather than "<code>position</code>." There are two reasons for naming them this way. The first is that, recall from the last section that $$\mbox{displacement} = (\mbox{new position}) - (\mbox{old position}).$$ If "old position" is $(0,0)$, then it follows that $$\mbox{displacement} = \mbox{new position}.$$ So, for simplicity of Program 3, we simply say that the position of the ball at the start of the program is $(0,0)$. This means that its position any time afterwards is equal to its displacement with respect to $(0,0)$. The second reason is that this displacement can be thought of as the displacement to be applied to the positions of the vertices of the circle defined in the last section, much like the displacement we applied to the vertices of the square in Section <a href="#time-dependent-displacement">12.2.2</a>. It is quite commmon in computer graphics programming to interchange position with displacement.</p>
+    <p>The variables are called "<code>displacement</code>" rather than "<code>position</code>." There are two reasons for naming them this way. The first is that, recall from Setion 1 that $$\mbox{displacement} = (\mbox{new position}) - (\mbox{old position}).$$ If "old position" is $(0,0)$, then it follows that $$\mbox{displacement} = \mbox{new position}.$$ So, for simplicity of Program 3, we simply say that the position of the ball at the start of the program is $(0,0)$. This means that its position any time afterwards is equal to its displacement with respect to $(0,0)$. The second reason is that this displacement can be thought of as the displacement to be applied to the positions of the vertices of the circle defined in the last section, much like the displacement we applied to the vertices of the square in Section <a href="#time-dependent-displacement">12.2.2</a>. It is quite commmon in computer graphics programming to interchange position with displacement.</p>
 
     <p>We also need variables to keep track of the ball's velocity because it changes over time as well. Again, these variables are defined and initialized in the constructor as follow.</p>
 
@@ -549,11 +574,14 @@ this.displacementY = this.displacementY + delta * this.velocityY;
 
     <p>We are done with the right wall, but there are 3 more walls left. The <code>updateWebGL</code> method contains three more if statements that deal with the left wall, the top wall, and the bottom wall. They call if the same structure: check if the ball is over the wall, keep the ball inside the wall, and negate the relevant component of the velocity to make the ball move in the opposite direction.</p>
 
-    <p>Now that we have updated the ball's position and dealt with collision against the walls, we can use the ball's position by feeding it as the displacement to the circle rendering command as shown below.</p>
+    <p>Now that we have updated the ball's position and dealt with collision against the walls, we can render the moving ball by setting the uniform variables to the right values as folllows.</p>
 
 <pre><code class="language-c">useProgram(this.gl, this.program, () => {
   let displacementLocation = self.gl.getUniformLocation(self.program, "displacement");
   self.gl.uniform2f(displacementLocation, this.displacementX, this.displacementY);
+
+  let radiusLocation = self.gl.getUniformLocation(self.program, "radius");
+  self.gl.uniform1f(radiusLocation, this.radius);
   
   setupVertexAttribute(self.gl, self.program, "position", self.vertexBuffer, 2, 8, 0);
   drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 3*this.numSlices, 0);
@@ -709,16 +737,21 @@ class WebGLApp {
 
 <pre><code class="language-c">uniform Ball ball;</code></pre>
 
-    <p>Let us see how this uniform variable is used insider the shaders. The easier usage is in the fragment shader, where we just set the output color to the color of the ball.</p>
+    <p>Let us see how this uniform variable is used insider the shaders. The easier usage is in the <a href=""></a> fragment shader, where we just set the output color to the color of the ball.</p>
 
-<pre><code class="language-c">void main() {
-  fragColor = vec4(ball.color, 1.0);
+<pre><code class="language-c">
+out vec4 fragColor;
+
+void main() {
+    fragColor = vec4(ball.color, 1.0);
 }</code></pre>
 
     <p>The vertex shader is a little more complicated.</p>
 
-<pre><code>void main() {
-  gl_Position = vec4(position * ball.radius + ball.displacement, 0, 1);
+<pre><code>in vec2 position;
+
+void main() {
+    gl_Position = vec4(position * ball.radius + ball.displacement, 0, 1);
 }</code></pre>
 
 
