@@ -836,6 +836,14 @@ void main() {
         <li>In our Javascript code, we need to keep track of the time since we started the program. Optinally, we can also keep track of the time since the last time we updated our OpenGL canvas.</li>
       </ul>
       </li>
+
+      <li>In Program 2, 3, and 4, we define static meshes whose vertex and index buffers do not changes at all. However, we can move these meshes around by adding the same "displacement" to each vertex's positions. When the displacement changes over time, we can move the mesh around the screen.</li>
+
+      <li>In Program 3, we create a mesh that represents a circle of radius 1 whose center is at the point $(0,0)$. However, we can render circles of arbitrary radii by multipying the vertex positions with the radius $r$.</li>
+
+      <li>Uniform variables can be grouped into a <code>struct</code> in order to achieve better code organization.</li>
+
+      <li>To retrieve the location of a field of a <code>struct</code> uniform variable, we must prefix the field's name with the name of the <code>struct</code> and the dot (<code>.</code>) symbol.</li>
     </ul>
 
 
