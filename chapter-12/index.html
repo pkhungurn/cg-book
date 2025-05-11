@@ -78,7 +78,7 @@
 
     <p>So far, we have been using only one mechanism for communication between a host program and a GLSL program: buffers. Buffers are specialized for communicating vertex and index data, and they have many restrictions. GLSL programs do not have direct access to data inside index buffers. A vertex shader can access data inside vertex buffers, but a fragment shader cannot. However, there are two more such mechanisms: uniform variables and textures. This chapter discuss the former, but the reader would have to wait until Chapter XXX for a discussion of the latter.</p>
 
-    <p>A <b>uniform variable</b> is a piece of GPU memory for storing a small piece of information, which can be directly set by the host program. Unlike buffers, both vertex shaders and fragment shaders have access to uniform variables. Both shaders would see the same value when referencing the same uniform variable, and this is why it is called "uniform." Moreover, the shaders cannot change the value themsevles, so this value would remain constant until the host program rewrites the variable. As a result, uniform variables can serve as "global" variables for GLSL programs.</p>
+    <p>A <b>uniform variable</b> is a piece of GPU memory for storing a small piece of information, which can be directly set by the host program. Unlike buffers, both vertex shaders and fragment shaders have access to uniform variables. Both shaders would see the same value when referencing the same uniform variable, and this is why it is called "uniform." Moreover, the shaders cannot change the value themselves, so this value would remain constant until the host program rewrites the variable. As a result, uniform variables can serve as "global" variables for GLSL programs.</p>
 
     <p>In this chapter, we will how to declare and manipulate uniform variables with both GLSL and Javascript. We start with a simple program where uniform variables are used to communicate user inputs to GLSL programs. We will then see how to manipulate uniform variables so that they change with time, and this would allow use to create simple animations. We will then study uniform variables that have <code>struct</code> type, which allow us to systematically manage related variables.</p>
 
@@ -509,7 +509,8 @@ void main() {
 <pre><code class="language-c">this.displacementX = 0.0;
 this.displacementY = 0.0;</code></pre>
 
-    <p>The variables are called "<code>displacement</code>" rather than "<code>position</code>." There are two reasons for naming them this way. The first is that, recall from Setion 1 that $$\mbox{displacement} = (\mbox{new position}) - (\mbox{old position}).$$ If "old position" is $(0,0)$, then it follows that $$\mbox{displacement} = \mbox{new position}.$$ So, for simplicity of Program 3, we simply say that the position of the ball at the start of the program is $(0,0)$. This means that its position any time afterwards is equal to its displacement with respect to $(0,0)$. The second reason is that this displacement can be thought of as the displacement to be applied to the positions of the vertices of the circle defined in the last section, much like the displacement we applied to the vertices of the square in Section <a href="#time-dependent-displacement">12.2.2</a>. It is quite commmon in computer graphics programming to interchange position with displacement.</p>
+<!--<p>The variables are called "<code>displacement</code>" rather than "<code>position</code>." There are two reasons for naming them this way. The first is that, recall from Setion 1 that $$\mbox{displacement} = (\mbox{new position}) - (\mbox{old position}).$$ If "old position" is $(0,0)$, then it follows that $$\mbox{displacement} = \mbox{new position}.$$ So, for simplicity of Program 3, we simply say that the position of the ball at the start of the program is $(0,0)$. This means that its position any time afterwards is equal to its displacement with respect to $(0,0)$. The second reason is that this displacement can be thought of as the displacement to be applied to the positions of the vertices of the circle defined in the last section, much like the displacement we applied to the vertices of the square in Section <a href="#time-dependent-displacement">12.2.2</a>. It is quite commmon in computer graphics programming to interchange position with displacement.</p>
+-->
 
     <p>We also need variables to keep track of the ball's velocity because it changes over time as well. Again, these variables are defined and initialized in the constructor as follow.</p>
 
@@ -574,6 +575,19 @@ this.displacementY = this.displacementY + delta * this.velocityY;
 
     <p>We are done with the right wall, but there are 3 more walls left. The <code>updateWebGL</code> method contains three more if statements that deal with the left wall, the top wall, and the bottom wall. They call if the same structure: check if the ball is over the wall, keep the ball inside the wall, and negate the relevant component of the velocity to make the ball move in the opposite direction.</p>
 
+<pre><code class="language-c">if (this.displacementX < -1.0 + this.radius) {
+  this.displacementX = -1.0 + this.radius;
+  this.velocityX *= -1.0;
+}
+if (this.displacementY > 1.0 - this.radius) {
+  this.displacementY = 1.0 - this.radius;
+  this.velocityY *= -1.0;
+}if (this.displacementY < -1.0 + this.radius) {
+  this.displacementY = -1.0 + this.radius;
+  this.velocityY *= -1.0;
+}
+</code></pre>
+
     <p>Now that we have updated the ball's position and dealt with collision against the walls, we can render the moving ball by setting the uniform variables to the right values as folllows.</p>
 
 <pre><code class="language-c">useProgram(this.gl, this.program, () => {
@@ -606,12 +620,14 @@ this.displacementY = this.displacementY + delta * this.velocityY;
           <td align="center">(c)</td>
         </tr>
       </table
-      <figcaption class="figure-caption"><strong>Figure 12.4</strong> Screenshots of Program 4, showing multiple balls of various sizes and colors moving through the screen at different directions.</figcaption>
+      <figcaption class="figure-caption"><strong>Figure 12.4</strong> Screenshots of Program 4, showing multiple balls of various sizes and colors moving through the screen at different directions. <b>TODO: Add screenshots.</b></figcaption>
     </figure>
 
     <h3>12.4.1 &nbsp; Modeling balls with a Javascript class</h3>
 
-    <p>Because our goal is to animate multiple balls, each having different properties, we need to a good way to represent these properties inside our program. A standard way to do this under object-oriented programming (OOP) is to represent the concept of a ball a class, so that we can create multiple instances of it to represent different balls at run time. So, what should our ball class should store? The answer is all the data we have used before in the last program.</p>
+    <p>Surprisingly, animating multiple balls is not much more difficult from animating a single ball: we just have to do what we did in the last program multiple times. While Program 2 animates a white ball of radius $0.1$, the code is flexible enough to allow us to change the ball's radius and position. We just have to add some more code to allow colors other than white, and we would be able to achieve our goal.</p>
+
+    <p>Because different balls have different properties such as radii, colors, and positions, we need to a good way to keep track of these properties inside our program. A standard way to do this under object-oriented programming (OOP) is to represent the concept of a ball a class, so that we can create multiple instances of it to represent different balls at run time. So, what should our ball class should store? The answer is all the data we have used before in the last program.</p>
 
     <ul>
       <li>The 2D displacement of the center of the ball.</li>
@@ -639,7 +655,7 @@ this.displacementY = this.displacementY + delta * this.velocityY;
   :
 }</code></pre>
 
-    <p>In the last section, we represent the displacement by two variables, <code>displacementX</code> and <code>displacementY</code>, and the same is true for the velocity. However, in this section, we will represent vectors by Javascript arrays so that in order to reduce the number of fields and make the code easier to read. Here, <code>displacement</code> is supposed to be an array of size 2, so that <code>displacement[0]</code> represents the $x$-component of the displacement, and <code>displacement[1]</code> represents the $y$-component. The same is also true for <code>velocity</code>. The field <code>radius</code> is obviously a single floating point number, but <code>color</code> should be an array of size 3 so that <code>color[0]</code>, <code>color[1]</code>, and <code>color[2]</code> represent the R, G, and B components of the color, respectively.</p>
+    <p>In the last section, we represent the displacement by two variables, <code>displacementX</code> and <code>displacementY</code>, and the same is true for the velocity. However, in this section, we will represent vectors by Javascript arrays in order to reduce the number of fields and make the code easier to read. Here, <code>displacement</code> is supposed to be an array of size 2, so that <code>displacement[0]</code> represents the $x$-component of the displacement, and <code>displacement[1]</code> represents the $y$-component. The same is also true for <code>velocity</code>. The field <code>radius</code> is obviously a single floating point number, but <code>color</code> should be an array of size 3 so that <code>color[0]</code>, <code>color[1]</code>, and <code>color[2]</code> represent the R, G, and B components of the color, respectively.</p>
 
     <p>After we have decided what fields the class should have, we need to decide what methods it should have. We know that Program 3 has to update the ball's displacement and velocity every frame in order to animate it. This piece of code is used repetitively, and it has to be executed for every ball we put on the screen. This makes it a good candidate to be refactored into a method so that we can refer to the whole process by a name. Let us call this method <code>update</code>.</p>
 
@@ -647,21 +663,21 @@ this.displacementY = this.displacementY + delta * this.velocityY;
   this.displacement[0] += this.velocity[0] * delta;
   this.displacement[1] += this.velocity[1] * delta;
   
+  if (this.displacement[0] > 1.0 - this.radius) {
+    this.displacement[0] = 1.0 - this.radius;
+    this.velocity[0] *= -1.0;
+  }
   if (this.displacement[0] < -1.0 + this.radius) {
       this.displacement[0] = -1.0 + this.radius;
       this.velocity[0] *= -1.0;
   }
-  if (this.displacement[0] > 1.0 - this.radius) {
-      this.displacement[0] = 1.0 - this.radius;
-      this.velocity[0] *= -1.0;
+  if (this.displacement[1] > 1.0 - this.radius) {
+    this.displacement[1] = 1.0 - this.radius;
+    this.velocity[1] *= -1.0;
   }
   if (this.displacement[1] < -1.0 + this.radius) {
       this.displacement[1] = -1.0 + this.radius;
       this.velocity[1] *= -1.0
-  }
-  if (this.displacement[1] > 1.0 - this.radius) {
-      this.displacement[1] = 1.0 - this.radius;
-      this.velocity[1] *= -1.0;
   }
 }</code></pre>
 
@@ -737,22 +753,91 @@ class WebGLApp {
 
 <pre><code class="language-c">uniform Ball ball;</code></pre>
 
-    <p>Let us see how this uniform variable is used insider the shaders. The easier usage is in the <a href=""></a> fragment shader, where we just set the output color to the color of the ball.</p>
+    <p>Let us see how this uniform variable is used insider the shaders. The easier usage is in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-12/program-04/src/fragment-shader.frag">fragment shader</a>, where we just set the output color to the color of the ball.</p>
 
-<pre><code class="language-c">
-out vec4 fragColor;
+<pre><code class="language-c">out vec4 fragColor;
 
 void main() {
     fragColor = vec4(ball.color, 1.0);
 }</code></pre>
 
-    <p>The vertex shader is a little more complicated.</p>
+    <p>The vertex shader is pretty much like the vertex shader of Program 3. The only change is that, instead of using the <code>radius</code> and <code>displacement</code> uniforms, we use the fields of the <code>ball</code> uniform instead.</p>
 
-<pre><code>in vec2 position;
+<pre><code class="language-c">in vec2 position;
 
 void main() {
     gl_Position = vec4(position * ball.radius + ball.displacement, 0, 1);
 }</code></pre>
+
+    <p>Inside the Javascript program, we need to prepare a circle mesh just like what we did in Program 3. Then, we need to draw the circle multiple times, using the properties of each <code>Ball</code> instance. The relevant piece of code inside the <code>updateWebGL</code> method is as follows.</p>
+
+<pre><code class="language-c">useProgram(this.gl, this.program, () => {
+  for (let i=0; i &lt; this.balls.length; i++) {
+    let ball = this.balls[i];
+
+    let ballDisplacementLocation = self.gl.getUniformLocation(
+      self.program, "ball.displacement");
+    self.gl.uniform2fv(ballDisplacementLocation, ball.displacement);
+
+    let ballRadiusLocation = self.gl.getUniformLocation(
+      self.program, "ball.radius");
+    self.gl.uniform1f(ballRadiusLocation, ball.radius);
+
+    let ballColorLocation = self.gl.getUniformLocation(
+      self.program, "ball.color");
+    self.gl.uniform3fv(ballColorLocation, ball.color);
+    
+    setupVertexAttribute(
+      self.gl, self.program, "position", self.vertexBuffer, 2, 8, 0);
+    drawElements(
+      self.gl, self.indexBuffer, self.gl.TRIANGLES, 3*this.numSlices, 0);
+  }
+}</code></pre>
+
+    <p>We see that the main difference between the piece of code above and the equivalent portion from Program 3 is the <code>for</code> loop that iterates through the <code>balls</code> array. In each iteration of this loop, we set the relevant uniform variables and finally call <code>drawElements</code> to draw the circle that represents each ball. The uniform variables are now called "<code>ball.displacement</code>", "<code>ball.radius</code>", and "<code>ball.color</code>" instead of just "<code>displacement</code>" and "<code>radius</code>" like in the last program. This is simply because we now move these uniforms into a <code>struct</code>, and so we have to prefix their names with the struct's name and a dot (<code>.</code>).</p>
+
+    <p>Notice also that we use two new WebGL commands: <code>uniform2fv</code> and <code>uniform3fv</code>. When <code>v</code> is the last letter of a <code>uniformXXX</code> method, the method accepts an array instead of the individual components of the vectors, allowing us to write more concise code. If we were to use <code>uniform3f</code> to assign <code>ball.color</code>, the code would have been</p>
+    
+<pre><code class="language-c">self.gl.uniform2fv(
+  ballColortLocation, ball.color[0], ball.color[1], ball.color[2]);</code></pre>
+
+    <p>which is quite lengthy indeed.</p>
+
+    <h2>12.5 &nbsp; Summary</h2>
+
+    <ul>
+      <li>A <code>uniform variable</code> is a mechanism to pass information from the host program to a GLSL program.
+      <ul>
+        <li>It is a global variable in a GLSL program that can be set by the host Javascript program but not the GLSL program itself.</li>
+        <li>Its value is the same when seen from the vertex shader and the fragment shader.</li>
+      </ul>
+      </li>      
+
+      <li>One declares a uniform variable by adding the <code>uniform</code> keyword in front of a global variable declaration in the shaders.</li>
+
+      <li>Assigning a value to a uniform variable is a two-step process.
+      <ul>
+        <li>Retrieve the location of the uniform variable using the <code>getUniformLocation</code> method.</li>
+        <li>Set the value by using the <code>uniformXXX</code> methods.
+          <ul>
+            <li>Typically, <code>XXX</code> contains the number of components of the uniform variable and the data type of each component. For example, <code>unifrom3f</code> assigns to uniform variable that has 3 components, each of which is a floating-point number, which is a <code>vec3</code>.</li>
+
+            <li>If there is a <code>v</code> at the end of the method name, the method accepts an array storing the values of the components instead of the individual components.</li>
+          </ul>
+        </li>
+      </ul>
+      </li>
+
+      <li>One use case of uniform variables is to make the GLSL program responds to user inputs. This is what we did in Program 1. Another use case is to create animations, which is what we do in Program 2, 3, and 4.</li>
+
+      <li>Creating an animation, we must keep track of time.
+      <ul>
+        <li>We can use <code>performance.now</code> to retrieve the current time in milliseconds.</li>
+        <li>In our Javascript code, we need to keep track of the time since we started the program. Optinally, we can also keep track of the time since the last time we updated our OpenGL canvas.</li>
+      </ul>
+      </li>
+    </ul>
+
 
 
     <hr>
