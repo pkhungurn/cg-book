@@ -419,7 +419,28 @@ self.gl.uniform2f(
     <p>You may recall that we have written a program that draw a circle before in the last chapter. However, we will usea different method here. The idea is to approximate a circle with a collection of triangles. We call such a triangle a "slice," much like a slice of pizza or a slice of pie.  Each slice has two of its vertices on the circumference of the circle, and the circle's center serves as the third vertex.</p>
 
     <figure class="figure">
-      <b>TODO: Create this figure.</b>
+      <table>
+        <tr>
+          <td><img src="images/circle-slices-004.png" width="200"></a></td>
+          <td><img src="images/circle-slices-008.png" width="200"></a></td>
+          <td><img src="images/circle-slices-016.png" width="200"></a></td>
+        </tr>
+        <tr>
+          <td align="center">4 slices</td>
+          <td align="center">8 slices</td>
+          <td align="center">16 slices</td>
+        </tr>
+        <tr>
+          <td><img src="images/circle-slices-032.png" width="200"></a></td>
+          <td><img src="images/circle-slices-064.png" width="200"></a></td>
+          <td><img src="images/circle-slices-128.png" width="200"></a></td>
+        </tr>
+        <tr>
+          <td align="center">32 slices</td>
+          <td align="center">64 slices</td>
+          <td align="center">128 slices</td>
+        </tr>
+      </table>
       <figcaption class="figure-caption"><strong>Figure 12.4</strong> How to approximate a circle by breaking it down to triangular slices.</figcaption>
     </figure>    
 
