@@ -103,7 +103,42 @@
 
     <h3>13.1.2 &nbsp; Difference between the color spaces</h3>
 
-    <p>The main point of Program 1 is to show the reader the visual difference between being mindful and not being mindful of color spaces.</p>
+    <p>The main point of Program 1 is to show the reader the visual difference between being mindful and not being mindful of color spaces. When you run the program, you will see what is depicted in the screenshot below.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-01-screenshot-00.png"><img src="images/program-01-screenshot-00.png" alt="" width="300"></a></td>          
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 13.1</strong> The initial state of Program 1.</figcaption>
+    </figure>
+
+    <p>The program acts like a color picker you would see in a painting program like Microsoft Paint, GIMP, or Photoshop. There are three sliders, each corresponding to a tristimulous value in the RGB color space. There are two canvases, one labelled "WebGL" and the other "HTML," that we would show the colors specified by the sliders. The WebGL canvas displays the color through the use of a WebGL program, and the HTML canvas displays the color by manipulating the <code>background-color</code> CSS property of the canvas itself. So, the color shown on the HTML canvas reflects how the web browser normally interprets color values. Lastly, the user how the WebGL canvas would process the color specified by the sliders. When the user chooses the "No conversion" radio box, the WebGL canvas would output the color specified by the sliders without performing any calculation on it. However, when the user chooses the "Linear to sRGB" radio box, the WebGL program would treat the color specified by the sliders to be in the linear color space and perform conversion from linear to sRGB before outputting the color to the canvas. Note that the "Linear to sRGB" option is the one consistent with the rules we discussed in the last section, while the "No conversion" option is not.</p>
+
+    <p>To see what the options mean visually, let us manipulate the G slider so that the G value is $128 / 256 \approx 0.5$.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-01-screenshot-01.png"><img src="images/program-01-screenshot-01.png" alt="" width="300"></a></td>          
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 13.2</strong> Program 1's displaying the color $(0, 0.5, 0)$ with the "No conversion" option.</figcaption>
+    </figure>
+
+    <p>We can see that the both canvases show the exact same color. This makes sense because, as we said earlier, the web browser's color space is sRGB. So, if the WebGL program just outputs the color without any modification, it would show the exact same color that the browser would natively show. However, if we switch to the "Linear to sRGB" option, we will see that the color in the WebGL canvas becomes brighter.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-01-screenshot-02.png"><img src="images/program-01-screenshot-02.png" alt="" width="300"></a></td>          
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 13.3</strong> Program 1's displaying the color $(0, 0.5, 0)$ with the "Linera to sRGB" option.</figcaption>
+    </figure>
+
+    <p>This behavior is consistent with what we learned in <a href="../chapter-02/.index.html#color-spaces">Section 2.3</a>: the same color values would appear brighter if it is in the linear color space than when it is in the sRGB color space.</p>
 
     <h2>13.2 &nbsp; Program 2: Using varying variables to create color gradients</h2>
 
