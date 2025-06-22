@@ -78,15 +78,38 @@
 
     <p>In this chapter, we turn our attention to the fragment shader. Recall from <a href="../chapter-07/index.html#fragment-shaders">Chapter 7</a> that the fragment shader has two responsibilities: (1) deciding whether to discard a fragment or not, and (2) computing the color of the fragment if it is not discarded. We will see in this chapter that the fragment shader is very powerful because it determines colors that would finally appear on the screen.</p>
 
-    <p>One mechanism that makes the fragment shader powerful is the <b>varying variable</b>, which is a mechanism that allows the vertex shader to pass information to the fragment shader. Varying variables allows the fragment shader to know about the fragment it is processing, and one of the most useful information about the fragment is its position on the screen. This information allows us to compute a color as a function of a position, which is an image, and we shall see that this image can be very complicated even when our fragment shader is quite simple.</p>
+    <p>As you might recall from <a href="../chapter-02/">Chapter 2</a>, color is quite a complicated subject in its own right. A programmer must be aware of the color space of each color value they manipulate, and this is especially important when writing a fragment shader. Luckily, there are only two color spaces we need to worry about: linear and sRGB. In Program 1, we will discuss a function that converts from the linear space to the sRGB space and discuss why it is important. This function will be used throughout the rest of the book.</p>
 
-    <h2>13.1 &nbsp; Program 1: Varying variables</h2>
+    <p>The mechanism that makes the fragment shader powerful is the <b>varying variable</b>, which is a mechanism that allows the vertex shader to pass information to the fragment shader. Varying variables allow use to create color gradients, which we will demonstrate in Program 2.</p>
 
-    <h2>13.2 &nbsp; Program 2: The full-screen quad</h2>
+    <p>Moreover, varying variables allows the fragment shader to know about the fragment it is processing. One of the most useful information about the fragment is its position on the screen, and a way to set up the scene so that each fragmeht knows its position is to render a "full screen quad", which we will discuss in Program 3. The fragment position allows us to compute a color as a function of it, which is an image, and we shall see in Program 4 that this image can be very complicated even when our fragment shader is quite simple.</p>
 
-    <h2>13.3 &nbsp; Program 3: Displaying a 2D function</h2>
+    <h2>13.1 &nbsp; Program 1: Color spaces</h2>
 
-    <h2>13.4 &nbsp; Program 4: Displaying a fractal</h2>
+    <h3>13.1.1 &nbsp; Color spaces and the fragment shader</h3>
+
+    <p>Recall from <a href="../chapter-02/.index.html#color-spaces">Section 2.3</a> that a color space specifies the mapping from the RGB color cube the actual color that appearas on the screen. The color space used by your web browser is the <b>sRGB color space</b>. So, in an HTML file, when you specify the color <code>#EA8032</code>, which translates to the RGB value of $(234, 128, 50)$ or approximately $(0.92, 0.50, 0.20)$ if we use floating point numbers, the fact that you see the orange color <font color="#ea8032">■</font> is because the sRGB color spaces chooses to associate $(0.92, 0.50, 0.20)$ with this particular color. We also learn that the sRGB color space is not physical, meaning that a tristimulus value of $0.5$ is not half as powerful (i.e., as bright) as $1.0$. The color space where tristimulus values corresponds to light power emitted by the monitor is the <b>linear color space</b>. We also learns the rule of thumb that all intermediate calculations should be performed in the the linear space while all output values should be in the sRGB space.</p>
+
+    <p>How are the above facts and rule apply to how we should write fragment shaders? The first thing to keep in mind is that <b>any color value that appears on the screen is automatically in the sRGB color space.</b> This is simply because it is the color space that the browser uses. For all the previous programs up to this point, this output color is what we assign to the fragment shader's output variable, which is always called <code>fragColor</code>. So, this means that <code>fragColor</code> is always in the sRGB color space. (This will no longer apply when the fragment shader does not output to the screen, but we will talk about this later.)</p>
+
+    <p>Second, to follow the "compute in linear, output in sRGB" rule, we should follow another two simple rules when we write our programs.</p>
+
+    <ol>
+      <li>All color variables other than <code>fragColor</code> are in the linear space.</li>
+      <li>We must convert from linear to sRGB when assigning a value to <code>fragColor</code>.</li>
+    </ol>
+
+    <p>Unfortunately, there are no automatic mechanisms such as a compiler that would enforce these rules for us. The program must instead enforce these rules by themself. Being mindful of colors spaces practically means convering colors from one space to another at the right places in your program.</p>
+
+    <h3>13.1.2 &nbsp; Difference between the color spaces</h3>
+
+    <p>The main point of Program 1 is to show the reader the visual difference between being mindful and not being mindful of color spaces.</p>
+
+    <h2>13.2 &nbsp; Program 2: Using varying variables to create color gradients</h2>
+
+    <h2>13.2 &nbsp; Program 3: The full-screen quad</h2>
+
+    <h2>13.3 &nbsp; Program 3: Displaying 2D functions</h2>
 
     <hr>
     <p>
