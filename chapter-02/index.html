@@ -225,6 +225,7 @@
 
     <p>The drawback of the byte representation is that it is hard to calculate with. A byte does not support floating-point division. Moreover, addition, subtraction, and multiplication can easily lead to values that are outside of the $[0,255]$ range, which cannot be stored in a byte. As a result, when performing calculation on images stored in the byte representation, it is typical to convert each byte to a float, perform calculation on the float, clamp the result to the range $[0,1]$, and then covert this back to a byte and store it.</p>
 
+    <a name="color-spaces"></a>
     <h2>2.3 &nbsp; Color spaces: linear, gamma, and sRGB</h2>
 
     <p>In the last section, we committed to representing a color with a point in the RGB color cube, and we also learned what colors that the 8 corners of the cube represent. However, we have not at all specified how to interpret any tristimulus value that is neither $0$ or $1$. One of the confusing things in computer graphics is that there are multiple ways to do this, and each leads to a different <strong>color space</strong>, which means the mapping from the RGB color cube to the actual color outputted by a display device. There are three common color spaces, so let's learn about them.</p>
