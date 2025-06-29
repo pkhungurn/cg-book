@@ -114,7 +114,7 @@
       <figcaption class="figure-caption"><strong>Figure 13.1</strong> The initial state of Program 1.</figcaption>
     </figure>
 
-    <p>The program acts like a color picker you would see in a painting program like Microsoft Paint, GIMP, or Photoshop. There are three sliders, each corresponding to a tristimulous value in the RGB color space. There are two canvases, one labelled "WebGL" and the other "HTML," that we would show the colors specified by the sliders. The WebGL canvas displays the color through the use of a WebGL program, and the HTML canvas displays the color by manipulating the <code>background-color</code> CSS property of the canvas itself. So, the color shown on the HTML canvas reflects how the web browser normally interprets color values. Lastly, the user how the WebGL canvas would process the color specified by the sliders. When the user chooses the "No conversion" radio box, the WebGL canvas would output the color specified by the sliders without performing any calculation on it. However, when the user chooses the "Linear to sRGB" radio box, the WebGL program would treat the color specified by the sliders to be in the linear color space and perform conversion from linear to sRGB before outputting the color to the canvas. Note that the "Linear to sRGB" option is the one consistent with the rules we discussed in the last section, while the "No conversion" option is not.</p>
+    <p>The program acts like a color picker you would see in a painting program like Microsoft Paint, GIMP, or Photoshop. There are three sliders, each corresponding to a tristimulous value in the RGB color space. There are two canvases, one labelled "WebGL" and the other "HTML," that we would show the colors specified by the sliders. The WebGL canvas displays the color through the use of a WebGL program, and the HTML canvas displays the color by manipulating the <code>background-color</code> CSS property of the canvas itself. So, the color shown on the HTML canvas reflects how the web browser normally interprets color values. Lastly, the user can control how the WebGL canvas would process the color specified by the sliders. When the user chooses the "No conversion" radio box, the WebGL canvas would output the color specified by the sliders without performing any calculation on it. However, when the user chooses the "Linear to sRGB" radio box, the WebGL program would treat the color specified by the sliders to be in the linear color space and perform conversion from linear to sRGB before outputting the color to the canvas. Note that the "Linear to sRGB" option is the one consistent with the rules we discussed in the last section, while the "No conversion" option is not.</p>
 
     <p>To see what the options mean visually, let us manipulate the G slider so that the G value is $128 / 256 \approx 0.5$.</p>
 
@@ -138,7 +138,108 @@
       <figcaption class="figure-caption"><strong>Figure 13.3</strong> Program 1's displaying the color $(0, 0.5, 0)$ with the "Linera to sRGB" option.</figcaption>
     </figure>
 
-    <p>This behavior is consistent with what we learned in <a href="../chapter-02/.index.html#color-spaces">Section 2.3</a>: the same color values would appear brighter if it is in the linear color space than when it is in the sRGB color space.</p>
+    <p>This behavior is consistent with what we learned in <a href="../chapter-02/.index.html#color-spaces">Section 2.3</a>: the same RGB values would appear brighter if it is in the linear color space than when it is in the sRGB color space. Let's take a look at the effect of the linear-to-sRGB conversion to other colors.</p>
+
+    <figure class="figure">
+      <p>TODO: Add images to this figure.</p>
+      <figcaption class="figure-caption"><strong>Figure 13.4</strong> The effect of the linear-to-sRGB conversion on other colors.</figcaption>
+    </figure>
+
+    <p>To repeat, the overall effect is that the linear-to-sRGB conversion results in brighter colors compared to directly outputting the color values directly. The exception to this behavior is when all the RGB values are either $0$ or $1$, in which case the converted color would be the same as the direct color. As a result, not performing the linear-to-sRGB conversion in the last step has a visible effect that WebGL renderings would appear dark.</p>
+
+    <p>The writer would like to repeat that the reason we need to put a linear-to-sRGB conversion at the last step of a fragment shader is not to make the rendering brighter. We do so because we want to make <b>all color calculations up to that point to be in the linear space</b> so that those calculations make sense according to physics. In this program, there is no calculation other than the conversion. However, the next program has color calculations despite us not writing them down explicitly in our code, so it is important to always stick to the rule even when our WebGL program seems to be very simple.</p>
+
+    <h3>13.1.3 &nbsp; How the program works</h3>
+
+    <p>We talked a lot about the linear-to-sRGB conversion and how important it is. Let us look at how it is implemented in code. The <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-01/src/vertex-shader.vert">vertex shader</a> is exceedingly simple: it just outputs the position fetched from the vertex buffer.</p>
+
+<pre><code class="language-c">#version 300 es
+
+in vec2 vert_position;
+
+void main() {
+    gl_Position = vec4(vert_position, 0, 1);
+}</code></pre>
+
+    <p>The <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-01/src/fragment-shader.frag">fragment shader</a> receives two pieces of information from the hose program though uniform variables. The first piece is color specified by the sliders, represented by the <code>color</code> variable of type <code>vec3</code>. The second piece is the whether the aforementioned color is in the linear color space, represented by the <code>useLinearColorSpace</code> variable of type <code>bool</code>. As usual, the fragment shader outputs a <code>vec4</code>, which we always call <code>fragColor</code>.</p>
+
+<pre><code class="language-c">#version 300 es
+
+precision highp float;
+
+uniform vec3 color;
+uniform bool useLinearColorSpace;
+
+out vec4 fragColor;</code></pre>
+
+    <p>Let us look at the host program and see how the uniform variables are set.</p>
+
+<pre><code class="language-javascript">let r = this.redSlider.slider("value") / 255.0;
+let g = this.greenSlider.slider("value") / 255.0;
+let b = this.blueSlider.slider("value") / 255.0
+
+let useLinearColorSpace = 
+  $('input[name=colorSpace]:checked').val() === 'linear';
+
+useProgram(this.gl, this.program, () => {
+    let colorLocation = self.gl.getUniformLocation(self.program, "color");
+    self.gl.uniform3f(colorLocation, r, g, b);
+
+    let useLinearColorSpaceLocation = self.gl.getUniformLocation(
+      self.program, "useLinearColorSpace");
+    self.gl.uniform1i(useLinearColorSpaceLocation, useLinearColorSpace);
+    
+    setupVertexAttribute(
+      self.gl, self.program, "vert_position", self.vertexBuffer, 2, 8, 0);
+    drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 6, 0);
+});
+</code></pre>
+
+    <p>We can see that the program fetches the tristimulous value <code>r</code>, <code>g</code>, and <code>b</code> from the sliders and convert them to floating point values in the $[0,1]$ inverval by dividing the fetched values with $255$, the maximum value of the sliders. Then, it uses the <code>uniform3f</code> matrix of the WebGL context to set the <code>color</code> uniform variable. For the <code>useLinearColorSpace</code> variable, the value can be obtained by examining whether the checked radio box is the "linear" one. Now, both in Javascript and in GLSL, the <code>useLinearColorSpace</code> are of the boolean types. However, when we set uniform variable, we have to use the <code>uniform1i</code> method, whose name indicates that it is for integer variables, as a substitute because the WebGL API does not have method specifically designed for the boolean type.</p>
+
+    <p>The <a href="https://github.com/pkhungurn/cg-book-code/blob/01e54ad4b85e394d7e45757fa644d021e680cf19/chapter-13/program-01/src/fragment-shader.frag#L28"><code>main</code> function of the fragment shader</a> looks at <code>useLinearColorSpace</code> and apply the linear-to-sRGB conversion if the variable is true.</p>
+
+<pre><code class="language-c">void main() {
+    if (useLinearColorSpace) {
+        fragColor = vec4(linearToSrgb(color), 1.0);
+    } else {
+        fragColor = vec4(color, 1.0);
+    }
+}</code></pre>
+
+    <p>The <code>linearToSrgb</code> function converts a <code>vec3</code> that is meant to represent an RGB value in the linear color space to an RGB value in the sRGB value in color space.</p>
+
+<pre><code class="language-c">vec3 linearToSrgb(vec3 color) {
+    return vec3(
+      linearToSrgbSingle(color.r), 
+      linearToSrgbSingle(color.g), 
+      linearToSrgbSingle(color.b));
+}</code></pre>
+
+    <p>The function applies the same transformation, implemented by the <code>linearToSrgbSingle</code> function to the R, G, and B channels. The <code>linearToSrgbSingle</code> function implements the function
+    $$
+    f_{\mathrm{linear}\rightarrow\mathrm{sRGB}}(x) = \begin{cases}
+    12.92 x, &amp; x \leq 0.0031308 \\
+    1.055x^{1.0/2.4} - 0.055, &amp; x &gt; 0.0031308
+    \end{cases}
+    $$
+    that we previously discussed in <a href="../chapter-02/index.html#srgb-color-space">Section 2.3.3.</a>
+    </p>
+
+<pre><code class="language-c">float linearToSrgbSingle(float c) {
+    float a = 0.055;
+    if (c <= 0.0)
+        return 0.0;
+    else if (c < 0.0031308) {
+        return 12.92*c;
+    } else {
+        if (c >= 1.0)
+            return 1.0;
+        else
+            return (1.0+a)*pow(c, 1.0/2.4)-a;
+    }
+}</code></pre>
+    
 
     <h2>13.2 &nbsp; Program 2: Using varying variables to create color gradients</h2>
 

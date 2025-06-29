@@ -275,6 +275,7 @@
 
     <p>To imitate CRT displays, LCD displays are created to have non-linear transfer functions as well even though the underlying technology is different. When using an LCD monitor, the standard gamma value is $2.2$ when using all modern OSes. However, for Mac OSes before Snow Leopard, the value was 1.8.<sup><a href="#fn:lcd-gamma-values">5</a></sup> When the monitor type and the OS are unknown, we default to $2.2$.</p>
 
+    <a name="srgb-color-space"></a>
     <h3>2.3.3 &nbsp; sRGB color space</h3>
 
     <p>The <strong>standard RGB</strong> (sRGB) color space was developed by Microsoft and HP and was adopted as a standard by the International Electrotechnical Commission (IEC) in 1999. It is the color space used in HTML documents<sup><a href="#fn:srgb-use-in-web">6</a></sup>, Moreover, a browser would assume that all tristimulus values in an image file are in sRGB if the image does not come with any color space information. In particular, it is safe to say that most JPEG and PNG images use sRGB. We care about the space because we will use it extensively: we will be doing 3DCG in the web browser, and we will process a lot of image data.</p>
