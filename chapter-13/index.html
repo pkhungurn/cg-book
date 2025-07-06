@@ -296,6 +296,8 @@ useProgram(this.gl, this.program, () => {
 
     <p>Lastly, in fragment processing, WebGL invokes the fragment shader for each of the generated fragments, and the fragment shader sees the value that was interpolated by the rasterization process.</p>
 
+    <p>We can now see why varying variables makes the fragment shader powerful. With a varying variable, a fragment shader sees a different value at each vertex, which means that it can now assign different colors to different pixels in a controlled manner. This capability allows us to create more complicated images than what we have been achieved before. </p>
+
     <h2>13.2 &nbsp; Program 3: The full-screen quad</h2>
 
     <h2>13.3 &nbsp; Program 3: Displaying 2D functions</h2>
