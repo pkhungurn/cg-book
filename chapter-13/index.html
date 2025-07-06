@@ -239,9 +239,62 @@ useProgram(this.gl, this.program, () => {
             return (1.0+a)*pow(c, 1.0/2.4)-a;
     }
 }</code></pre>
-    
 
+    <p>From now on, we will always apply <code>linearToSrgb</code> function as the final steps of our fragment shaders. To repeat, we are doing this in order to comply with the rule we set up for ourselves that (1) the final output must be in the sRGB color space, and (2) all intermediate computations should be carried out in the linear color space.</p>
+    
     <h2>13.2 &nbsp; Program 2: Using varying variables to create color gradients</h2>
+
+    <p>In this section, we discuss a mechanism that makes the fragment shader extremely poweful, the <b>varying variables</b>. In the programs we have discussed so far, primitives always have a single color. However, with a varying variable, we can render primives whose individual pixels might have different colors, and we will use it to create color gradients that can be seen the following screenshot.</p>
+
+<figure class="figure">
+  TODO: Fill this figure.
+  <figcaption class="figure-caption"><strong>Figure 13.5</strong> A screenshot of Program 2.</figcaption>
+</figure>
+
+    <h3>13.2.1 &nbsp; Varying variables</h3>
+
+    <p>Varying variables are a mechanism for passing information from the vertex shader to the fragment shader. For a piece of information to be passed, we must declare two variables of the same name and the same type: one in the vertex shader, and the other in the fragment shaders. For example, in <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-13/program-02">Program 2</a>, the information we want to pass from the vertex shader to the fragment shader is a <code>vec3</code> that we use to represent an RGB color value. So, in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-02/src/vertex-shader.vert">vertex shader</a> , we declare a global variable called <code>geom_color</code> as follows.</p>
+
+<pre class="language-c"><code>out vec3 geom_color;</code></pre>
+
+    <p>Then, in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-02/src/fragment-shader.frag">fragment shader</a>, we declare another variable with the same type and the same name.</p>
+
+<pre class="language-c"><code>in vec3 geom_color;</code></pre>
+
+    <p>The only difference is that, in the vertex shader, we prefix the declaration with the keyword <code>out</code>, and, in the fragment shader, we instead use the keyword <code>in</code>. The keywords make sense because information always flows from the vertex shader to the fragment shader, so we can think of a varying variable as being an "output" of the vertex shader and also an "input" of the fragment shader. It is the job the vertex shader to assign values to varying variables and the fragment shader to read and process them.</p>
+
+    <p>Let us discuss the semantics of varying variables. That is, after the vertex shader assign their values, what values do we expect to see in the fragment shaders when they read the same varying variables? The answer is that it is almost always not the same values that were assigned to by the vertex shader!</p>
+
+    <p>To understand how varying variables work, we need to revisit how the graphics pipeline work. Recall from <a href="../chapter-07/index.html">Chapter 7</a> that the graphics pipeline has multiple stages. The vertex shader controls a step called "vertex processing." This step is followed by two more steps: "primitive assembly" and "rasterization." The fragment shader controls "fragment processing," which is the next step in the process.</p>
+
+    <p>When the host program renders a primitive, say with the <code>drawElements</code> method of the WebGL context, it must specify a number of vertices in the vertex buffer. For each of these vertices, WebGL invokes the vertex shader to process each vertex individually. So, if the vertex shader assigns a value to a varying variable, then there would be an independent value associated with each vertex, and values of different vertices can be different. In case of Program 2, <code>geom_color</code> and be red for one vertex, and it can be green for another.</p>
+
+<figure class="figure">
+  TODO: Fill this figure
+  <figcaption class="figure-caption"><strong>Figure 13.6</strong> Values of the varying variable <code>geom_color</code> associated with different vertices.</figcaption>
+</figure>
+
+    <p>Then, in primitive assembly, vertices belonging to the same primitives are connected, and primitives are simplified. In the end, we are left with points, lines, and triangles such that each individual vertex has a <code>geom_color</code> value associated with it.</p>
+
+<figure class="figure">
+  TODO: Fill this figure
+  <figcaption class="figure-caption"><strong>Figure 13.7</strong> The state of scene after primitive assembly.</figcaption>
+</figure>
+
+    <p>In rasterization, each primitive is turned into a number of fragments. <b>The value of the varying variable of a fragment is an interpolation of the the values at the vertices that make up the primitive</b>. The type of interpolation used depends on the primitive type.</p>
+
+    <ul>
+      <li>If the primitive is a point, then the value is copied directly from the vertex.</li>
+      <li>If the primitive is a line, then the value is a linear interpolation between the values at the endpoints of the line.</li>
+      <li>If the primitive is a triangle, then the value is an interpolation computed using the barycentric coordinates of the fragment position.</li>
+    </ul>
+
+<figure class="figure">
+  TODO: Fill this figure
+  <figcaption class="figure-caption"><strong>Figure 13.8</strong> The value of a varying variable of a fragment is an interpolation of the values of the vertices that make up the primitive where the fragment comes from.</figcaption>
+</figure>
+
+    <p>Lastly, in fragment processing, WebGL invokes the fragment shader for each of the generated fragments, and the fragment shader sees the value that was interpolated by the rasterization process.</p>
 
     <h2>13.2 &nbsp; Program 3: The full-screen quad</h2>
 
