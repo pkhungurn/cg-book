@@ -286,7 +286,7 @@ useProgram(this.gl, this.program, () => {
     <ul>
       <li>If the primitive is a point, then the value is copied directly from the vertex.</li>
       <li>If the primitive is a line, then the value is a linear interpolation between the values at the endpoints of the line.</li>
-      <li>If the primitive is a triangle, then the value is an interpolation computed using the barycentric coordinates of the fragment position.</li>
+      <li>If the primitive is a triangle, then the value is an interpolation computed using the <a href="../chapter-03/index.html#barycentric-coordinates">barycentric coordinates</a> of the fragment position.</li>
     </ul>
 
 <figure class="figure">
@@ -298,9 +298,76 @@ useProgram(this.gl, this.program, () => {
 
     <p>We can now see why varying variables makes the fragment shader powerful. With a varying variable, a fragment shader sees a different value at each vertex, which means that it can now assign different colors to different pixels in a controlled manner. This capability allows us to create more complicated images than what we have been achieved before. </p>
 
-    <h2>13.2 &nbsp; Program 3: The full-screen quad</h2>
+    <h3>13.2.2 &nbsp; Color gradients</h3>
 
-    <h2>13.3 &nbsp; Program 3: Displaying 2D functions</h2>
+    <p>Now that we understand how varying variables work, it is time to see it in action. The color gradients that we see in Figure 13.5 is a direct result of rendering a mesh where each vertex has an extra attribute, color, which is represented by the <code>vert_color</code> attribute variable. In the host program <a href="https://github.com/pkhungurn/cg-book-code/blob/01e54ad4b85e394d7e45757fa644d021e680cf19/chapter-13/program-02/src/index.js#L28"><code>createBuffers</code></a> method, we set up the mesh as follows.</p>
+  
+<pre><code language="c">createBuffers() {
+    let vertexData = [
+        -0.5, -0.5,        // First vertex 
+          1.0,  1.0, 0.0,  // is yellow.
+          0.5, -0.5,       // Second vertex
+          0.0,  1.0, 1.0,  // is cyan.
+          0.5,  0.5,       // Third vertex
+          1.0,  0.0, 1.0,  // is magenta.
+        -0.5,  0.5,        // Fourth vertex
+          1.0,  1.0, 1.0   // is white.
+    ];
+    this.vertexBuffer = createVertexBuffer(
+      this.gl, new Float32Array(vertexData));
+
+    let indexData = [
+        0, 1, 2,
+        0, 2, 3
+    ];
+    this.indexBuffer = createIndexBuffer(
+      this.gl, new Int32Array(indexData));
+}</code></pre>
+
+    <p>The mesh has four vertices where each has it own color, and the mesh is made up of two triangles, forming a square. In the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-02/src/vertex-shader.vert">vertex shader</a>, we assign the attribute to the <code>geom_color</code> varying variable, which basically tells WebGL to interpolate the vertex colors during rasterization.</p>
+
+<pre><code language="c">#version 300 es
+
+in vec2 vert_position;
+in vec3 vert_color;
+
+out vec3 geom_color;
+
+void main() {
+    gl_Position = vec4(vert_position, 0, 1);
+    geom_color = vert_color;
+}</code></pre>
+
+    <p>The <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-02/src/fragment-shader.frag">fragment shader</a>, however, is a little more complicated. The interpolated color is available to the fragment shader via the <code>geom_color</code> varying variable. It is tempting to just set the output color to this value. Nevertheless, we have to remember the rule we discussed in the last section: we must apply linear-to-sRGB conversion as the last step in our fragment shader. This is exactly what is done in the <code>main</code> function of the fragment shader.</p>
+
+<pre><code language="c">in geom_color;
+
+void main() {
+  fragColor = vec4(linearToSrgb(geom_color), 1.0);
+}</code></pre>
+
+    <p>The <code>linearToSrgb</code> function is the same one we discussed in the last section. To make the whole program work, we must set up the attributes and render the mesh in the host program, and the code that does this is as follows.</p>
+
+<pre><code language="c">useProgram(this.gl, this.program, () => {
+  setupVertexAttribute(
+    self.gl, self.program, "vert_position", self.vertexBuffer, 2, 4*5, 0);
+  setupVertexAttribute(
+    self.gl, self.program, "vert_color", self.vertexBuffer, 3, 4*5, 4*2)
+  drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 6, 0);
+});</code></pre>
+
+    <p>The reader might recall that we apply the linear-to-sRGB conversion because we recognize that we want the output color to be in the sRGB space while we want all intermediate calculations to be in the linear space. Paradoxically, the code of Program 2 does not specify any color calculations at all. All it does is copying color values from one variable to another. There are no additions, subtractions, or multiplications of color variables in the code! However, although we do not specify any calculation <i>explicitly</i>, there are <i>implicit</i> calculations involving colors: the color interpolation carried out by the graphics pipeline in the rasterization step. <b>We want all color interpolations conducted in the linear space.</b> So, to recognize this fact, we apply linear-to-sRGB conversion before we set the output of the fragment shader.</p>
+
+    <p>Not applying the linear-to-sRGB conversion at the end can result in a very different color gradient, which is shown in Figure 13.9. We emphasize that Figure 13.9(a) is <b>RIGHT</b>, and Figure 13.9(b) is <b>WRONG</b>. A competent graphics programmer should not allow Figure 13.9(b) to happen. The reason is that interpolation carried out by the graphics pipeline is <i>linear</i> in nature, and this calculation must be carried out in the <i>linear</i> color space in order for it to make any mathematical sense. Not applying the linear-to-sRGB in the last step means that the colors being interpolated by the graphics pipeline are in the sRGB color space. This is not mathematically sound and is therefore wrong. <b>It is thus important to always apply linear-to-sRGB at the last step even though the code does not directly specify any calculations on color values.</b></p>
+
+<figure class="figure">
+  TODO: Fill this figure
+  <figcaption class="figure-caption"><strong>Figure 13.9</strong> The comparison between color gradients in cases where (a) the linear-to-sRGB conversion is applied and where (b) the conversion is not applied.</figcaption>
+</figure>
+
+    <h2>13.3 &nbsp; Program 3: The full-screen quad</h2>
+
+    <h2>13.4 &nbsp; Program 3: Displaying 2D functions</h2>
 
     <hr>
     <p>
