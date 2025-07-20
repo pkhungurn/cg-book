@@ -367,7 +367,82 @@ void main() {
 
     <h2>13.3 &nbsp; Program 3: The full-screen quad</h2>
 
-    <h2>13.4 &nbsp; Program 3: Displaying 2D functions</h2>
+    <p>Through the last program, we learned that the fragment shader can generate color gradients through the use of a varying varying variables. This is, of course, not the only thing that the fragment shader and the varying variables are capable of. In fact, the fragment shader can generate arbitrary images that we can encode in a GLSL program. To get a sense of what is possible, take a look at <a href="https://www.shadertoy.com">Shadertoy</a>, which is a web sita that hosts GLSL programs that can generate impressive images with minimal access to data.</p>
+
+    <p>While we will not generate images and animations like those in Shadertoy just yet in this chapter, we will generate some complicated ones with Program 4. To get Program 4 to work, though, we need to study a tool that it relies on: <i>the full-screen quad</i> (FSQ). Creating a full-screen quad is actually even easier than creating the color gradients in Program 2. Nevertheless, although the FSQ itself is a simple object, it can be used to create very complicated images as we shall see later.</p>
+
+    <p>What is an FSQ then? As the name implies, it is simply a quad(riliteral) whose area is the area of the whole screen. The clip-space coordinates of the four corners of the screen are $(-1,1,0,1)$, $(-1,1,0,1)$, $(1,1,0,1)$, and $(-1,1,0,1)$. So, an FSQ is a quad whose four corners are these four vertices, making it a rectangle. Note that we can already render such a shape using what we know before this chapter. However, the FSQ we are introducing has an extra feature: when we render it, we interpolate the verticec' 2D positions and pass these positions to the fragment shader through a varying variable. The quad with interpolated positions is much more powerful than the one without.</p>
+
+    <p>It is very simple to set up an FSQ. We just need to create a vertex buffer with four vertices where each vertex has just a single attribute, its 2D position, and then connect the vertices to form a rectangle. This is done in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-03/src/index.js"><code>index.js</code></a> file of Program 3 as follows.</p>
+
+<pre><code class="language-c">createBuffers() {
+  let vertexData = [
+      -1.0, -1.0,       
+        1.0, -1.0,       
+        1.0,  1.0,       
+      -1.0,  1.0
+  ];
+  this.vertexBuffer = createVertexBuffer(this.gl, new Float32Array(vertexData));
+
+  let indexData = [
+      0, 1, 2,
+      0, 2, 3
+  ];
+  this.indexBuffer = createIndexBuffer(this.gl, new Int32Array(indexData));
+}
+</code></pre>
+
+    <p>In the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-03/src/vertex-shader.vert">vertex shader</a>, we make the clip position from the 2D position attribute, and we also assign the attribute to a varying variable.</p>
+
+<pre><code class="language-c">in vec2 vert_position;
+
+out vec2 geom_position;
+
+void main() {
+    gl_Position = vec4(vert_position, 0, 1);
+    geom_position = vert_position;
+}</code></pre>
+
+    <p>Of course, in the host program, we need to configure the attribute accordingly, and this is done in the <a href="https://github.com/pkhungurn/cg-book-code/blob/01e54ad4b85e394d7e45757fa644d021e680cf19/chapter-13/program-03/src/index.js#L44C5-L44C14"><code>updateGL</code></a> method as follows.</p>
+
+<pre><code='language-c'>updateWebGL() {
+    let self = this;
+
+    this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+    useProgram(this.gl, this.program, () => {
+        setupVertexAttribute(self.gl, self.program, "vert_position", self.vertexBuffer, 2, 8, 0);
+        drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 6, 0);
+    });
+    
+    window.requestAnimationFrame(() => self.updateWebGL());
+}
+</code></pre>
+
+    <p>The fragment shader now has access to a varying variable called <code>geom_position</code> that is the interpolation of the four vertices of the four corners. This inpolated positions are precisely the clip-space coordinates of the fragment's position on the screen. The fragment shader becomes aware of the fragment it is processing, and it can use this information to choose a color to output based on this information. This is where all the magic happens, and we will showcase what we can do with it in the next section.</p>
+
+    <p>However, to make this section self-contained, we will simply visualize the screen position as colors. We will use the R channel to represent the $x$-position, and the G channel to represent the $y$-position. Because the positions are in the range $[-1,1]$, we need to transform them to the $[0,1]$ range before outputing. Of course, we shall apply linear-to-sRGB conversion in the end so as to comply with the rule we set up for ourselves in the last section. The main function of the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-03/src/fragment-shader.frag">fragment shader</a> is reproduced below.</p>
+
+<pre><code class="language-c">in vec2 geom_position;
+
+out vec4 fragColor;
+
+void main() {
+    vec3 color = vec3((geom_position + 0.5) + 0.5, 0.0);
+    fragColor = vec4(linearToSrgb(color), 1.0);
+}</code></pre>
+
+    <p>After all is said and done, we end up with another color gradient that is depicted in the figure below.</p>
+
+    <figure class="figure">
+      TODO: Fill this figure
+      <figcaption class="figure-caption"><strong>Figure 13.10</strong> A screenshot of Program 3.</figcaption>
+    </figure>
+
+    <p>It may seem that we have not accomplished anything new as we just got another color gradient with even fewer colors than what we saw in Program 2. But stay tuned! We will see how to take full advantage of the FSQ in the next program</p>
+    
+    <h2>13.4 &nbsp; Program 4: Displaying 2D functions</h2>
 
     <hr>
     <p>
