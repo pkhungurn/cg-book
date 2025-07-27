@@ -427,14 +427,16 @@ void main() {
 
     <p>Of course, in the host program, we need to configure the attribute accordingly, and this is done in the <a href="https://github.com/pkhungurn/cg-book-code/blob/01e54ad4b85e394d7e45757fa644d021e680cf19/chapter-13/program-03/src/index.js#L44C5-L44C14"><code>updateGL</code></a> method as follows.</p>
 
-<pre><code='language-c'>updateWebGL() {
+<pre><code class='language-c'>updateWebGL() {
     let self = this;
 
     this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
     useProgram(this.gl, this.program, () => {
-        setupVertexAttribute(self.gl, self.program, "vert_position", self.vertexBuffer, 2, 8, 0);
+        setupVertexAttribute(
+            self.gl, self.program, 
+            "vert_position", self.vertexBuffer, 2, 8, 0);
         drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 6, 0);
     });
     
