@@ -141,7 +141,16 @@
     <p>This behavior is consistent with what we learned in <a href="../chapter-02/.index.html#color-spaces">Section 2.3</a>: the same RGB values would appear brighter if it is in the linear color space than when it is in the sRGB color space. Let's take a look at the effect of the linear-to-sRGB conversion to other colors.</p>
 
     <figure class="figure">
-      <p>TODO: Add images to this figure.</p>
+      <table>
+        <tr>
+          <td><a href="images/program-01-screenshot-03.png"><img src="images/program-01-screenshot-03.png" alt="" width="300"></a></td>
+          <td><a href="images/program-01-screenshot-04.png"><img src="images/program-01-screenshot-04.png" alt="" width="300"></a></td>
+        </tr>
+        <tr>
+          <td><a href="images/program-01-screenshot-05.png"><img src="images/program-01-screenshot-05.png" alt="" width="300"></a></td>
+          <td><a href="images/program-01-screenshot-06.png"><img src="images/program-01-screenshot-06.png" alt="" width="300"></a></td>
+        </tr>
+      </table>
       <figcaption class="figure-caption"><strong>Figure 13.4</strong> The effect of the linear-to-sRGB conversion on other colors.</figcaption>
     </figure>
 
@@ -247,7 +256,11 @@ useProgram(this.gl, this.program, () => {
     <p>In this section, we discuss a mechanism that makes the fragment shader extremely poweful, the <b>varying variables</b>. In the programs we have discussed so far, primitives always have a single color. However, with a varying variable, we can render primives whose individual pixels might have different colors, and we will use it to create color gradients that can be seen the following screenshot.</p>
 
 <figure class="figure">
-  TODO: Fill this figure.
+  <table>
+    <tr>
+      <td><a href="images/program-02-screenshot-00.png"><img src="images/program-02-screenshot-00.png" alt="" width="300"></a></td>
+    </tr>
+  </table>
   <figcaption class="figure-caption"><strong>Figure 13.5</strong> A screenshot of Program 2.</figcaption>
 </figure>
 
@@ -361,7 +374,16 @@ void main() {
     <p>Not applying the linear-to-sRGB conversion at the end can result in a very different color gradient, which is shown in Figure 13.9. We emphasize that Figure 13.9(a) is <b>RIGHT</b>, and Figure 13.9(b) is <b>WRONG</b>. A competent graphics programmer should not allow Figure 13.9(b) to happen. The reason is that interpolation carried out by the graphics pipeline is <i>linear</i> in nature, and this calculation must be carried out in the <i>linear</i> color space in order for it to make any mathematical sense. Not applying the linear-to-sRGB in the last step means that the colors being interpolated by the graphics pipeline are in the sRGB color space. This is not mathematically sound and is therefore wrong. <b>It is thus important to always apply linear-to-sRGB at the last step even though the code does not directly specify any calculations on color values.</b></p>
 
 <figure class="figure">
-  TODO: Fill this figure
+  <table>
+    <tr>
+      <td><a href="images/program-02-screenshot-00.png"><img src="images/program-02-screenshot-00.png" alt="" width="300"></a></td>
+      <td><a href="images/program-02-screenshot-01.png"><img src="images/program-02-screenshot-01.png" alt="" width="300"></a></td>
+    </tr>
+    <tr>
+      <td align="center">(a)</td>
+      <td align="center">(b)</td>
+    </tr>
+  </table>
   <figcaption class="figure-caption"><strong>Figure 13.9</strong> The comparison between color gradients in cases where (a) the linear-to-sRGB conversion is applied and where (b) the conversion is not applied.</figcaption>
 </figure>
 
@@ -436,7 +458,11 @@ void main() {
     <p>After all is said and done, we end up with another color gradient that is depicted in the figure below.</p>
 
     <figure class="figure">
-      TODO: Fill this figure
+      <table>
+        <tr>
+          <td><a href="images/program-03-screenshot-00.png"><img src="images/program-03-screenshot-00.png" alt=""  width="300"></a></td>
+        </tr>
+      </table>
       <figcaption class="figure-caption"><strong>Figure 13.10</strong> A screenshot of Program 3.</figcaption>
     </figure>
 
