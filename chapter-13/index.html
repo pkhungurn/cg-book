@@ -472,7 +472,7 @@ void main() {
     
     <h2>13.4 &nbsp; Program 4: Drawing a fractal</h2>
 
-    <p>Program 4 displays two images of two mathematical functions defined on the 2D plane. The first is called the <a href="https://en.wikipedia.org/wiki/Zone_plate">zone plate</a> function, and the second is a fractal called the <a href="https://en.wikipedia.org/wiki/Mandelbrot_set">Mandelbrot set</a>. The user can choose which function to display through the radio box below the canvas. The sliders allows the user to move the image around and change the zoom level. Some screenshots of the program are shown in the figure below.</p>
+    <p>Program 4 displays an image of a fractal called the <a href="https://en.wikipedia.org/wiki/Julia_set">Julia set</a>. The sliders allows the user to move the image around and change the zoom level. Two screenshots of the program are shown in the figure below.</p>
 
     <figure class="figure">
       <table>
@@ -484,11 +484,37 @@ void main() {
       <figcaption class="figure-caption"><strong>Figure 13.11</strong> Screenshots of Program 4.</figcaption>
     </figure>
 
-    <p>The images that Program 4 show are much more complicated and psychedelic than the simple images that we have seen so far in this chapter. However, Program 4 is just a fancier version of Program 3. The mesh rendered and the vertex shader are exactly the same. The biggest difference is the fragment shader. Instead of just directly outputing the <code>geom_position</code> varying variable as color, Program 4's fragment shader converts the 2D position into a color that varies rapidly as the position changes. Let us see how it is done.</p>
+    <p>The image that Program 4 show are much more complicated and psychedelic than the simple images that we have seen so far in this chapter. However, Program 4 is just a fancier version of Program 3. The mesh rendered and the vertex shader are exactly the same. The biggest difference is the fragment shader. Instead of just directly outputing the <code>geom_position</code> varying variable as color, Program 4's fragment shader converts the 2D position into a color that varies rapidly as the position changes. Let us see how it is done.</p>
 
-    <h3>13.4.1 &nbsp; Zone plate</h3>
+    <h3>13.4.1 &nbsp; Julia set</h3>
 
-    <h3>13.4.2 &nbsp; Mandelbrot set</h3>
+    <p>A Julia set is a shape we call a "fractal." Intuitively, it is a shape where, when you zoom in on a part, you see structures that are similar to the overall structure. For our purpose, it is just a shape with complex details that is interesting to draw. A Julia set fits our goal well because it is a fractal that is easy to describe and program. So, let us start with the definition.</p>
+
+    <p>The definition of the Julia set is based on a process conducted on a complex number. We are given two complex numbers $c$ and $p$. We are then to construct an infinite sequence of complex numbers $z_1, z_2, \dotsc$ according to the following equation.
+    \begin{align*}
+      z_n = \begin{cases}
+        p, & n = 0 \\
+        z_{n-1}^2 + c, & n > 0
+      \end{cases}.
+    \end{align*}
+    For example, if $c = 1 + i$ and $p = 0$, then,
+    \begin{align*}
+      z_0 &= p = 0, \\
+      z_1 &= 0^2 + c = 1 + i, \\
+      z_2 &= z_1^2 + c = (1 + i)^2 + (1 + i) = 2i + (1 + i) = 1 + 3i, \\
+      z_3 &= z_2^2 + c = (1 + 3i)^2 + (1 + i) = (-7 + 6i) + (1 + i) = 6 + 7i \\
+      z_4 &= z_3^2 + c = (6 + 7i)^2 + (1 + i) = (-13 + 84i) + (1 + i) = -12 + 85i.
+    \end{align*}
+    We can continue this process and compute $z_5$, $z_6$, and so on indefinitely. For complex number $c$ and a positive real number $R$, the <b>Julia set with parameter $c$ and $R$</b> is the set of complex numbers $p$ such that the infinite sequence $z_1$, $z_2$, $z_3$, $\dotsc$ ($z_0$ is not included) defined above has the properties that the absolute value of each $z_n$ is always less than $R$. Symbolically,
+    \begin{align*}
+      \mbox{Julia set with parameter $c$ and $R$} = \{ p : |z_n| &lt; R \mbox{ for all } n = 1,2,3,\dotsc \}
+    \end{align*}
+    Recall that, for a complex number $z = x + yi$, the magnitude (also called the absolute value) of $z$, denoted by $|z|$, is a real number defined as:
+    \begin{align*}
+      |z| = \sqrt{x^2 + y^2}.
+    \end{align*}</p>
+
+    <p>From the definition above, it seems that it would be impossible to compute a Julia set because we have to predict everything that would happen in a process that never finishes. So, when we draw a Julia set in practice, we settle on a simpler process that terminates in finite time. To do this, we pick an integer $N$ to serve as an upper bound on the number of calculation steps. That is, we start with $z_0 = p$, and we compute $z_1$, $z_2$, and so on until we have computed $z_N$. Then, we check whether each of the $z_1$, $z_2$, $\dotsc$, $z_N$ has magnitude large than $R$ or not. If one is larger, then we say $p$ is not in the Julia set. If none is larger, then we say that $p$ is in the Julia set.</p>
 
     <hr>
     <p>
