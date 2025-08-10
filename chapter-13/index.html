@@ -509,12 +509,66 @@ void main() {
     \begin{align*}
       \mbox{Julia set with parameter $c$ and $R$} = \{ p : |z_n| &lt; R \mbox{ for all } n = 1,2,3,\dotsc \}
     \end{align*}
-    Recall that, for a complex number $z = x + yi$, the magnitude (also called the absolute value) of $z$, denoted by $|z|$, is a real number defined as:
+    Recall that, for a complex number $z = x + yi$, the absolute value of $z$, denoted by $|z|$, is a real number defined as:
     \begin{align*}
       |z| = \sqrt{x^2 + y^2}.
     \end{align*}</p>
 
     <p>From the definition above, it seems that it would be impossible to compute a Julia set because we have to predict everything that would happen in a process that never finishes. So, when we draw a Julia set in practice, we settle on a simpler process that terminates in finite time. To do this, we pick an integer $N$ to serve as an upper bound on the number of calculation steps. That is, we start with $z_0 = p$, and we compute $z_1$, $z_2$, and so on until we have computed $z_N$. Then, we check whether each of the $z_1$, $z_2$, $\dotsc$, $z_N$ has magnitude large than $R$ or not. If one is larger, then we say $p$ is not in the Julia set. If none is larger, then we say that $p$ is in the Julia set.</p>
+
+    <h3>13.4.2 &nbsp; Visualizing the Julia set</h3>
+
+    <p>Now that we know what a Julia set is, how do we go about creating a picture from it? Suppose that we have fixed $c$, $R$, and $N$. We can look at the image plane as the set of 2D points where each point can serve as the initial value $p$ in the process above. We can then run the process and see if $p$ is in the Julia set or not. If $p$ is in the set, we can assign the point $p$ with a color (say, white), and, if not, we can assign to it another color (say, black). However, this will lead to a monochrome picture that might not be as interesting as what we saw in Figure 13.11. The trick is to visualize the first number $n$ where the $|z_n| \geq R$. This is basically what we done in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-04/src/fragment-shader.frag">fragment shader</a>, whose <code>main</code> function is reproduced below:</p>
+
+<pre><code class="language-c">in vec2 geom_position;
+
+uniform vec2 center;
+uniform float scale;
+
+out vec4 fragColor;
+
+void main() {
+    vec2 p = (geom_position - center) * scale;
+    vec2 c = vec2(-0.4, 0.6);
+    float R = 2.0;
+    int N = 100;
+
+    int n = julaNumIterations(p, R, c, N);
+    vec3 color = scalarToColor(float(n) / float(N));
+    fragColor = vec4(linearToSrgb(color), 1.0);
+}</code></pre>
+
+    <p>Here, <code>geom_position</code> is the varying variable that stores the on-screen position of the fragment being process, and we get it from the full-screen quad as we did in Program 3. The <code>center</code> and <code>scale</code> uniforms variables are taken from the sliders in the web page, and they are used to computed the position $p$ that is to be processed further. These variables allows the generated image to be moved around and zoomed in and out. Notice that we use <code>vec2</code>, the 2D vector type, to represent a complex number. It is convenient because a complex number also have two real component. One can also see that the parameters of the Julia set are $c = -0.4 + 0.6i$, $R  = 2$, and $N = 100$.</p>
+
+    <p>We noted earlier that, to get a more interesitng image, we shall visualize the number $n$, which is the smallest integer where $|z_n| \geq R$. The function <code>juliaNumIterations</code> computes just that, and we will discuss it later. Once we have $n$, our next task is to convert it to a color, and this what <code>scalarToColor</code> does. To make it easier to code the function, we send the fraction $n/N$ to it instead of the number $n$. In this way, the function does not have to know about $N$ at all. Lastly, we convert the color returned by the function to the sRGB color space in order to comply with the color space rule we have been using since Program 2.</p>
+
+    <p>Let us now deep dive to the functions used by the <code>main</code> function. The first is the <code>juliaNumIterations</code> function, which is reproduced below.</p>
+
+<pre><code class="language-c">int julaNumIterations(vec2 p, float R, vec2 c, int N) {
+  vec2 z = p;
+  int n = 0;
+  for (int i = 0; i &lt; N; i++) {
+    z = square(z) + c;
+    n = n+1;
+    if (dot(z, z) >= R*R) {
+      break;
+    }
+  }
+  return n;
+}
+</code></pre>
+
+    <p>We see that another advantage of using a <code>vec2</code> to represent a complex number is that we can perform operations such as addition and subtraction with the built-in GLSL operators. However, we cannot compute the square of <code>z</code> with <code>z*z</code> because multiplying two complex numbers together work differently from the way GLSL muliplies two <code>vec2</code> together. Instead, we created a function <code>square</code> to do the squaring.</p>
+
+<pre><code class="language-c">vec2 square(vec2 z) {
+  return vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y);
+}</code></pre>
+
+    <p>Notice also that we check whether $|z| \geq R$ with the condition:</p>
+
+<pre><code class="language-c">dot(z, z) >= R*R</code></pre>
+
+    <p>As discussed in <a href="../chapter-10/index.html">Chapter 10</a>, <code>dot</code> is a built-in GLSL function that computes the dot product between the two input vectors. So, <code>dot(z, z)</code> is equal to <code>z.x * z.x + z.y * z.y</code>, which is equal to $|z|^2$ if we regard $z$ as a complex number. We check whether <code>dot(z, z)</code> is greater than or equal to <code>R * R</code> because it is faster than taking the square root and then checking whether the result is greater than or equal to <code>R</code> or not.</p>
 
     <hr>
     <p>
