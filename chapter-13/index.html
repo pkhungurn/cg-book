@@ -564,11 +564,102 @@ void main() {
   return vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y);
 }</code></pre>
 
+    <p>The function follows the formula:
+    \begin{align*}
+      (x + yi)^2 = (x^2 - y^2) + (2xy) i.
+    \end{align*}
+    </p>
+
     <p>Notice also that we check whether $|z| \geq R$ with the condition:</p>
 
 <pre><code class="language-c">dot(z, z) >= R*R</code></pre>
 
     <p>As discussed in <a href="../chapter-10/index.html">Chapter 10</a>, <code>dot</code> is a built-in GLSL function that computes the dot product between the two input vectors. So, <code>dot(z, z)</code> is equal to <code>z.x * z.x + z.y * z.y</code>, which is equal to $|z|^2$ if we regard $z$ as a complex number. We check whether <code>dot(z, z)</code> is greater than or equal to <code>R * R</code> because it is faster than taking the square root and then checking whether the result is greater than or equal to <code>R</code> or not.</p>
+
+    <p>Now that we have the number of iterations $n$ from <code>julaNumIterations</code>, we need to turn this number into a color. This is the job of the <code>scalarToColor</code> function. It takes a floating point number from the interval $[0,1]$, computed by dividing $n$ with the maximum iteration number $N$, and returns a color corresponding to the ratio. The code of the function is reproduced below.</p>
+
+<pre><code class="language-c">const vec3 red = vec3(1.0, 0.0, 0.0);
+const vec3 yellow = vec3(1.0, 1.0, 0.0);
+const vec3 green = vec3(0.0, 1.0, 0.0);
+const vec3 cyan = vec3(0.0, 1.0, 1.0);
+const vec3 blue = vec3(0.0, 0.0, 1.0);
+const vec3 purple = vec3(0.5, 0.0, 1.0);
+const vec3 magenta = vec3(1.0, 0.0, 1.0);
+
+vec3 scalarToColor(float x) {
+    if (x < 1.0 / 6.0) {
+        float alpha = x * 6.0;
+        return mix(red, yellow, alpha);
+    } else if (x < 2.0 / 6.0) {
+        float alpha = (x - 1.0 / 6.0) * 6.0;
+        return mix(yellow, green, alpha);
+    } else if (x < 3.0 / 6.0) {
+        float alpha = (x - 2.0 / 6.0) * 6.0;
+        return mix(green, cyan, alpha);
+    } else if (x < 4.0 / 6.0) {
+        float alpha = (x - 3.0 / 6.0) * 6.0;
+        return mix(cyan, blue, alpha);
+    } else if (x < 5.0 / 6.0) {
+        float alpha = (x - 4.0 / 6.0) * 6.0;
+        return mix(blue, purple, alpha);
+    } else {
+        float alpha = (x - 5.0 / 6.0) * 6.0;
+        return mix(purple, magenta, alpha);
+    }
+}
+</code></pre>
+
+    <p>The code is quite long, but it operates on a simple principle. We pick seven colors&mdash;red, yellow, green, cyan, blue, purple, and magenta&mdash;and associated them with the ratio values (stored in the variable <code>x</code>) of $0/6$, $1/6$, $2/6$, $3/6$, $4/6$, $5/6$, and $6/6$, respectively. These seven values partition the $[0,1]$ interval into 6 subintervals: $[0/6,1/6)$, $[1/6,2/6)$, and so on until $[5/6, 6/6]$. For $x$ in each of these intervals, we simply linearly interpolated between the colors associated with their endpoints. Linear interpolation is done with the <a href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/mix.xhtml"><code>mix</code></a> build-in function of the GLSL language. The function signature is</p>
+
+<code><pre class="language-c">mix(a, b, alpha)</pre></code>
+
+    <p>and it computes <code>(1.0 - alpha) * a + alpha * b</code>. This built-in function is very useful, and we will use it in future programs.</p>
+
+    <p>After we have computed a color from the number of iterations $n$, we need to convert this color from the linear color space to the sRGB color space using the <code>linearToSrgb</code> function, which we discussed in the last program.</p>
+
+    <h3>13.4.3 &nbsp; The rest of the program</h3>
+
+    <p>The fragment shader, which we just finished discussing the last section, is obviously the most complicated part of Program 4. The host program and the vertex shader are much simpler in comparison. In order for the fragment shader to carry out its magic, the host program needs to render a full-screen quad and pass user input from the sliders to the GLSL program. The construction of the full-screen quad is the same as that in Program 3, and we shall not repeat that part here. The main difference is just how the program sets up the uniform variables, and <a href="https://github.com/pkhungurn/cg-book-code/blob/15317263e3ba5fec57d2e8b7fca9a765105dbbcf/chapter-13/program-04/src/index.js#L69-L82">the Javascript code around that part</a> is shown below.</p>
+
+<pre><code class="language-c">let centerX = this.centerXSlider.slider("value") / 1000.0;
+let centerY = this.centerYSlider.slider("value") / 1000.0;
+let scale = Math.pow(2, -this.scaleSlider.slider("value") / 100.0);
+
+useProgram(this.gl, this.program, () => {
+    let centerLocation = self.gl.getUniformLocation(self.program, "center");
+    self.gl.uniform2f(centerLocation, centerX, centerY);
+
+    let scaleLocation = self.gl.getUniformLocation(self.program, "scale");
+    self.gl.uniform1f(scaleLocation, scale);
+
+    setupVertexAttribute(
+      self.gl, self.program, "vert_position", self.vertexBuffer, 2, 8, 0);
+    drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 6, 0);
+});</code></pre>
+
+    <p>We see that the code takes the <code>centerX</code> and <code>centerY</code> values from the corresponding sliders, and it sets the uniform variable <code>center</code>, which is defined in the fragment shader, to those values. It also takes the <code>scale</code> value from another slider and set it to the <code>scale</code> uniform variable.</p>
+
+    <p>The <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-13/program-04/src/vertex-shader.vert">vertex shader</a> is exactly the same as that of Program 4. Again, it is responsible for setting up the <code>geom_position</code> varying variable so that the fragment shader has access to the screen position of each fragment it processes. Because the code is exactly the same, we shall not repeat it here.</p>
+
+    <p>All in all, we see that we can generate a very complex image by coding the image generation logic in the fragment shader and using the full-screen quad and a simple vertex shader to give the fragment shader access to the position of each fragment.</p>
+    
+    <h2>13.5 &nbsp; Summary</h2>
+
+    <ul>
+      <li>Fragment shaders are responsible for computing the color of each fragment. Therefore, it largely determines what colors the user see.</li>
+      
+      <li>WebGL programs outputs colors to the framebuffer, and the web browser assumes that these color values are in the <b>sRGB color space</b>. This is the color space that web browser uses by default: colors in HTML and CSS are in this space.</li>
+
+      <li>However, because WebGL programs will inevitably do calculations on the colors, we make take great care to make sure that the colors inside GLSL code are in the <b>linear color space</b>. This means that, before we set the final output of our fragment shader, we must convert all color values from the linear to the sRGB color space. This is done by the <code>linearToSrgb</code> function, which we discussed in Program 1.</li>
+
+      <li>Fragment shaders have access to uniform variables like vertex shaders. However, it can also receive information from the vertex shaders in the form of <code>varying variables</code>.</li>
+
+      <li>Values of variables inside a fragment shaders are interpolations of values set by the vertex shader. This makes it possible for the fragment shader to output different colors for different fragments. For example, Program 2 shows how a varying variable can be used to create color gradients.</li>
+
+      <li>An important tool for creating complex images with WebGL program is the full-screen quad, which is basically a rectangle that covers the whole screen. Program 3 shows how to set up one.</li>
+
+      <li>The full-screen quad allows the fragment shader to know the position of the fragment being processed. Program 4 shows how this information can be used to create a complex image like that of a fractal.</li>
+    </ul>
 
     <hr>
     <p>
@@ -580,7 +671,7 @@ void main() {
   <script src="../js/littlefoot.js" type="application/javascript"></script>
   <script type="application/javascript">
     const { littlefoot } = require('littlefoot')
-
+ou
     const lf = littlefoot({
       activateOnHover: true,
       hoverDelay: 250,
