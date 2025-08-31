@@ -283,14 +283,14 @@ useProgram(this.gl, this.program, () => {
     <p>When the host program renders a primitive, say with the <code>drawElements</code> method of the WebGL context, it must specify a number of vertices in the vertex buffer. For each of these vertices, WebGL invokes the vertex shader to process each vertex individually. So, if the vertex shader assigns a value to a varying variable, then there would be an independent value associated with each vertex, and values of different vertices can be different. In case of Program 2, <code>geom_color</code> and be red for one vertex, and it can be green for another.</p>
 
 <figure class="figure">
-  TODO: Fill this figure
+  <center><img src="images/program-02-geom-color-values.png" alt="" width="600"></center>
   <figcaption class="figure-caption"><strong>Figure 13.6</strong> Values of the varying variable <code>geom_color</code> associated with different vertices.</figcaption>
 </figure>
 
     <p>Then, in primitive assembly, vertices belonging to the same primitives are connected, and primitives are simplified. In the end, we are left with points, lines, and triangles such that each individual vertex has a <code>geom_color</code> value associated with it.</p>
 
 <figure class="figure">
-  TODO: Fill this figure
+  <center><img src="images/program-02-state-after-primitive-assembly.png" width="600" alt=""></center>
   <figcaption class="figure-caption"><strong>Figure 13.7</strong> The state of scene after primitive assembly.</figcaption>
 </figure>
 
@@ -303,7 +303,7 @@ useProgram(this.gl, this.program, () => {
     </ul>
 
 <figure class="figure">
-  TODO: Fill this figure
+  <center><img src="images/program-02-interpolated-fragment-colors.png" width="600" alt=""></center>
   <figcaption class="figure-caption"><strong>Figure 13.8</strong> The value of a varying variable of a fragment is an interpolation of the values of the vertices that make up the primitive where the fragment comes from.</figcaption>
 </figure>
 
@@ -663,8 +663,9 @@ useProgram(this.gl, this.program, () => {
 
     <hr>
     <p>
-      <a href="../chapter-12/index.html"><<</a>
+      <a href="../chapter-12/index.html">&lt;&lt;</a>
       <a href="../index.html">Contents</a>
+      <a href="../chapter-14/index.html">&gt;&gt;</a>
     </p>
   </div>
   <script src="../js/bootstrap.bundle.min.js"></script>
