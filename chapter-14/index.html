@@ -72,7 +72,23 @@
     </span>
 
     <h1>14 &nbsp; Abstracting OpenGL</h1>
-    <hr>    
+    <hr>
+
+    <p>We learned in the past few chapters of the essential components of a GLSL program: vertex shader, fragment shader, vertex attributes, uniform variables, and varying variables. We also learned that rendering a mesh involves multiple steps. We need to create buffers to store vertex data. Then, we need to create a buffer to store the vertex indices that make up primitives. We then use a GLSL program and setup all of its vertex attributes and uniform variables. Finally, we must bind the index buffer and issue a drawing command.</p>
+
+    <p>Because of all the above details, we can see that it can be hard to manage those objects, especially in more complex WebGL applications where we might have multiple GLSL programs and multiple meshes. One bad aspect of the way we have written the code so far is that <i>things are not properly encapsulated</i>. This means that things that should be parts of a larger object are not bundled together. For example, when we create a mesh, we need to create two variables: one for the vertex buffer and another for the index buffer. There is nothing to indicate that these two buffers should always be used together, and so the programmer has to keep track of this fact themself.</p>
+
+    <p>Another worrying aspect is that the programmer must also keep track of the vertex attributes and uniform variables of all GLSL programs. Because the programmer can name these variables in any way they want, there can be too many names to remember, and this can lead to bugs that are hard to identify. Fortunately, it turns out that GLSL programs in generally tend to use only a small set of vertex attributes. So, we can reduce the cognitive load on the programmer by naming attributes with the same semantics with the same names.</p>
+      
+    <p>Still, because different GLSL programs serve different purposes, some programs might use one particular vertex attribute (for examples, the vertex color) while others do not. As a result, we need the ability to identify which vertex attributes are present in a GLSL program.</p>
+
+    <p>This chapter presents a way to solve the above programs by creating new abstractions (i.e., classes) for GLSL programs and colored meshes. These abstractions are what the author personally use in his personal projects, and they will be use in later chapters of the book. We choose to introduce them here because he thinks he would not be able to manage WebGL's complexity without them. A decent programmer must know the limit of their cognitive capacity and introduce appropriate abstractions to make their life easier.</p>
+
+    <h2>14.1 &nbsp; An abstraction for GLSL programs</h2>
+
+    <p>WebGL already has an abstraction for GLSL programs: the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLProgram"><code>WebGLProgram</code></a> class. However, the author finds that they are not the most convenient to use. In particular, <code>WebGLProgram</code> does not have any information about the vertex attributes or the uniforms of the GLSL program it represents. Moreover, working with vertex attributes and uniforms require issuing at least two WebGL commands. First, we must issue one to get the variable's location. Only then we can issue another command to do what we want with the variable itself.</p>
+
+    <h2>14.2 &nbsp; An abstraction for colored meshes</h2>
 
     <hr>
     <p>
