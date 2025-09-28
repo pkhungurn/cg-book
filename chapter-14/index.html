@@ -88,6 +88,77 @@
 
     <p>WebGL already has an abstraction for GLSL programs: the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLProgram"><code>WebGLProgram</code></a> class. However, the author finds that they are not the most convenient to use. In particular, <code>WebGLProgram</code> does not have any information about the vertex attributes or the uniforms of the GLSL program it represents. Moreover, working with vertex attributes and uniforms require issuing at least two WebGL commands. First, we must issue one to get the variable's location. Only then we can issue another command to do what we want with the variable itself.</p>
 
+    <h3>14.1.1 &nbsp; <code>GlProgram</code></h3>
+
+    <p>To deal with the above problem, we introduce a new class called <code>GlProgram</code> that encapsulates a GLSL program together with its vertex attributes and uniforms. The source code for the class is available in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-01/src/program.js"><code>program.js</code></a> file in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-14/program-01/src"><code>chapter-14/program-01/src</code></a> directory. Before going into the details of how the class is implemented, let us see what it accomplishes. Using the code we have developed so far in the book, a typical sequence of commands when we use a GLSL program to render some primitives is as follows.</p>
+
+<pre><code class="language-c">// Step 1: Create the program.
+this.program = createGlslProgram(
+  this.gl, vertexShaderSource, fragmentShaderSource);
+
+// Step 2: Use programs.
+let self = this;
+useProgram(this.gl, this.program, () => {
+  // Step 3: Set the values of uniforms.
+  let centerLocation = self.gl.getUniformLocation(self.program, "center");
+  self.gl.uniform2f(centerLocation, centerX, centerY);
+
+  let scaleLocation = self.gl.getUniformLocation(self.program, "scale");
+  self.gl.uniform1f(scaleLocation, scale);
+
+  // Step 4: Set up the vertex attributes.
+  setupVertexAttribute(
+    self.gl, self.program, "vert_position", self.vertexBuffer, 2, 4*5, 0);
+  setupVertexAttribute(
+    self.gl, self.program, "vert_color", self.vertexBuffer, 3, 4*5, 4*2);
+
+  // Step 5: Call drawElements to draw the primitives.
+  drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 6, 0);
+});
+</code></pre>
+
+    <p>Using the <code>GlProgram</code> class, we can shorten the code above.</p>
+
+<pre><code class="language-c">// Step 1: Create the program
+this.program = new GlProgram(
+  this.gl, vertexShaderSource, fragmentShaderSource);
+  
+// Step 2: Use the program.
+let self = this;
+this.program.use(() => {
+  // Step 3: Set the values of uniforms.
+  self.program.uniform("center")?.set2Float(centerX, centerY);
+  self.program.uniform("scale")?.set1Float(scale);
+
+  // Step 4: Set up the vertex attributes.
+  self.program.attribute("vert_position")?.setup(
+    self.vertexBuffer, 2, 4*5, 0);
+  self.program.attribute("vert_color")?.setup(
+    self.vertexBuffer, 3, 4*5, 4*2);
+
+  // Step 5: Call drawElements to draw the primitives.
+  drawElements(self.gl, self.indexBuffer, self.gl.TRIANGLES, 6, 0);
+});
+</code></pre>
+
+    <p>There are cosmetic changes such as how the <code>program</code> field is initialized and the fact that the <code>useProgram</code> function has become a method. The substantive changes, though, are how the uniforms and vertex attributes are accessed. The <code>GlProgram</code> class has the <code>uniform</code> and <code>attribute</code> methods that take a name and returns an object representing a uniform or an attribute, respectively. However, the methods are written so that they return <code>null</code> if there are uniforms or attributes with the given name. This is why we use the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining">optional chaining</a> operator (<code>?.</code>) to invoke the methods (i.e., <code>set2Float</code>, <code>set1Float</code>, and <code>setup</code>) of these objects.</p>
+
+    <p>The author argues that the benefits of the new abstraction is not only that the code becomes a little shorter, but also the fact that the vertex attributes and the uniforms are accessed somewhat like fields of the <code>program</code> object. It makes the code easier to read and aligned with the fact that attributes are uniforms are part of a GLSL program.</p>
+
+    <p>Another benefits that is not obvious from reading the code is that it eases shader debugging. Debugging any code involves changing the code a little bit and running the changed code to try to discover the root cause of the bug or test a hypothesis. When we debug a GLSL shader, we often rewrite the code so that some vertex attributes or uniforms becomes unused so that the shader becomes simpler and easier to understand. The problem is that, when such an object becomes unused, the GLSL compiler will automatically removes it completely from the GLSL program, and that means that any attempts to access them would cause an error. For example, if we change the code so that it temporarily does not use the <code>center</code> uniform, then the <code>self.gl.getUniformLocation(self.program, "center")</code> command would return <code>null</code> instead of valid <code>WebGLUniformLocation</code> object. Then, the subsequent <code>self.gl.uniform2f(centerLocation, centerX, centerY);</code> would result in an error. It is annoying to have to modify the Javascript code every time we make such changes to the shader. On the other hand, the line</p>
+
+<pre><code class="language-c">self.program.uniform("center")?.set2Float(centerX, centerY);</code></pre>
+
+    <p>automatically skips the setting of the uniform if it does not exist, and this allows us to focus more on the GLSL code rather than modifying the Javascript host code to avoid errors.</p>
+
+    <h3>14.1.3 &nbsp; Overall structure</h3>
+
+    <h3>14.1.4 &nbsp; Modeling vertex attributes</h3>
+
+    <h3>14.1.5 &nbsp; Modeling uniform variables</h3>
+
+    <h3>14.1.6 &nbsp; Program 1</h3>
+
     <h2>14.2 &nbsp; An abstraction for colored meshes</h2>
 
     <hr>
