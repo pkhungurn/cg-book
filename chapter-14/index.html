@@ -153,6 +153,48 @@ this.program.use(() => {
 
     <h3>14.1.3 &nbsp; Overall structure</h3>
 
+    <p>Let's take a look at the overall structure of the <code>GlProgram</code> class, whose source code is available in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-01/src/index.js"><code>program.js</code></a> file of <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-01">Program 1</a> of <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14">Chapter 14</a>. The class has a constructor and the following three methods:
+      <ul>
+        <li><code>use</code>,</li>
+        <li><code>attribute</code>, and</li>
+        <li><code>uniform</code>.</li>
+      </ul>
+    Here, <code>attribute</code> and <code>uniform</code> are accessors for the vertex attributes and uniforms, which we just mentioned earlier. The <code>use</code> does what its name suggest and serves the same function as the <code>useProgram</code> function we have been utilizing up until this point.
+    </p>
+
+    <p>The class has four fields: <code>gl</code>, <code>glObject</code>, <code>attributes</code>, and <code>uniforms</code>. The <code>gl</code> field wholes the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext"><code>WebGLRenderingContext</code></a> through which all WebGL commands are issued.  The <code>glObject</code> field holds the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLProgram"><code>WebGLProgram</code></a> object that the WebGL API provides when we create a GLSL program. The fields <code>attributes</code> and <code>uniforms</code> are Javascript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"><code>Map</code></a> that sends a name to an object representing an attribute or a uniform with that time. The constructor initialize the fields as follows.</p>
+
+<pre><code class="language-c">export class GlProgram{
+    constructor(gl, vertexShaderSource, fragmentShaderSource) {
+        this.gl = gl;
+        this.glObject = createGlslProgram(
+          gl, vertexShaderSource, fragmentShaderSource);
+
+        this.attributes = new Map();
+        // Code that fills this.attributes.
+           :
+           :
+        
+        this.uniforms = new Map();        
+        // Code that fills this uniforms.
+           :
+           :
+    }
+}</code></pre>
+
+    <p>Like what we have done before, we create an instance of <code>WebGLProgram</code> with the <a href="https://github.com/pkhungurn/cg-book-code/blob/c1e13b8f71d47ec0fac3fd6ed9313fa2cd71af27/chapter-14/program-01/src/program.js#L24"><code>createGlslProgram</code></a> function and save the return value in the <code>glObject</code> field. The <code>atttributes</code> and <code>uniforms</code> fields initially hold two new empty <code>Map</code>s. We shall discuss how the maps are filled in the next subsections.</p>
+
+    <p>The <code>use</code> method is just a reimplementation of the <code>useProgram</code> function.</p>
+
+<pre><code>use(code) {
+  this.gl.useProgram(this.glObject);
+  code();
+  this.gl.useProgram(null);
+}    
+</code></pre>
+
+    <p>With the explanation of the easy parts completed, let us discuss how we model vertex attributes and uniform variables.</p>
+
     <h3>14.1.4 &nbsp; Modeling vertex attributes</h3>
 
     <h3>14.1.5 &nbsp; Modeling uniform variables</h3>
