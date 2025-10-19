@@ -197,6 +197,94 @@ this.program.use(() => {
 
     <h3>14.1.4 &nbsp; Modeling vertex attributes</h3>
 
+    <p>Our goal here is to create an object that represents each vertex attribute of a GLSL program so that we may have a nicer interface to work with. As a result, we need to extract information about vertex attributes from a <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLProgram"><code>WebGLProgram</code></a> object. The first bit of information we need is how many vertex attributes a program has. This can be objected using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getProgramParameter"><code>getProgramParameter</code></a> method of the WebGL context, passing the <code>WebGLProgram</code> instance and the contant <code>ACTIVE_ATTRIBUTES</code> as arguments. The method is used in the constructor of the <code>GlProgram</code> class as follows.</p>
+
+<pre><code class="language-c">let numAttributes = gl.getProgramParameter(
+  this.glObject, gl.ACTIVE_ATTRIBUTES);</code></pre>
+
+    <p>WebGL refers to the vertex atrributes with integer indices from 0 to <code>numAttributes</code>-1, and it provides us a way to query information about a vertex attribute given its index. We shall use this mechanism inside the constructor of a <a href="https://github.com/pkhungurn/cg-book-code/blob/c1e13b8f71d47ec0fac3fd6ed9313fa2cd71af27/chapter-14/program-01/src/program.js#L59"><code>GlAttribute</code></a> object, which we create to model a vertex attribute. Before discussing the details of the class, let us see how the <code>GlAttribute</code> objects are instantiated.</p>
+
+<pre><code class="language-c">this.attributes = new Map();
+for (let index = 0; index &lt; numAttributes; index++) {
+  let attribute = new GlAttribute(gl, this, index);
+  this.attributes.set(attribute.name, attribute);
+}</code></pre>
+
+    <p>Here, we create field called <code>attributes</code> that is a Javascript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"><code>Map</code></a> which allows us to refer to vertex attributes by their names. We then loop through the indices of the vertex attributs and create an instance of <code>GlAttribute</code> for each of the index. The created will have a field called <code>name</code>, which we can use when we add the object to the map. Once the loop has finished running, we can use the <code>attributes</code> field to implement the <code>attribute</code> method of the <code>GlProgram</code> class that we discuss in the last section as follows.</p>
+
+<pre><code class="language-c">attribute(name) {
+  if (this.attributes.has(name)) {
+    return this.attributes.get(name);
+  } else {
+    return null;
+  }
+}</code></pre>
+
+    <p>Now, let us discuss the implementation of the <code>GlAttribute</code> object itself. The following is the its constructor.</p>
+
+<pre><code class="language-c">export class GlAttribute {
+  constructor(gl, program, index) {
+    this.gl = gl;
+    this.program = program;
+    this.index = index;
+
+    let info = gl.getActiveAttrib(program.glObject, index);
+    this.name = info.name;
+    this.size = info.size;
+    this.type = info.type;
+    this.location = gl.getAttribLocation(program.glObject, this.name);
+    this.enabled = false;
+  }
+
+  :
+  :
+}</code></pre>
+
+    <p>The constructor accepts three arguments: the WebGL context, the <code>GlProgram</code> object to which this <code>GlAttribute</code> object belongs, and lastly <code>the index</code> of the vertex attribute. The first three lines of the constructor saves the arguments as fields. The rest of the constructor extracts and saves information about the vertex attribute itself.</p>
+
+    <p>First, we call the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getActiveAttrib"><code>getAttiveAttrib</code></a> method of the WebGL context, passing the <code>WebGLProgram</code> instance stored in the <code>GlProgram</code> object and the index of the vertex attribute as arguments. The method would return the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLActiveInfo"><code>WebGLActiveInfo</code></a>, which has three fields.
+    <ul>
+      <li><code>name</code> is the name of the vertex attribute.</li>
+      <li><code>size</code> is the "size" of the field. It is 1 if the field is not an array, and the number of elements in the array if the field is an array.</li>
+      <li><code>type</code> is the data type of each of the component of the field. These are WebGL-specific constants such as <code>FLOAT</code>, <code>FLOAT_VEC2</code>, <code>FLOAT_VEC3</code>, <code>INT</code>, and <code>INT_VEC4</code>, and so on.</li>
+    </ul>
+    We then save these fields of the <code>WebGLActiveInfo</code> as fields of the <code>GlAttribute</code> instance.</p>
+
+    <p>The next step is to retrieve the location of the vertex attribute. We have done this before in most programs in the previous chapters. However, this time, we do not specify the name of the vertex attribute ourselves but use the name we queried using the <code>glActiveInfo</code> method.</p>
+
+    <p>Lastly, we initialize the <code>enabled</code> field to <code>false</code>. This field keeps track whether the vertex attribute has been enabled using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/enableVertexAttribArray"><code>enableVertexAttribArray</code></a> method or not.</p>
+
+    <p>The class has two methods. The first is <code>setEnabled</code>, which we will not use directly most of the time.</p>
+
+<pre><code class="language-c">setEnabled(enabled) {
+    if (enabled) {
+        this.gl.enableVertexAttribArray(this.location);
+        this.enabled = true;
+    } else {
+        this.gl.glDisableVertexAttribArray(this.location);
+        this.enabled = false;
+    }
+}</code></pre>
+
+    <p>The argument <code>enabled</code> is a boolean that indicates whether the user wants to enable of disable the attribute. So, to enable, we call <code>enable(true)</code>, and, to disable, we call <code>enable(false)</code>. The other method is the <code>setup</code> method, which replaces the <code>setupVertexAttribute</code> function we have been using so far.</p>
+
+<pre><code class="language-c">setup(buffer, size, stride, offset, type=null, normalized=false) {
+  this.setEnabled(true);
+  type = type || this.gl.FLOAT;
+  let self = this;
+  bindBuffer(this.gl, this.gl.ARRAY_BUFFER, buffer, () => {
+    self.gl.vertexAttribPointer(
+      self.location, size, type, normalized, stride, offset);
+  });
+}</code></pre>
+
+    <p>With the <code>setup</code> method in place, we can succinctly setup vertex attributes as like we discussed in the last section.</p>
+
+<pre><code class="language-c">self.program.attribute("vert_position")?.setup(
+  self.vertexBuffer, 2, 4*5, 0);
+self.program.attribute("vert_color")?.setup(
+  self.vertexBuffer, 3, 4*5, 4*2);</code></pre>
+
     <h3>14.1.5 &nbsp; Modeling uniform variables</h3>
 
     <h3>14.1.6 &nbsp; Program 1</h3>
