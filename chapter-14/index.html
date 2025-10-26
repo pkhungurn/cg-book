@@ -170,13 +170,13 @@ this.program.use(() => {
         this.glObject = createGlslProgram(
           gl, vertexShaderSource, fragmentShaderSource);
 
-        this.attributes = new Map();
         // Code that fills this.attributes.
+        this.attributes = new Map();
            :
            :
         
-        this.uniforms = new Map();        
         // Code that fills this.uniforms.
+        this.uniforms = new Map();        
            :
            :
     }
@@ -286,6 +286,77 @@ self.program.attribute("vert_color")?.setup(
   self.vertexBuffer, 3, 4*5, 4*2);</code></pre>
 
     <h3>14.1.5 &nbsp; Modeling uniform variables</h3>
+
+    <p>The next thing to do is to model uniform variables in the same way we did with vertex attributes. The process to do this starts in the constructor of the <code>GlProgram</code> class that we showed, in an incomplete from, in the last section. The following is the code that fills the <code>uniforms</code> map that associates uniforms with their names.</p>
+
+<pre><code class="language-c">let numUniforms = gl.getProgramParameter(this.glObject, gl.ACTIVE_UNIFORMS);
+this.uniforms = new Map();
+for (let index = 0; index < numUniforms; index++) {
+  let uniform = new GlUniform(gl, this, index);
+  this.uniforms.set(uniform.name, uniform);
+}</code></pre>
+
+    <p>What we did here is similar to what we did in the last section. First, we find out how many uniform variables the program has, and this is done by calling the <code>getProgramParameter</code> method with the <code>ACTIVE_UNIFORMS</code> constant.</p>
+
+<pre><code class="language-c">let numUniforms = gl.getProgramParameter(this.glObject, gl.ACTIVE_UNIFORMS);</code></pre>
+
+    <p>Similar to vertex attributes, uniforms are indexed from $0$ to the number of uniforms minus one. Again, we iterate through the indices with the for loop and create a <code>GlUniform</code> object to represent the uniform with a given index. We then call the <code>set</code> method of the <code>Map</code> class to assiociate the newly created <code>GlUniform</code> object with the uniform's name.</p>
+
+    <p>Let us now look at the <a href="https://github.com/pkhungurn/cg-book-code/blob/01178900bf69de740ff843914506ee030711cab6/chapter-14/program-01/src/program.js#L93"><code>GlUniform</code></a> class, which is also located in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-01/src/program.js"><code>program.js</code></a> file. First, let us look at the constructor.</p>
+
+<pre><code class="language-c">export class GlUniform {
+  constructor(gl, program, index) {
+    this.gl = gl;
+    this.program = program;
+    this.index = index;
+    
+    let info = gl.getActiveUniform(program.glObject, index);
+    this.name = info.name;
+    this.type = info.type;
+    this.size = info.size;
+    this.location = gl.getUniformLocation(program.glObject, this.name);
+  }
+
+  :
+  :
+}</code></pre>
+
+    <p>Much like the constructor of <code>GlAttribute</code>, <code>GlUniform</code>'s is given the WebGL context, a <code>GlProgram</code> instance, and the index of the uniform. After saving the input arguments as fields, we proceed to get information about the uniform by calling the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getActiveUniform"><code>getActiveUniform</code></a> of the WebGL context, which is the uniform counterpart of the <code>glAtiveAttrib</code> method. The two method receives the same arguments (a <code>WebGLProgram</code> object and an index), and it returns the same thing (a <code>WebGLActiveInfo</code> object). We then proceed to save the information in the return value as fields. The last line of the constructor queries the location of the uniform using the name we fetched with <code>getActiveUniorm</code> method. Because a uniform does not require enabling like a vertex attribute, we do not need the <code>enabled</code> field like the <code>GlUniform</code> class.</p>
+
+    <p>The <code>GlUniform</code> class has more methods than the <code>GlAttribute</code> class. This is because there are WebGL context methods such as <code>uniform1f</code>, <code>uniform2f</code>, and so on to wrap. In this chapter, we wrap 8 methods that are used to set vector types with float or integer components. We list some of the wrapping methods below and refer the reader to the code repository for the full listing.</p>
+
+<pre><code class="language-c">export class GlUniform {
+  :
+  :
+
+  set1Int(x) {
+    this.gl.uniform1i(this.location, x);
+  }
+
+  set2Int(x, y) {
+    this.gl.uniform2i(this.location, x, y);
+  }
+    
+  :
+  :
+
+  set1Float(x) {
+    this.gl.uniform1f(this.location, x);
+  }
+
+  set2Float(x, y) {
+    this.gl.uniform2f(this.location, x, y);
+  }
+    
+  :
+  :
+}</code></pre>
+
+    <p>With the above methods, we can assign uniforms of a GLSL program as follows.</p>
+
+<pre><code class="language-c">  self.program.uniform("center")?.set2Float(centerX, centerY);
+self.program.uniform("scale")?.set1Float(scale);
+</code></pre>
 
     <h3>14.1.6 &nbsp; Program 1</h3>
 
