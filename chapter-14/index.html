@@ -360,6 +360,23 @@ self.program.uniform("scale")?.set1Float(scale);
 
     <h3>14.1.6 &nbsp; Program 1</h3>
 
+    <p><a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-14/program-01">Program 1</a> from the code repository contains a demonstration of how the abstractions in the last few sections are used. As we can see from the screenshots in Figure 14.1, the screen shows a square painted with a gradient of colors. The user can manipulate the position and the size of the square through through the sliders below the screen. This makes it quite similar to Program 2 from the last chapter in terms of what it shows and Program 4 (also from the same chapter) in terms of what the user can do with the UI.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-01-screenshot-00.png"><img src="images/program-01-screenshot-00.png" alt="" width="300"></a></td>
+          <td><a href="images/program-01-screenshot-01.png"><img src="images/program-01-screenshot-01.png" alt="" width="300"></a></td>          
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 14.1</strong> Screenshots of Program 1.</figcaption>
+    </figure>
+
+    <p>However, Program 1 is different from all the programs we have seen so far because it displays information about the GLSL program being used to update the screen. In particular, there are two tables listing the vertex attributes and uniforms that the GLSL program has. We can show such information now precisely because we took time to create objects to represent these variables. </p>
+
+    <p>If the reader is curious, they are welcome to read the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-01/src/index.js"><code>index.js</code></a> file to see how the shaders are implemented (not very different from the shaders from Chapter 13) and how we use the created <code>GlAttribute</code> and <code>GlUniform</code> objects to populate the tables (rather tedious and not very instructive). The main point of this section is <i>refactoring</i>: introducing a new way to do the same thing we did before so that we have a better foundation for more complex programs later.</p>
+
+
     <h2>14.2 &nbsp; An abstraction for colored meshes</h2>
 
     <hr>
