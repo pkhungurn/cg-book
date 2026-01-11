@@ -379,6 +379,14 @@ self.program.uniform("scale")?.set1Float(scale);
 
     <h2>14.2 &nbsp; An abstraction for colored meshes</h2>
 
+    <p>Recall that a mesh is a collection of vertices that are connected to form a number of primitives. Operationally, all the meshes we have worked with so far are represented by two buffers. One is a buffer that holds vertex attributes, and we refer to this buffer as the "vertex buffer." The other stores the indices of vertices that are to be connected together, ad we refer to it as the "index buffer". In all previous programs, the buffers are specified independently, and there are no indications that they are parts of the same mesh. In this section, we introduce a new class that bundles the two buffers together so that there can be no confusion to which vertex buffer is to be used with with index buffer.</p>
+
+    <h3>14.2.1 &nbsp; <code>PosColMesh</code></h3>
+
+    <p>So far, all meshes we have worked with have at most two vertex attributes. The first is the 3D position of each vertex, which is mandatory. The second is the color of each vertex, which is optional. In later chapters, we will introduce more attributes such as the texture coordinates and the normal vector. However, in the next few chapters, we will only deal with vertex color. As a result, the new class represents colored meshes and is aptly called <code>PosColMesh</code>, where <code>Pos</code> stands for "position," and <code>Col</code> stands for "color." The source code for the class is available in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-02/src/pos-col-mesh.js"><code>pos-col-mesh.js</code></a> file in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-02/src"><code>chapter-14/program-02/src</code></a> directory of the book's code repository.</p>
+
+    <p>Again, before going into how the class is implemented, let's see how it is used first. In previous programs, we intiialize the vertex and index buffer in a method called <code>createBuffers</code>, which is called by the <code>run</code> method, the entry point of our application. With the new class, we create a mesh instead of buffers, so the method is renamed to <code>createMesh</code>. Its source code is reproduced below.</p>
+
     <hr>
     <p>
       <a href="../chapter-13/index.html">&lt;&lt;</a>
