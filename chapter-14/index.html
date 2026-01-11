@@ -385,7 +385,45 @@ self.program.uniform("scale")?.set1Float(scale);
 
     <p>So far, all meshes we have worked with have at most two vertex attributes. The first is the 3D position of each vertex, which is mandatory. The second is the color of each vertex, which is optional. In later chapters, we will introduce more attributes such as the texture coordinates and the normal vector. However, in the next few chapters, we will only deal with vertex color. As a result, the new class represents colored meshes and is aptly called <code>PosColMesh</code>, where <code>Pos</code> stands for "position," and <code>Col</code> stands for "color." The source code for the class is available in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-02/src/pos-col-mesh.js"><code>pos-col-mesh.js</code></a> file in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-02/src"><code>chapter-14/program-02/src</code></a> directory of the book's code repository.</p>
 
-    <p>Again, before going into how the class is implemented, let's see how it is used first. In previous programs, we intiialize the vertex and index buffer in a method called <code>createBuffers</code>, which is called by the <code>run</code> method, the entry point of our application. With the new class, we create a mesh instead of buffers, so the method is renamed to <code>createMesh</code>. Its source code is reproduced below.</p>
+    <p>Again, before going into how the class is implemented, let's see how it is used first. In previous programs, we intiialize the vertex and index buffer in a method called <code>createBuffers</code>, which is called by the <code>run</code> method, the entry point of our application. With the new class, we create a mesh instead of buffers, so the method is renamed to <code>createMesh</code>. Its <a href="https://github.com/pkhungurn/cg-book-code/blob/a40e4bdc1a9c3ce2f865e82013a1dd073ab13d5f/chapter-14/program-02/src/index.js#L47">source code</a> is reproduced below.</p>
+
+<pre><code class="language-c">createMesh() {
+  let meshBuilder = new PosColMeshBuilder(this.gl);
+  
+  meshBuilder
+    .setColor(1.0, 1.0, 0.0, 1.0)
+    .addVertex(-0.5, -0.5, 0.0)
+    .setColor(0.0,  1.0, 1.0, 1.0)
+    .addVertex(0.5, -0.5, 0.0)
+    .setColor(1.0,  0.0, 1.0, 1.0)
+    .addVertex(0.5, 0.5, 0.0)
+    .setColor(1.0, 1.0, 1.0, 1.0)
+    .addVertex(-0.5, 0.5, 0.0);
+      
+  meshBuilder
+    .addIndices(0, 1, 2)
+    .addIndices(0, 2, 3);
+
+  this.mesh = meshBuilder.build();
+}</code></pre>
+
+    <p>The reader can see that we do no directly create the mesh. Instead, we create an instance of <a href="https://github.com/pkhungurn/cg-book-code/blob/05e4add205bba6ae76e14609900c2317a6929334/chapter-14/program-02/src/pos-col-mesh.js#L45"><code>PosColMeshBuilder</code></a>, a  class specifically designed to "build" <code>PosColMesh</code>. The class has methods such as <code>setColor</code>, <code>addVertex</code>, and <code>addIndices</code> that can be used to add information, piece by piece, to the mesh being built. After we have specified all the vertex and index data, we call the <code>build</code> method to get an instance of <code>PosColMesh</code>, which we keep as a field of the application class. For those who are familiar with object-oriented programming, this is an instance of the <a href="https://en.wikipedia.org/wiki/Builder_pattern">builder pattern</a> from the <a href="https://en.wikipedia.org/wiki/Design_Patterns">Gang of Four book</a>. </p>
+
+    <p>The code becomes somewhat longer than those that we used to create buffers in previous programs. However, the author argues that it is much easier to read. Instead of seeing a bunch of numbers like in previous programs, we can easily read the vertex positions, the vertex colors, and the indices that make up the triangles from the code.</p>
+
+    <p>It becomes easier to render the mesh using the new class. The relevent code in the <code>updateWebGL</code> method is as follows.</p>
+
+<pre><code class="language-c">this.program.use(() => {
+    self.program.uniform("center")?.set3Float(centerX, centerY, 0.0);
+    self.program.uniform("scale")?.set1Float(scale);
+    self.mesh.draw(self.program);
+});</code></pre>
+
+    <p>In previous programs, we need to use the vertex buffer to set up attribute variables. We also need to call <code>drawElements</code> with the index buffer to do the rendering. With the new class, all of these statements have been moved into the <code>draw</code> method of the <code>PosColMesh</code>, and so rendering becomes much simpler.</p>
+
+    <h3>14.2.2 &nbsp; Implementation of <code>PosColMesh</code></h3>
+
+    <h3>14.2.3 &nbsp; Implementation of <code>PosColMeshBuilder</code></h3>
 
     <hr>
     <p>
