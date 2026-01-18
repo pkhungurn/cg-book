@@ -423,6 +423,84 @@ self.program.uniform("scale")?.set1Float(scale);
 
     <h3>14.2.2 &nbsp; Implementation of <code>PosColMesh</code></h3>
 
+    <p>Let's see how the <code>PosColMesh</code> class is implemented. It is located in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-02/src/pos-col-mesh.js"><code>pos-col-mesh.js</code></a> file in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-14/program-02/src"><code>chapter-14/program-2/src</code></a> directory of the book's code repository. The class itself is quite simple. It has a constructor, which is a little lengthy, and 3 short methods: <code>setupVertexAttributes</code>, <code>drawElements</code>, and <code>draw</code>. Most of the time, the only method we need to use is the last one, which draws the entire mesh, and t is implemented by calling the first two in succession. However, we expose these two methods so that the class's users can do more advanced things such as drawing the meshes multiple times after setting up the attribute variables once.</p>
+
+    <p>Let us start with the constructor, whose code is reproduced below.</p>
+  
+<pre><code class="language-c">constructor(gl, positionData, colorData, indexData, primitiveType=null) {
+  if (primitiveType === null) {
+    primitiveType = gl.TRIANGLES;
+  }
+
+  if (primitiveType != gl.POINTS && primitiveType != gl.LINES && primitiveType != gl.TRIANGLES) {
+    throw Error(`Primitive type ${primitiveType} is not supported.`);      
+  }
+    
+  this.gl = gl;
+  this.positionBuffer = createVertexBuffer(this.gl, new Float32Array(positionData));
+  this.colorBuffer = createVertexBuffer(this.gl, new Float32Array(colorData));
+  this.indexBuffer = createIndexBuffer(this.gl, new Int32Array(indexData));    
+  
+  this.numVertices = Math.floor(positionData.length / 3);
+  this.numIndices = indexData.length;
+}
+</code></pre>
+
+    <p>The constructor takes quite a number of parameters, which is not at all surprising for something as complicated as a colored mesh. As with almost all classes we created in this book, the first parameter <code>gl</code> is the WebGL context that we will use to issue WebGL commands. The next two parameters, <code>positionData</code> and <code>colorData</code>, are data that will constitute the vertex attributes, and they should be arrays of floating point numbers. We expect the length of <code>positionData</code> to be multiples of three because we want to represent 3D meshes. (Note though that we will work with 2D meshes almost exclusively in the next few chapters. However, we can think of a 2D mesh as a 3D mesh where the $z$-components of all vertices are the same.) We expect the length of <code>colorData</code> to be multiples of four because we would like to represent colors in the RGBA format. The <code>indexData</code> parameter should be a list containing vertex indices that we will used to form primitives. Lastly, we have the <code>primitiveType</code>, which should contain the WebGL constant that indicates the type of primitives that the mesh should be built from. The parameter has a default value of <code>null</code>, which the constructor would convert to <code>gl.TRIANGLES</code> immediately.</p>
+
+<pre><code class='language-c'>if (primitiveType === null) {
+  primitiveType = gl.TRIANGLES;
+}</code></pre>
+
+    <p>So, if the user does not specify a primitive type, the class would default to triangles. The next if statement in the constructor limits the allowed primitive types of only points, lines, and triangles for simplicity.</p>
+
+    <p>The next four lines create assigns the main fields of the class. We save the WebGL context and then create three buffers: one for the vertex positions, one for the vertex colors, and one for the vertex indices.</p>
+
+<pre><code class="language-c">this.gl = gl;
+this.positionBuffer = createVertexBuffer(this.gl, new Float32Array(positionData));
+this.colorBuffer = createVertexBuffer(this.gl, new Float32Array(colorData));
+this.indexBuffer = createIndexBuffer(this.gl, new Int32Array(indexData));</code></pre>
+
+    <p>The <code>createVertexBuffer</code> and <code>createIndexBuffer</code> methods are the same ones used in previous programs, and their sources are located in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-02/src/vertex-index-buffer.js"><code>vertex-index-buffer.js</code></a> file. Lastly, we calculate the number of vertices and indices and save them as fields.</p>
+
+<pre><code class="language-c">this.numVertices = Math.floor(positionData.length / 3);
+this.numIndices = indexData.length;</code></pre>
+
+    <p>Next, let's look at the <code>setupVertexAttributes</code> method. This method takes a <code>GlProgram</code> object and try to set up the attributes variables of the program with the position and color buffers.</p>
+
+<pre><code class="language-c">setupVertexAttributes(program, 
+    vertPositionName="vert_position", vertColorName="vert_color") {
+  program.attribute(vertPositionName)?.setup(this.positionBuffer, 3, 4*3, 0);
+  program.attribute(vertColorName)?.setup(this.colorBuffer, 4, 4*4, 0);
+}
+</code></pre>
+
+    <p>Notice that the user can change the name of the attribute variables by specifying the <code>vertPositionName</code> and <code>vertPositionColor</code> parameters. However, for most of the programs in this book, we will use the default names <code>vert_color</code> and <code>vert_color</code>, so we will not need to specify the names when we use this method.</p>
+
+    <p>The <code>drawElements</code> method is the wrapper of the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-02/src/primitives.js"><code>drawElements</code></a> function that we have been using in the last programs. It basically provides the default values to the arguments so that, when the method is called with no arguments specified, all the primitives of the mesh is rendered.</p>
+
+<pre><code class="language-c">drawElements(mode=null, count=null, offset=0) {
+  if (mode === null) {
+    mode = this.primitiveType;
+  }
+  if (count === null) {
+    count = this.numIndices;
+  }    
+  drawElements(this.gl, this.indexBuffer, mode, count, offset);
+}</code></pre>
+
+    <p>Lastly, let us look at the <code>draw</code> method, which is basically calls the previous two methods in succession. In other words, in one step, it sets up the attribute variables to use the vertex buffers of the mesh, and then draws all the primitives.</p>
+
+<pre><code class="language-c">draw(program, 
+    vertPositionName="vert_position", 
+    vertColorName="vert_color", 
+    mode=null, count=null, offset=0) {
+  this.setupVertexAttributes(program, vertPositionName, vertColorName);
+  this.drawElements(mode, count, offset);
+}</code></pre>
+
+    <p>By specifying the parameters to values other than the default ones, the user can customizes the method calls to change the attribute variable names or to render the mesh partially.</p>
+ 
     <h3>14.2.3 &nbsp; Implementation of <code>PosColMeshBuilder</code></h3>
 
     <hr>
