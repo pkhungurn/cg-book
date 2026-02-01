@@ -501,7 +501,134 @@ this.numIndices = indexData.length;</code></pre>
 
     <p>By specifying the parameters to values other than the default ones, the user can customizes the method calls to change the attribute variable names or to render the mesh partially.</p>
  
-    <h3>14.2.3 &nbsp; Implementation of <code>PosColMeshBuilder</code></h3>
+    <h3>14.2.3 &nbsp; <code>PosColMeshBuilder</code></h3>
+
+    <p>Next, we look at the <code>PosColMeshBuilder</code> class, a helper class that makes creating a colored mesh more intuitive. Let us see how the class is supposed to be used. The first thing to do is to call the constructor to create an instance of the builder class. The last thing with the class to do is to call its <code>build</code> method to get an instance of <code>PosColMesh</code>. Between the calls to the constructor and <code>build</code>, the user can call the builder's methods to specify various aspects of the mesh. So, a code block that uses the class to build a mesh may look lile the following.</p>
+
+<pre><code class="language-c">let builder = new PosColMeshBuilder(this.gl);
+  :
+  : // Call builder methods to specify meshes.
+  :
+let mesh = builder.build();
+</code></pre>
+
+    <p>There are five methods for specifying the mesh.</p>
+
+    <ul>
+      <li><code>setPrimitiveType(primitiveType)</code> is used to specify the type of primitives that make up the mesh. The argument can be either <code>gl.POINTS</code>, <code>gl.LINES</code>, or <code>gl.TRIANGLES</code>. If the method is not called at all, the primitive type is defauled to triangles.</li>
+
+      <li><code>setColor(r, g, b, a)</code> is used to set the "current" color of the builder. The current color that will be assigned to each new vertex added by the next method. The current color is initially white (RGBA = $(1,1,1,1)$).</li>
+
+      <li><code>addVertex(x, y, z)</code> adds a new vertex with the positions specified by the three arguments. The color of the new vertex will be the current color that was last set by the <code>setColor</code> method.</li>
+
+      <li><code>addIndex(index)</code> adds a new vertex index to the index buffer.</li>
+
+      <li>Lastly, <code>addIndices(...indices)</code> adds multiple vertex indices to the index buffer. It is equivalent to calling <code>addIndex</code> multiple times.</li>
+    </ul>
+
+    <p>All of the above methods return the build instance, so we can chain the method calls to make them easier. To see what this means, let's see some examples. The following code builds a red triangle.</p>
+
+<pre><code class="language-c">let builder = new PosColMeshBuilder(this.gl);
+builder
+  .setColor(1.0, 0.0, 0.0, 1.0)  // Make the current color red. 
+  .addVertex(-1.0, -1.0, 0.0)    // Vertex #0
+  .addVertex(1.0, -1.0, 0.0)     // Vertex #1
+  .addVertex(0.0, 1.0, 0.0)      // Vertex #2
+  .addIndices(0, 1, 2);          // Lastly, add a triangle.
+let mesh = builder.build();
+</code></pre>
+
+    <p>The following code creates a mesh that has three lines. The first is red, the second green, and the third blue.</p>
+
+<pre><code class="language-c">let builder = new PosColMeshBuilder(this.gl);
+builder.setPrimitiveType(this.gl.LINES);
+// First line.
+builder
+  .setColor(1.0, 0.0, 0.0, 1.0)  // Make the current color red. 
+  .addVertex(-1.0, -1.0, 0.0)    // Vertex #0
+  .addVertex(-1.0, 1.0, 0.0)     // Vertex #1  
+  .addIndices(0, 1);             // Make a line using the last two vertices.
+// Second line.
+builder
+  .setColor(0.0, 1.0, 0.0, 1.0)  // Make the current color green. 
+  .addVertex(0.0, -1.0, 0.0)    // Vertex #2
+  .addVertex(0.0, 1.0, 0.0)     // Vertex #3  
+  .addIndices(2, 3);             // Make a line using the last two vertices.
+// Third line.
+builder
+  .setColor(0.0, 0.0, 1.0, 1.0)  // Make the current color green. 
+  .addVertex(1.0, -1.0, 0.0)    // Vertex #4
+  .addVertex(1.0, 1.0, 0.0)     // Vertex #5  
+  .addIndices(4, 5);             // Make a line using the last two vertices.
+let mesh = builder.build();</code></pre>
+
+    <h3>14.2.4 &nbsp; Implementation of <code>PosColMeshBuilder</code></h3>
+
+    <p>Let us now look at the code that makes the above usage possible. The source of the <code>PosCollMeshBuilder</code> class is available in the <a href="https://github.com/pkhungurn/cg-book-code/blob/main/chapter-14/program-02/src/pos-col-mesh.js"><code>pos-col-mesh.js</code></a> file in the <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-14/program-02/src"><code>chapter-14/program-2/src</code></a> directory of the book's code repository, just below the <code>PosColMesh</code> class. We shall start with the constructor.</p>
+
+<pre><code class="language-c">export class PosColMeshBuilder {
+  constructor(gl) {
+    this.gl = gl;
+    this.positionData = [];
+    this.colorData = [];
+    this.indexData = [];
+    this.color = [1.0, 1.0, 1.0, 1.0];
+    this.primitiveType = gl.TRIANGLES;
+  }
+  
+  :
+  :
+  :
+}
+</code></pre>
+
+    <p>The constructor simply creates some arrays to hold the data. We can see that it sets the default value of <code>primitiveType</code> to <code>gl.TRIANGLES</code> and make the "current" <code>color</code> white. The data stored in the fields are used to build a <code>PosColMesh</code> in the <code>build</code> method.</p>
+
+<pre><code class="language-c">build() {
+  return new PosColMesh(
+    this.gl, 
+    this.positionData, 
+    this.colorData, 
+    this.indexData, 
+    this.primitiveType);
+}
+</pre></code>
+
+    <p>The other five methods simply modify the fields appropropriately and return <code>this</code> to allow method chaining.</p>
+
+<pre><code class="language-c">setPrimitiveType(primitiveType) {
+  if (primitiveType != gl.POINTS
+      && primitiveType != gl.LINES 
+      && primitiveType != gl.TRIANGLES) {
+    throw Error(`Primitive type ${primitiveType} is not supported.`);      
+  }
+  this.primitiveType = primitiveType;
+  return this;
+}
+
+setColor(r, g, b, a) {
+  this.color = [r, g, b, a];
+  return this;
+}
+
+addVertex(x, y, z) {
+  this.positionData.push(x);
+  this.positionData.push(y);
+  this.positionData.push(z);
+  this.colorData.push(...this.color);
+  return this;
+}
+
+addIndex(index) {
+  this.indexData.push(index);
+  return this;
+}
+
+addIndices(...indices) {
+  this.indexData.push(...indices);
+  return this;
+}
+</code></pre>
 
     <hr>
     <p>
