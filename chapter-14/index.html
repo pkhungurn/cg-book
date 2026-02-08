@@ -419,7 +419,18 @@ self.program.uniform("scale")?.set1Float(scale);
     self.mesh.draw(self.program);
 });</code></pre>
 
-    <p>In previous programs, we need to use the vertex buffer to set up attribute variables. We also need to call <code>drawElements</code> with the index buffer to do the rendering. With the new class, all of these statements have been moved into the <code>draw</code> method of the <code>PosColMesh</code>, and so rendering becomes much simpler.</p>
+    <p>In previous programs, we need to use the vertex buffer to set up attribute variables. We also need to call <code>drawElements</code> with the index buffer to do the rendering. With the new class, all of these statements have been moved into the <code>draw</code> method of the <code>PosColMesh</code>, and so rendering becomes much simpler. The result of using the <code>PosColMesh</code> class to represent and render mesh can be seen in the web page of Program 2, whose screenshot is given below.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-02-screenshot-00.png"><img src="images/program-02-screenshot-00.png" alt="" width="300"></a></td>
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 14.2</strong> Screenshots of Program 2.</figcaption>
+    </figure>
+
+    <p>What we see is the same mesh that we saw in Program 1, but now the mesh was built differently.</p>
 
     <h3>14.2.2 &nbsp; Implementation of <code>PosColMesh</code></h3>
 
@@ -443,6 +454,7 @@ self.program.uniform("scale")?.set1Float(scale);
   
   this.numVertices = Math.floor(positionData.length / 3);
   this.numIndices = indexData.length;
+  this.primitiveType = primitiveType;
 }
 </code></pre>
 
@@ -597,9 +609,9 @@ let mesh = builder.build();</code></pre>
     <p>The other five methods simply modify the fields appropropriately and return <code>this</code> to allow method chaining.</p>
 
 <pre><code class="language-c">setPrimitiveType(primitiveType) {
-  if (primitiveType != gl.POINTS
-      && primitiveType != gl.LINES 
-      && primitiveType != gl.TRIANGLES) {
+  if (primitiveType != this.gl.POINTS
+      && primitiveType != this.gl.LINES 
+      && primitiveType != this.gl.TRIANGLES) {
     throw Error(`Primitive type ${primitiveType} is not supported.`);      
   }
   this.primitiveType = primitiveType;
@@ -630,6 +642,85 @@ addIndices(...indices) {
 }
 </code></pre>
 
+    <h3>14.2.5 &nbsp; Building and Rendering Multiple Meshes</h3>
+
+    <p>The reader might have felt disappointed that we have been introducing much new machinery into the code base just only to render the same mesh in Program 1 in a different way in Program 2. The author would like to ensure that this is not the case. As said earlier, the main benefit of the new mesh abstraction is that all details of the mesh is bundled together, and we can now treat a mesh as a unit. This is demonstarted in <a href="https://github.com/pkhungurn/cg-book-code/tree/main/chapter-14/program-03">Program 3</a> where the user can choose one out ten of prepared meshes to display.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td><a href="images/program-03-screenshot-00.png"><img src="images/program-03-screenshot-00.png" alt="" width="200"></a></td>
+          <td><a href="images/program-03-screenshot-01.png"><img src="images/program-03-screenshot-01.png" alt="" width="200"></a></td>          
+          <td><a href="images/program-03-screenshot-02.png"><img src="images/program-03-screenshot-02.png" alt="" width="200"></a></td>          
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 14.3</strong> Screenshots of Program 3.</figcaption>
+    </figure>
+
+    <p>How the program works is quite simple. We write methods to create meshes using <code>PosColMeshBuilder</code>. (Details are omitted for brevity.)</p>
+
+<pre><code class="language-c">createHouseMesh() {
+    let meshBuilder = new PosColMeshBuilder(this.gl);
+
+    :
+    :
+    :
+    
+    return meshBuilder.build();
+}
+
+createStarMesh(numSpikes) {
+    let meshBuilder = new PosColMeshBuilder(this.gl);
+
+    :
+    :
+    :
+    
+    return meshBuilder.build();
+}</code></pre>
+
+    <p>Then, in the <a href="https://github.com/pkhungurn/cg-book-code/blob/a3dcdfc6e2c82bc0759a5903ea2ccf6fd1a980b4/chapter-14/program-03/src/index.js#L44"><code>createMeshes</code></a> method, which is called when the application starts running, we use the above methods to populate an array of meshes.</p>
+
+<pre><code class="language-c">createMeshes() {
+    this.meshes = [this.createHouseMesh()];
+    for (let numSpikes=3;numSpikes&lt;=12;numSpikes++) {
+        this.meshes.push(this.createStarMesh(numSpikes));
+    }        
+}</code></pre>
+
+    <p>When we render the scene in the <a href="https://github.com/pkhungurn/cg-book-code/blob/a3dcdfc6e2c82bc0759a5903ea2ccf6fd1a980b4/chapter-14/program-03/src/index.js#L177"><code>updateWebGL</code></a> method, we pick the mesh from the array and just call <code>draw</code> on it.</p>
+
+<pre><code class="language-c">// Get the mesh ID.
+let meshId = parseInt($("#meshId").val());
+
+this.program.use(() => {
+    self.program.uniform("center")?.set3Float(centerX, centerY, 0.0);
+    self.program.uniform("scale")?.set1Float(scale);
+    self.meshes[meshId].draw(self.program);
+});</code></pre>
+
+    <h2>14.3 &nbsp; Summary</h2>
+
+    <ul>
+      <li>In this chapter, we introduce two abstractions to help tame the complexity of WebGL programming: the <code>GlProgram</code> and the <code>PosColMesh</code> classes.</li>
+
+      <li>The <code>GlProgram</code> class encapsulates a GLSL program.        
+      <ul>
+        <li>It main features are the <code>attribute</code> and <code>uniform</code> methods, which can be used to conveninently access vertex attributes and uniforms by names.</li>
+
+        <li>Through the use of optional chaining, we can write code to set up vertex attributes and uniforms without having to check whether they exist in the program. This simplify GLSL program development and debugging.</li>
+      </ul>
+      </li>
+
+      <li>The <code>PosColMesh</code> class encapsulates a colored mesh.
+        <ul>
+          <li>It contains all the buffers related to a mesh inside, allowing us to treat the mesh as a unit instead of as a collection of separate buffers.</li>
+          <li>Its <code>draw</code> method configures the WebGL program's vertex attributes, sets up the index buffer, and performs rendering in one step. This significantly shortens the code needs to draw a mesh.</li>
+          <li>The class also comes with a builder class <code>PosColMeshBuilder</code>, that makes creating mesh more intuitive.</li>
+        </ul>
+      </li>
+    </ul>
+  
     <hr>
     <p>
       <a href="../chapter-13/index.html">&lt;&lt;</a>
