@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script type="text/javascript">
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        tags: "ams",
+      },
+      svg: {
+        fontCache: 'global'
+      },
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
+  <link rel="stylesheet"
+      href="../highlight/styles/default.min.css">
+  <script src="../highlight/highlight.min.js"></script>
+  <script src="../js/highlightjs-line-numbers.min.js"></script>
+  <script>
+  hljs.highlightAll();
+  hljs.initLineNumbersOnLoad();
+  </script>
+    
+  <title>Chapter 15</title>
+</head>
+
+<body>
+  <div class="container" style="max-width: 640px;">
+    <span style="visibility: hidden;">
+      \(
+      \def\sc#1{\dosc#1\csod}
+      \def\dosc#1#2\csod{{\rm #1{\small #2}}}
+
+      \newcommand{\dee}{\mathrm{d}}
+      \newcommand{\Dee}{\mathrm{D}}
+      \newcommand{\In}{\mathrm{in}}
+      \newcommand{\Out}{\mathrm{out}}
+      \newcommand{\pdf}{\mathrm{pdf}}
+      \newcommand{\Cov}{\mathrm{Cov}}
+      \newcommand{\Var}{\mathrm{Var}}
+
+      \newcommand{\ve}[1]{\mathbf{#1}}
+      \newcommand{\mrm}[1]{\mathrm{#1}}
+      \newcommand{\ves}[1]{\boldsymbol{#1}}
+      \newcommand{\etal}{{et~al.}}
+      \newcommand{\sphere}{\mathbb{S}^2}
+      \newcommand{\modeint}{\mathcal{M}}
+      \newcommand{\azimint}{\mathcal{N}}
+      \newcommand{\ra}{\rightarrow}
+      \newcommand{\mcal}[1]{\mathcal{#1}}
+      \newcommand{\X}{\mathcal{X}}
+      \newcommand{\Y}{\mathcal{Y}}
+      \newcommand{\Z}{\mathcal{Z}}
+      \newcommand{\x}{\mathbf{x}}
+      \newcommand{\y}{\mathbf{y}}
+      \newcommand{\z}{\mathbf{z}}
+      \newcommand{\tr}{\mathrm{tr}}
+      \newcommand{\sgn}{\mathrm{sgn}}
+      \newcommand{\diag}{\mathrm{diag}}
+      \newcommand{\Real}{\mathbb{R}}
+      \newcommand{\sseq}{\subseteq}
+      \newcommand{\ov}[1]{\overline{#1}}
+      \DeclareMathOperator*{\argmax}{arg\,max}
+      \DeclareMathOperator*{\argmin}{arg\,min}
+      \)
+    </span>
+
+    <h1>15 &nbsp; 2D Transformations</h1>
+    <hr>
+
+    <p>So far, we have learned how to write GLSL shaders, and we have introduced abstractions to make working with them easier. What we can draw so far with OpenGL are images that can be computed in the fragment shader (<a href="../chapter-13/index.html">Chapter 13</a>) and colored meshes (<a href="../chaper-14">Chapter 14</a> and many previous chapters).</p>
+
+    <p>In this chapter, we introduce a new concept: <b>transformations</b>. A transformation is a mathematical operation that we can apply to the geometric data (points, lines, triangles, camera positions, and so on) that make up our scene so that such data change their positions and shapes. For example, given a mesh, we can apply a transformation to change its position in the scene, rotate it to face other direction, or scale it so that it becomes 2 times or 3 times bigger. We can use transformations to change how the scene is rendered; for examples, changing the zoom level or moving the final rendering around the canvas. Transformation is a fundamental concept in computer graphics, and mastering it is a requirement for a competent graphics practitioner.</p>
+
+    <p>Transformation, however, is quite a complicated topic in it self. In the end, we want to cover transformations on 3D objects because WebGL is all about rendering 3D scenes. Nevertheless, such 3D transformations are quite complex by themselves. Moreover, we have not really discussed how to deal with 3D data so far besides setting the $z$-coordinates to zero so as to not worry about the third dimension like in the last chapter. So, in this chapter, we shall limit ourselves to the discussions of 2D transformations. They are much easier to deal with because they are very easy to visualize with what we have learned so far, and there are fewer types of 2D transformations we need to discuss.</p>
+
+    <h2>15.1 &nbsp; Definitions and examples</h2>
+
+    <p>Mathematically, a <b>2D transformation</b> is a function that consumes a 2D point and outputs a 2D point. More formally, we say that $f$ is a 2D transformation if its maps $\Real^2$ to $\Real^2$. In other words, its signature is $$f: \Real^2 \ra \Real^2.$$ Let us look at some examples. One of the simplest transformations is the <b>identity transformation</b> $\mathtt{I}$, which simply outputs whatever the input is:
+    \begin{align*}
+    \mathtt{I}( \ve{x} ) = \ve{x}
+    \end{align*}
+    for every $\ve{x} \in \Real^2$. So,
+    \begin{align*}
+        I((0,0)) &= (0,0), &
+        I((1,2)) &= (1,2),&
+        I((-5,3)) &= (-5, 3),
+    \end{align*}
+    and so on. (To simplify the notation, we will omit double parentheses and write $f(-5, 3)$ in place of $f((-5,3))$ from now on.)  
+    </p>
+
+    <p>Other transformations are more complicated to define as they involve some parameters to define their behavior. An example of transformations with parameters are the <b>constant functions</b> $\mathtt{C}_{\ve{a}}$ where $\ve{a} \in \Real^2$ is the parameter. The constant function always outputs $\ve{a}$ no matter what the input is:
+    \begin{align*}
+        \mathtt{C}_{\ve{a}}(\ve{x}) = \ve{a}
+    \end{align*}
+    for all $\ve{x} \in \Real^2$. So,
+    \begin{align*}
+        \mathtt{C}_{(2,1)}(10, 15) &= (2,1), &
+        \mathtt{C}_{(-1,1)}(0, 0) &= (-1,1), &
+        \mathtt{C}_{(46,49)}(39, 888) &= (46,49).
+    \end{align*}
+    (Again, when the parameter is a 2D point, we may drop the parantheses around it to make the notation simpler. That is, we may write $\mathtt{C}_{2,1}$ to mena $\mathtt{C}_{(2,1)}$.) Note that, while there is only one identity transformation, there are as many constants functions as there are points in $\Real^2$.
+    </p>
+
+    <p>A type of transformation that is used extensively in computer graphics is the <b>translation</b>. Like a constant function, a translation $\mathtt{T}_{\ve{a}}$ is parametered by a point $\mathbf{a} \in \Real^2$. What it does is to add $\ve{a}$ to the input:
+    \begin{align*}
+        \mathtt{T}_{\ve{a}}(\ve{x}) = \ve{x} + \ve{a}.
+    \end{align*}
+    So,
+    \begin{align*}
+        \mathtt{T}_{1,1}(5,6) &= (6,7), &
+        \mathtt{T}_{-2,3}(7,8) &= (5,11), &
+        \mathtt{T}_{-10,-20}(100,200) &= (90,180).
+    \end{align*}
+    </p>
+
+    <p>Lastly, another type of transformation that is used extensively in computer graphics is <b>scaling</b>. It is also parameterized by a point $\ve{a} \in \Real^2$, but it is better to treat the points as an ordered pair $(a_1, a_2)$. The scaling $\mathtt{S}_{a_1,a_2}$ simply multiplies $a_1$ to the $x$ component of the input and $a_2$ to the $y$-component of the input. In other words,
+    \begin{align*}
+        \mathtt{S}_{a_1, a_2}\bigg( \begin{bmatrix} x \\ y \end{bmatrix} \bigg) = \begin{bmatrix} a_1 x \\ a_2 y \end{bmatrix}
+    \end{align*}
+    So,
+    \begin{align*}
+        \mathtt{S}_{2,2}(10, 9) &= (20, 18), & 
+        \mathtt{S}_{4,5}(-3, 2) &= (-12, 10), & 
+        \mathtt{S}_{20,10}(-1,-2) &= (-20, -20).
+    \end{align*}
+    </p>
+
+    <h2>15.2 &nbsp; Why transformations matter</h2>
+
+    <p>So far, we have introduced transformation as a mathematical concept. This, however, is very abstract and quite removed from the visual world of computer graphics. However, transformations are used in graphics because they we can apply them to graphics data and see the results with our eyes. In this section, we shall see how we can apply transformations to two types of graphics data we have encountered so far, images and meshes, to see why they are useful to graphics practioners.</p>
+
+    <h3>15.2.1 &nbsp; Effects of transformations on images</h3>
+
+    <p>Let us start with images; more specifically, continuous images. Recall from <a href="../chapter-02/index.html">Chapter 2</a> that a continuous image is a function $p: \Real^2 \ra \mathcal{C}$ where $\mathcal{C}$ denotes the set of colors. One way to think about a continous image is that it is a way to assign a color to each 2D point in a plane. 
+    </p>
+
+    <h2>15.3 &nbsp; Transformation arithematic</h2>
+
+    <h2>15.4 &nbsp; Linear transformations</h2>
+
+    <h2>15.5 &nbsp; Affine transformations</h2>
+
+    <h2>15.6 &nbsp; Two equivalent views of affine transformations</h2>
+
+    <h2>15.7 &nbsp; Matrices in GLSL</h2>
+
+    <h2>15.8 &nbsp; Graphics math in Javascript</h2>
+
+    <h2>15.9 &nbsp; Summary</h2>
+
+    <hr>
+    <p>
+      <a href="../chapter-14/index.html">&lt;&lt;</a>
+      <a href="../index.html">Contents</a>      
+    </p>
+  </div>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/littlefoot.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    const { littlefoot } = require('littlefoot')
+ou
+    const lf = littlefoot({
+      activateOnHover: true,
+      hoverDelay: 250,
+    });
+  </script>
+</body>
+
+</html>
