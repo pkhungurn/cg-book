@@ -134,12 +134,293 @@
 
     <h2>15.2 &nbsp; Why transformations matter</h2>
 
-    <p>So far, we have introduced transformation as a mathematical concept. This, however, is very abstract and quite removed from the visual world of computer graphics. However, transformations are used in graphics because they we can apply them to graphics data and see the results with our eyes. In this section, we shall see how we can apply transformations to two types of graphics data we have encountered so far, images and meshes, to see why they are useful to graphics practioners.</p>
+    <p>So far, we have introduced transformation as a mathematical concept. This, however, is very abstract and quite removed from the visual world of computer graphics. However, transformations are used in graphics because they we can apply them to graphics data and see the results with our eyes. In this section, we shall see how we can apply transformations to two types of graphics data we have encountered so far, meshes and images, to see why they are useful to graphics practioners.</p>
 
-    <h3>15.2.1 &nbsp; Effects of transformations on images</h3>
+    <h3>15.2.1 &nbsp; Effects of transformations on meshes</h3>
 
-    <p>Let us start with images; more specifically, continuous images. Recall from <a href="../chapter-02/index.html">Chapter 2</a> that a continuous image is a function $p: \Real^2 \ra \mathcal{C}$ where $\mathcal{C}$ denotes the set of colors. One way to think about a continous image is that it is a way to assign a color to each 2D point in a plane. 
-    </p>
+    <p>Let us start with meshes because we have been studying how to draw them in the last few chapters. Meshes are made of vertices, and all vertices must have one attribute: their positions. For a 2D mesh, the position is a point in $\Real^2$. If we apply a 2D transformation to it, we get another position. In other words, when we apply a transformation to a vertex, we <i>move</i> it to a new position. So, if we apply the same transformation to all vertices in a mesh, we can change <i>both</i> the mesh's positions and shape. Let's see how the transformations we have learned so far affect 2D meshes.</p>
+
+    <p>For the identity transformation $\mathtt{I}$, we know that it does not change any vertex's position at all, so any mesh would remain unchanged if we apply the identity transformation to it. For the constant transformation $\mathbb{C}_{a,b}$, all vertices are moved $(a,b)$, and so the mesh is reduced to a single point. So, these two transformations are not useful on their own.</p>
+    
+    <p>The translation $\mathtt{T}_{a,b}$ is a little more interesting. We know that it adds the vector $(a,b)$ to all vertex positions. For example, let us say we have a square mesh made with 4 vertices at $(0, 0)$, $(1,0)$, $(1,1)$, and $(0,1)$. If we apply $T_{-1,2}$ to the mesh, then the vertex position becomes $(-1,2)$, $(0, 2)$, $(0, 3)$, and $(-1, 3)$, respectively. The overall effect is presented in the figure below.</p>
+
+    <style>
+      .coord-line {
+        stroke: #c0c0c0;
+        fill: none;
+      }
+
+      .coord-text {
+        font-size: 10px;
+        font-family: sans-serif;
+        font-weight: normal;
+        stroke: #c0c0c0;
+      }
+      
+      .mesh-edge {
+        stroke: #000000;
+        stroke-width: 2;
+      }
+    </style>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <svg version="1.1" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 10 V 290" class="coord-line" />
+              <path d="M 72 10 V 290" class="coord-line" />
+              <path d="M 124 10 V 290" class="coord-line" />
+              <path d="M 176 10 V 290" class="coord-line" />
+              <path d="M 228 10 V 290" class="coord-line" />
+              <path d="M 280 10 V 290" class="coord-line" />
+
+              <path d="M 10 20 H 290" class="coord-line" />
+              <path d="M 10 72 H 290" class="coord-line" />
+              <path d="M 10 124 H 290" class="coord-line" />
+              <path d="M 10 176 H 290" class="coord-line" />
+              <path d="M 10 228 H 290" class="coord-line" />
+              <path d="M 10 280 H 290" class="coord-line" />
+
+              <text x="10" y="20" dy="-4" dx="2" text-anchor="end" class="coord-text">4</text>
+              <text x="10" y="72" dy="-4" dx="2" text-anchor="end" class="coord-text">3</text>
+              <text x="10" y="124" dy="-4" dx="2" text-anchor="end" class="coord-text">2</text>
+              <text x="10" y="176" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="228" dy="-4" dx="2" text-anchor="end" class="coord-text">0</text>
+              <text x="10" y="280" dy="-4" dx="2" text-anchor="end" class="coord-text">-1</text>
+
+              <text y="300" x="20" dy="-4" dx="2" text-anchor="start" class="coord-text">-2</text>
+              <text y="300" x="72" dy="-4" dx="2" text-anchor="start" class="coord-text">-1</text>
+              <text y="300" x="124" dy="-4" dx="2" text-anchor="start" class="coord-text">0</text>
+              <text y="300" x="176" dy="-4" dx="2" text-anchor="start" class="coord-text">1</text>
+              <text y="300" x="228" dy="-4" dx="2" text-anchor="start" class="coord-text">2</text>
+              <text y="300" x="280" dy="-4" dx="2" text-anchor="start" class="coord-text">3</text>
+
+              <path d="M124 228 h52 v-52 h-52 v52" class="mesh-edge" fill="none"/>
+
+              <circle cx="124" cy="228" r="4" />
+              <circle cx="176" cy="228" r="4" />
+              <circle cx="176" cy="176" r="4" />
+              <circle cx="124" cy="176" r="4" />
+            </svg>
+          </td>
+          <td>
+            ${\huge \xrightarrow{\mathtt{T}_{-1,2}}}$
+          </td>
+          <td>
+            <svg version="1.1" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 10 V 290" class="coord-line" />
+              <path d="M 72 10 V 290" class="coord-line" />
+              <path d="M 124 10 V 290" class="coord-line" />
+              <path d="M 176 10 V 290" class="coord-line" />
+              <path d="M 228 10 V 290" class="coord-line" />
+              <path d="M 280 10 V 290" class="coord-line" />
+
+              <path d="M 10 20 H 290" class="coord-line" />
+              <path d="M 10 72 H 290" class="coord-line" />
+              <path d="M 10 124 H 290" class="coord-line" />
+              <path d="M 10 176 H 290" class="coord-line" />
+              <path d="M 10 228 H 290" class="coord-line" />
+              <path d="M 10 280 H 290" class="coord-line" />
+
+              <text x="10" y="20" dy="-4" dx="2" text-anchor="end" class="coord-text">4</text>
+              <text x="10" y="72" dy="-4" dx="2" text-anchor="end" class="coord-text">3</text>
+              <text x="10" y="124" dy="-4" dx="2" text-anchor="end" class="coord-text">2</text>
+              <text x="10" y="176" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="228" dy="-4" dx="2" text-anchor="end" class="coord-text">0</text>
+              <text x="10" y="280" dy="-4" dx="2" text-anchor="end" class="coord-text">-1</text>
+
+              <text y="300" x="20" dy="-4" dx="2" text-anchor="start" class="coord-text">-2</text>
+              <text y="300" x="72" dy="-4" dx="2" text-anchor="start" class="coord-text">-1</text>
+              <text y="300" x="124" dy="-4" dx="2" text-anchor="start" class="coord-text">0</text>
+              <text y="300" x="176" dy="-4" dx="2" text-anchor="start" class="coord-text">1</text>
+              <text y="300" x="228" dy="-4" dx="2" text-anchor="start" class="coord-text">2</text>
+              <text y="300" x="280" dy="-4" dx="2" text-anchor="start" class="coord-text">3</text>
+
+              <circle cx="72" cy="124" r="4" />
+              <circle cx="124" cy="124" r="4" />
+              <circle cx="124" cy="72" r="4" />
+              <circle cx="72" cy="72" r="4" />
+
+              <path d="M72 124 h52 v-52 h-52 v52" class="mesh-edge" fill="none"/>
+            </svg>
+          </td>          
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 14.1</strong> The effect of applying a translation to a square mesh.</figcaption>
+    </figure>
+
+    <p>In general, the effect of applying $\mathtt{T}_{a,b}$ to a mesh is to move the mesh to the right by $a$ units and then to upward by $b$ units. Note that $a$ and $b$ are <i>signed</i>. So, moving to the right by a negative number of units means moving to the left, and moving upward by a negative number of units means moving downward. </p>
+
+    <p>Next, let's look at scaling $\mathtt{S}_{a,b}$. When we apply it to the square mesh above, the vertices become $(0,0)$, $(a,0)$, $(a,b)$, and $(0,b)$. What the results looks like depends on the sign of $a$ and $b$. When $a$ and $b$ are both positive, it scales the mesh up $a$ times in the $x$-direction and $b$-times in the $y$-direction. Note that $a$ and $b$ can be less than $1$, which means that it can also shrinks (i.e., scales down) the mesh too.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <svg version="1.1" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 10 V 290" class="coord-line" />
+              <path d="M 72 10 V 290" class="coord-line" />
+              <path d="M 124 10 V 290" class="coord-line" />
+              <path d="M 176 10 V 290" class="coord-line" />
+              <path d="M 228 10 V 290" class="coord-line" />
+              <path d="M 280 10 V 290" class="coord-line" />
+
+              <path d="M 10 20 H 290" class="coord-line" />
+              <path d="M 10 72 H 290" class="coord-line" />
+              <path d="M 10 124 H 290" class="coord-line" />
+              <path d="M 10 176 H 290" class="coord-line" />
+              <path d="M 10 228 H 290" class="coord-line" />
+              <path d="M 10 280 H 290" class="coord-line" />
+
+              <text x="10" y="20" dy="-4" dx="2" text-anchor="end" class="coord-text">4</text>
+              <text x="10" y="72" dy="-4" dx="2" text-anchor="end" class="coord-text">3</text>
+              <text x="10" y="124" dy="-4" dx="2" text-anchor="end" class="coord-text">2</text>
+              <text x="10" y="176" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="228" dy="-4" dx="2" text-anchor="end" class="coord-text">0</text>
+              <text x="10" y="280" dy="-4" dx="2" text-anchor="end" class="coord-text">-1</text>
+
+              <text y="300" x="20" dy="-4" dx="2" text-anchor="start" class="coord-text">-1</text>
+              <text y="300" x="72" dy="-4" dx="2" text-anchor="start" class="coord-text">0</text>
+              <text y="300" x="124" dy="-4" dx="2" text-anchor="start" class="coord-text">1</text>
+              <text y="300" x="176" dy="-4" dx="2" text-anchor="start" class="coord-text">2</text>
+              <text y="300" x="228" dy="-4" dx="2" text-anchor="start" class="coord-text">3</text>
+              <text y="300" x="280" dy="-4" dx="2" text-anchor="start" class="coord-text">4</text>
+
+              <path d="M72 228 h52 v-52 h-52 v52" class="mesh-edge" fill="none"/>
+
+              <circle cx="72" cy="228" r="4" />
+              <circle cx="124" cy="228" r="4" />
+              <circle cx="124" cy="176" r="4" />
+              <circle cx="72" cy="176" r="4" />
+            </svg>
+          </td>
+          <td>
+            ${\huge \xrightarrow{\mathtt{S}_{3,2}}}$
+          </td>
+          <td>
+            <svg version="1.1" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 10 V 290" class="coord-line" />
+              <path d="M 72 10 V 290" class="coord-line" />
+              <path d="M 124 10 V 290" class="coord-line" />
+              <path d="M 176 10 V 290" class="coord-line" />
+              <path d="M 228 10 V 290" class="coord-line" />
+              <path d="M 280 10 V 290" class="coord-line" />
+
+              <path d="M 10 20 H 290" class="coord-line" />
+              <path d="M 10 72 H 290" class="coord-line" />
+              <path d="M 10 124 H 290" class="coord-line" />
+              <path d="M 10 176 H 290" class="coord-line" />
+              <path d="M 10 228 H 290" class="coord-line" />
+              <path d="M 10 280 H 290" class="coord-line" />
+
+              <text x="10" y="20" dy="-4" dx="2" text-anchor="end" class="coord-text">4</text>
+              <text x="10" y="72" dy="-4" dx="2" text-anchor="end" class="coord-text">3</text>
+              <text x="10" y="124" dy="-4" dx="2" text-anchor="end" class="coord-text">2</text>
+              <text x="10" y="176" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="228" dy="-4" dx="2" text-anchor="end" class="coord-text">0</text>
+              <text x="10" y="280" dy="-4" dx="2" text-anchor="end" class="coord-text">-1</text>
+
+              <text y="300" x="20" dy="-4" dx="2" text-anchor="start" class="coord-text">-1</text>
+              <text y="300" x="72" dy="-4" dx="2" text-anchor="start" class="coord-text">0</text>
+              <text y="300" x="124" dy="-4" dx="2" text-anchor="start" class="coord-text">1</text>
+              <text y="300" x="176" dy="-4" dx="2" text-anchor="start" class="coord-text">2</text>
+              <text y="300" x="228" dy="-4" dx="2" text-anchor="start" class="coord-text">3</text>
+              <text y="300" x="280" dy="-4" dx="2" text-anchor="start" class="coord-text">4</text>
+
+              <path d="M72 228 h156 v-104 h-156 v104" class="mesh-edge" fill="none"/>
+
+              <circle cx="72" cy="228" r="4" />
+              <circle cx="228" cy="228" r="4" />
+              <circle cx="228" cy="124" r="4" />
+              <circle cx="72" cy="124" r="4" />
+            </svg>
+          </td>          
+        </tr>
+        <tr>
+          <td>
+            <svg version="1.1" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 10 V 290" class="coord-line" />
+              <path d="M 72 10 V 290" class="coord-line" />
+              <path d="M 124 10 V 290" class="coord-line" />
+              <path d="M 176 10 V 290" class="coord-line" />
+              <path d="M 228 10 V 290" class="coord-line" />
+              <path d="M 280 10 V 290" class="coord-line" />
+
+              <path d="M 10 20 H 290" class="coord-line" />
+              <path d="M 10 72 H 290" class="coord-line" />
+              <path d="M 10 124 H 290" class="coord-line" />
+              <path d="M 10 176 H 290" class="coord-line" />
+              <path d="M 10 228 H 290" class="coord-line" />
+              <path d="M 10 280 H 290" class="coord-line" />
+
+              <text x="10" y="20" dy="-4" dx="2" text-anchor="end" class="coord-text">4</text>
+              <text x="10" y="72" dy="-4" dx="2" text-anchor="end" class="coord-text">3</text>
+              <text x="10" y="124" dy="-4" dx="2" text-anchor="end" class="coord-text">2</text>
+              <text x="10" y="176" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="228" dy="-4" dx="2" text-anchor="end" class="coord-text">0</text>
+              <text x="10" y="280" dy="-4" dx="2" text-anchor="end" class="coord-text">-1</text>
+
+              <text y="300" x="20" dy="-4" dx="2" text-anchor="start" class="coord-text">-1</text>
+              <text y="300" x="72" dy="-4" dx="2" text-anchor="start" class="coord-text">0</text>
+              <text y="300" x="124" dy="-4" dx="2" text-anchor="start" class="coord-text">1</text>
+              <text y="300" x="176" dy="-4" dx="2" text-anchor="start" class="coord-text">2</text>
+              <text y="300" x="228" dy="-4" dx="2" text-anchor="start" class="coord-text">3</text>
+              <text y="300" x="280" dy="-4" dx="2" text-anchor="start" class="coord-text">4</text>
+
+              <path d="M72 228 h52 v-52 h-52 v52" class="mesh-edge" fill="none"/>
+
+              <circle cx="72" cy="228" r="4" />
+              <circle cx="124" cy="228" r="4" />
+              <circle cx="124" cy="176" r="4" />
+              <circle cx="72" cy="176" r="4" />
+            </svg>
+          </td>
+          <td>
+            ${\huge \xrightarrow{\mathtt{S}_{0.5,0.5}}}$
+          </td>
+          <td>
+            <svg version="1.1" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 10 V 290" class="coord-line" />
+              <path d="M 72 10 V 290" class="coord-line" />
+              <path d="M 124 10 V 290" class="coord-line" />
+              <path d="M 176 10 V 290" class="coord-line" />
+              <path d="M 228 10 V 290" class="coord-line" />
+              <path d="M 280 10 V 290" class="coord-line" />
+
+              <path d="M 10 20 H 290" class="coord-line" />
+              <path d="M 10 72 H 290" class="coord-line" />
+              <path d="M 10 124 H 290" class="coord-line" />
+              <path d="M 10 176 H 290" class="coord-line" />
+              <path d="M 10 228 H 290" class="coord-line" />
+              <path d="M 10 280 H 290" class="coord-line" />
+
+              <text x="10" y="20" dy="-4" dx="2" text-anchor="end" class="coord-text">4</text>
+              <text x="10" y="72" dy="-4" dx="2" text-anchor="end" class="coord-text">3</text>
+              <text x="10" y="124" dy="-4" dx="2" text-anchor="end" class="coord-text">2</text>
+              <text x="10" y="176" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="228" dy="-4" dx="2" text-anchor="end" class="coord-text">0</text>
+              <text x="10" y="280" dy="-4" dx="2" text-anchor="end" class="coord-text">-1</text>
+
+              <text y="300" x="20" dy="-4" dx="2" text-anchor="start" class="coord-text">-1</text>
+              <text y="300" x="72" dy="-4" dx="2" text-anchor="start" class="coord-text">0</text>
+              <text y="300" x="124" dy="-4" dx="2" text-anchor="start" class="coord-text">1</text>
+              <text y="300" x="176" dy="-4" dx="2" text-anchor="start" class="coord-text">2</text>
+              <text y="300" x="228" dy="-4" dx="2" text-anchor="start" class="coord-text">3</text>
+              <text y="300" x="280" dy="-4" dx="2" text-anchor="start" class="coord-text">4</text>
+
+              <path d="M72 228 h26 v-26 h-26 v26" class="mesh-edge" fill="none"/>
+
+              <circle cx="72" cy="228" r="4" />
+              <circle cx="98" cy="228" r="4" />
+              <circle cx="98" cy="202" r="4" />
+              <circle cx="72" cy="202" r="4" />
+            </svg>
+          </td>          
+        </tr>        
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 14.2</strong> The effects of scaling with positive scaling factors.</figcaption>
+    </figure>
 
     <h2>15.3 &nbsp; Transformation arithematic</h2>
 
