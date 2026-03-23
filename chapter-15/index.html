@@ -675,20 +675,222 @@
 
     <p>From the examples we have seen so far, we can see why transformations are useful to computer graphics. Using translation, we can move a mesh around the scene. Using scaling, we can make a mesh larger or smaller to our liking. Using these two transformations togeter allows us to resize a mesh and place it to where we like in a scene.</p>
 
-
     <h2>15.3 &nbsp; Transformation arithematic</h2>
 
-    <h2>15.4 &nbsp; Linear transformations</h2>
+    <p>Like many other mathematical objects, we can perform operations such as addition, subtraction, and multiplication on transformations to another transformation. This allows us to build more complex transformations from simpler transformations, and it makes transformation another kind of "numbers," much like vectors. In this section, we will learn about three operations on transformations that are used widely in computer graphics: composition, addition, and scalar multiplication.</p>
 
-    <h2>15.5 &nbsp; Affine transformations</h2>
+    <h3>15.3.1 &nbsp; Transformation Equality</h3>
 
-    <h2>15.6 &nbsp; Two equivalent views of affine transformations</h2>
+    <p>Let us talk, though, about how to decide whether two transformations are the same or not first. This will help us make more sense of the operations we are about to learn. We say that two transformations $f$ and $g$ are <b>equal</b> if the results of applying $f$ and $g$ to 2D any point $\ve{x}$ are the same. In mathematcal notations:
+    </p>
 
-    <h2>15.7 &nbsp; Matrices in GLSL</h2>
+    <p style="text-align: center;">
+    $f = g$ if $f(\ve{x}) = g(\ve{x})$ for all $\ve{x} \in \Real^2$.
+    </p>
 
-    <h2>15.8 &nbsp; Graphics math in Javascript</h2>
+    <p>In other words, $f$ and $g$ have the exact same effect on every point. We can swap $g$ in place of $f$, apply the function, and no one would notice any differences in the result. If there is a point $\ve{x}$ where $f(\ve{x}) \neq g(\ve{x})$, then $f$ and $g$ are not equal, and we would write $f \neq g$.</p>
 
-    <h2>15.9 &nbsp; Summary</h2>
+    <p>Let us observe equality between transformations we have seen so far. The identity transformation $\mathtt{I}$ returns the input $\ve{x}$ exactly without change. So does the translation by $(0,0)$, $\mathbb{T}_{0,0}$, and the scaling by $(1,1)$, $\mathtt{s}_{1,1}$. As a result, $$ \mathtt{I} = \mathtt{T}_{0,0} = \mathtt{S}_{1,1}.$$</p>
+
+    <p>The case above is the only case where a translation can be equal to a scaling. If $(a,b) \neq (0,0)$, them $\mathtt{T}_{a,b} \neq \mathtt{S}_{c,d}$ for any $(c, d) \in \Real^2$. This is because there is a point, $(0,0)$, where the effects of the two transformations differ:
+    \begin{align*}
+      T_{a,b}(0,0) = (a,b) \neq (0,0) = S_{c,d}(0,0). 
+    \end{align*}
+    </p>
+
+    <h3>15.3.2 &nbsp; Transformation Composition</h3>
+
+    <p>With the discussion on equality out of the way, let us talk about the first operation on transformations. Given a 2D transformation $f: \Real^2 \ra \Real^2$ and another 2D transformation $g: \Real^2 \ra \Real^2$, we can create another transformation $h$ by just applying $f$ and then $g$. So, the defintion of $h$ is given by the equation $$h(\ve{x}) = g(f(\ve{x}))$$ for all $\ve{x} \in \Real^2$. Here, $h$ is called the <b>composition of $f$ and $g$</b> and is denoted by $g \circ f$. As a result, we can write: $$(g \circ f)(\ve{x}) = g(f(\ve{x})).$$</p>
+
+    <p>Let us see an example. Let $f = \mathtt{T}_{1,0}$ and $g = \mathtt{S}_{2,2}$. We have that
+    \begin{align*}
+      (g \circ f)(x,y) &= g(f(x,y)) =  \mathtt{S}_{2,2}(\mathtt{T}_{1,0}(x,y)) = \mathtt{S}_{2,2}(x+1, y) = (2x+2, 2y), \\
+      (f \circ g)(x,y) &= f(g(x,y)) =  \mathtt{T}_{1,0}(\mathtt{S}_{2,2}(x,y)) = \mathtt{T}_{1,0}(2x, 2y) = (2x+1, 2y). 
+    \end{align*}
+    It should be clear that, in this case, $f \circ g \neq g \circ f$ because their effects are different on all points. In generally, scaling then translation is not the same as translation then scaling. <b>Composition is not commutative</b>. The order at which we apply transformations matters.</p>
+
+    <p>On the other hand, if the order of transformations is fixed, it does not matter how we group the transformations in this order. More concretely, suppose we have three transformation $f$, $g$, and $h$ that we will apply to a point $\ve{x}$ in that order. The result is always $$h(g(f(\ve{x}))).$$ It does not matter if we first compose $f$ and $g$ to get $g\circ f$ and then compose it with $h$ before applying the result. In other words, 
+    \begin{align*}
+      (h \circ (g \circ f))(\ve{x}) = h((g\circ f)\ve{x}) = h(g(f(\ve{x}))).
+    \end{align*} 
+    It also does not matter if we compose $g$ and $h$ to get $h\circ g$ and then compose it with $f$ later:
+    \begin{align*}
+      ((h \circ g) \circ f)(\ve{x}) = (h \circ g)(f(\ve{x})) = h(g(f(\ve{x}))). 
+    \end{align*}
+    This is because, in the end, all the transformations are applied in the same order. Mathematically, this fact is captured by the <b>associative property</b>:
+    \begin{align*}
+      (h \circ g) \circ f = h \circ (g \circ f)
+    \end{align*}
+    for any transformations $f$, $g$, and $h$. As a result, when we a long chain of transformations such as $f_5 \circ f_4 \circ f_3 \circ f_2 \circ f_1$, there is no need to write any parentheses between them because any parenthesization would yield the same transformation nonetheless. To repeat, <b>composition is associative.</b> As long as the order does not change, different groupings of transformations within the order do not produce different results.</p>
+
+    <p>While composition is in general not commutative, there are special cases where they are. The first special case is that <b>the identity transformation commutes with any transformation</b>: for any $f \in \Real^2 \ra \Real^2$, we have that
+    \begin{align*}
+      \mathtt{I} \circ f = f \circ \mathtt{I}.
+    \end{align*}
+    The second special case is that two translations commute with each other:
+    \begin{align*}
+      \mathtt{T}_{a,b} \circ \mathtt{T}_{c,d} = \mathtt{T}_{a+c, b+d} = \mathtt{T}_{c,d} \circ \mathtt{T}_{a,b}.
+    \end{align*}
+    So do two scalings:
+    \begin{align*}
+      \mathtt{S}_{a,b} \circ \mathtt{S}_{c,d} = \mathtt{S}_{ac, bd} = \mathtt{S}_{c,d} \circ \mathtt{S}_{a,b}.
+    \end{align*}
+    Commutativity generally breaks when you start mixing different types of transformations together.
+    </p>
+
+    <h3>15.3.3 &nbsp; Transformation Addition</h3>
+
+    <p>A 2D transformation produces a 2D vector, which can be added. We can take this operation on vectors and then "lift" it to become an operation on transforamtions. More precisely, let $f$ and $g$ be two 2D transformations, the <b>sum of $f$ and $g$</b> is the transformation $h$ such that
+    \begin{align*}
+      h(\ve{x}) = f(\ve{x}) + g(\ve{x}).
+    \end{align*}
+    For convenience, we shall write the sum of $f$ and $g$ as $f + g$. This gives:
+    \begin{align*}
+      (f+g)(\ve{x}) = f(\ve{x}) + g(\ve{x}).
+    \end{align*}
+    Transformation addition inherits many properties from vector addition (and addition in general). It is <b>commutative</b> and <b>associative</b>.</p>
+
+    <p>For the composition operator, the identity transformation $\mathtt{I}$ is the magic transformation that, when composed with another transformation, would leave the other transformation unchanged. For addition, this is no longer the case. This is because
+    \begin{align*}
+      (\mathtt{I} + f)(\ve{x}) = \mathtt{I}(\ve{x}) + f(\ve{x}) = \ve{x} + f(\ve{x}).
+    \end{align*}
+    We have that, the RHS would not be equal to the LHS unless $\ve{x} = (0,0)$, and so $I+f \neq f$. The magic transformatioin in this case is the constant transformation $\mathtt{C}_{0,0}$:
+    \begin{align*}
+      (\mathtt{C}_{0,0} + f)(\ve{x}) = \mathtt{C}_{0,0}(\ve{x}) + f(\ve{x}) = (0,0) + f(\ve{x}) = f(\ve{x}).
+    \end{align*}
+    </p>
+
+    <p>Adding two scalings together results in a scaling where the parameters are added.
+    \begin{align*}
+      (\mathtt{S}_{a,b} + \mathtt{S}_{c,d})(x,y)
+      &= \mathtt{S}_{a,b}(x,y) + \mathtt{S}_{c,d}(x,y) \\
+      &= (ax, by) + (cx, dy) \\
+      &= \big( (a+c)x, (b+d) y \big) \\
+      &= \mathtt{S}_{a+c,b+d}(x,y).
+    \end{align*}
+    So,
+    \begin{align*}
+      \mathtt{S}_{a,b} + \mathtt{S}_{c,d} = \mathtt{S}_{a+c,b+d}
+    \end{align*}
+    </p>
+
+    <p>However, adding two translations together do not produce the same result as above.
+    \begin{align*}
+      (\mathtt{T}_{a,b} + \mathtt{T}_{c,d})(x,y)
+      &= \mathtt{T}_{a,b}(\ve{x}) + \mathtt{T}_{c,d}(x,y) \\
+      &= (x+a, y+b) + (x+c,y+d) \\
+      &= (2x+a+b, 2y+b+d) \\
+      &= (x,y) + \big((x,y) +(a+c,b+d)) \\
+      &= \mathtt{I}(x,y) + \mathtt{T}_{a+c,b+d}(x,y)
+    \end{align*}
+    So,
+    \begin{align*}
+      \mathtt{T}_{a,b} + \mathtt{T}_{c,d} = \mathtt{I} + \mathtt{T}_{a+c,b+d} 
+    \end{align*}
+    </p>
+
+    <p>In fact, we can say that a translation is the identity transformation added to a constant transformation:</p>
+    \begin{align*}
+      \mathtt{T}_{a,b}(x,y) 
+      &= (x+a,y+b) \\
+      &= (x,y) + (a,b) \\
+      &= \mathtt{I}(x,y) + \mathtt{C}_{a,b}(x,y) \\
+      &= (\mathtt{I} + \mathtt{C}_{a,b})(x,y),
+    \end{align*}
+    which gives us
+    \begin{align*}
+      \mathtt{T}_{a,b} = \mathtt{I} + \mathtt{C}_{a,b}.
+    \end{align*}
+
+    <h3>15.3.4 &nbsp; Transformation Scalar Multiplication</h3>
+
+    <p>Similar to the previous section, we can take another vector operation, multiplication by a scalar, and define an operation on transformation with it.
+    Let $f$ be a 2D transformation and $c \in \Real$ be a scalar. The <b>product of $f$ and $c$</b> is a transformation $g$ such that
+    \begin{align*}
+      g(\ve{x}) = c f(\ve{x})
+    \end{align*}
+    for all $\ve{x} \in \Real^2$. We write the product as $cf$. Note that the scalar multiplication is conducted to <i>after</i> we apply the transformation. The order is important here.</p>
+
+    <p>In fact, muliplication by scalar is actually the same as composition with a scaling:
+    \begin{align*}
+      (c f)(\ve{x}) = cf(\ve{x}) = \mathtt{S}_{c,c}(f(\ve{x})) = (\mathtt{S}_{c,c} \circ f)(\ve{x}),
+    \end{align*}
+    and so
+    \begin{align*}
+      cf = \mathtt{S}_{c,c} \circ f.
+    \end{align*}
+    </p>
+    
+    <p>The reader might think it is pointless to introduce a new operation that can be defined in terms of previous ones. However, scalar multiplication gives us a a way to write expressions involving transformation more succinctly. A scaling $\mathtt{S}_{c,c}$ where the two scaling parameters are equal is called a <b>uniform scaling</b>. We can replace a composition with such a scaling (which we would write $\mathtt{S}_{c,c} \circ$) with just $c$.</p>
+
+    <p>Another convenience afforded by scalar multiplication is the definition of <b>transformation subtraction</b>, which we can defined as:
+    \begin{align*}
+      f - g = f + (-1)g.
+    \end{align*}
+    </p>
+
+    <p>Scalar multiplication inherits properties from the multiplication operators for real numbers. For one, the order we multiply the scalars do not matter:
+    \begin{align*}
+      c(df) = (cd)f = (dc)f = d(cf).
+    \end{align*}
+    When paired with transformation addition, we also have the <b>distributive rules</b>:
+    \begin{align*}
+      c(f + g) &= cf + cg \\
+      (c + d)f &= cf + df
+    \end{align*}
+    In fact, one may show that the distributive rules also apply to scaling transformations.
+    \begin{align*}
+      \mathtt{S}_{a,b} \circ (f + g) &= \mathtt{S}_{a,b} \circ f + \mathtt{S}_{a,b} \circ g \\
+      (\mathtt{S}_{a,b} + \mathtt{S}_{c,d}) \circ f &= \mathtt{S}_{a,b} \circ f + \mathtt{S}_{c,d} \circ f
+    \end{align*}
+    </p>
+
+    <h2>15.4 &nbsp; Linear Transformations</h2>
+
+    <p>We have studied some simple types of transformations. It is time to study another type of transformations that is more complicated than the one we have encountered before: <i>linear transformation</i>. Linear transformations are widely used in computer graphics because they encompass useful transformations and also because they can easily represented by data, not programs.</p>
+
+    <p>We say that a transformation (or a function) $f: \Real^2 \ra \Real^2$ is <b>linear</b> if the following conditions are true:
+    <ol>
+      <li>$f(\ve{x} + \ve{y}) = f(\ve{x}) + f(\ve{y})$ for any $\ve{x}, \ve{y} \in \Real^2$, and</li>
+      <li>$f(c\ve{x}) = cf(\ve{x})$ for all $\ve{x} \in \Real^2$ and $c \in \Real$.</li>
+    </ol>
+    Condition (1) says that the transformation $f$ "distributes" like how a multiplication with scalar interacts with addition. Condition (2) says that the function "commutes" with scalar multiplcation.
+    </p>
+
+    <p>Let's classify the transformations we have seen so far whether they are linear or not. The constant function is generally not linear. If $(a,b) \neq (0,0)$ we have that
+    \begin{align*}
+      \mathtt{C}_{a,b}\big((x,y) + (0,0)\big) &= \mathtt{C}_{a,b}(x,y) \\
+      &= (a,b) \\
+      &\neq (a,b) + (a,b) \\ 
+      &= \mathtt{C}_{a,b}(x,y) + \mathtt{C}_{a,b}(0,0).
+    \end{align*}
+    The reader should check that $\mathtt{C}_{0,0}$ is linear.
+    </p>
+
+    <p>Translation is also not linear if $(a,b) \neq (0,0)$. This is because
+    \begin{align*}
+      \mathtt{T}_{a,b}((x,y) + (0,0))
+      &= \mathtt{T}_{a,b}((x,y) + (0,0)) \\
+      &= (x,y) + (a,b) \\
+      &\neq (x,y) + (a,b) + (a,b) \\ 
+      &= \mathtt{T}_{a,b}(x,y) + \mathtt{T}_{a,b}(0,0) 
+    \end{align*}
+    The only translation that is linear is $\mathtt{T}_{0,0} = \mathtt{I}$.
+    </p>
+
+    <h3>15.4.1 &nbsp; 2D Rotation</h3>
+
+    <h2>15.5 &nbsp; Matrices</h2>
+
+    <h2>15.6 &nbsp; Affine transformations</h2>
+
+    <h2>15.7 &nbsp; Two equivalent views of affine transformations</h2>
+
+    <h2>15.8 &nbsp; Matrices in GLSL</h2>
+
+    <h2>15.9 &nbsp; Graphics math in Javascript</h2>
+
+    <h2>15.10 &nbsp; Summary</h2>
 
     <hr>
     <p>
