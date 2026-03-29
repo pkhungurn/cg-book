@@ -875,22 +875,58 @@
       &\neq (x,y) + (a,b) + (a,b) \\ 
       &= \mathtt{T}_{a,b}(x,y) + \mathtt{T}_{a,b}(0,0) 
     \end{align*}
-    The only translation that is linear is $\mathtt{T}_{0,0} = \mathtt{I}$.
+    The only translation that is linear is $\mathtt{T}_{0,0} = \mathtt{I}$.</p>
+
+    <p>On  the other hand, scaling is linear. This is because
+    \begin{align*}
+      \mathtt{S}_{a,b}((x_0, y_0) + (x_1, y_1)) 
+      &= \mathtt{S}_{a,b}(x_0 + x_1, y_0 + y_1) \\
+      &= (a(x_0 + x_1), b(y_0 + y_1)) \\
+      &= (ax_0 + ax_1, by_0 + by_1) \\
+      &= (ax_0, by_0) + (ax_1, by_1) \\
+      &= \mathtt{S}_{a,b}(x_0, y_0) + \mathtt{S}_{a,b}(x_1, y_1),
+    \end{align*}
+    and
+    \begin{align*}
+    \mathtt{S}_{a,b}(c(x, y)) 
+    &= \mathtt{S}_{a,b}(c(x, y)) \\ 
+    &= \mathtt{S}_{a,b}(cx, cy) \\
+    &= (acx, bcy) \\
+    &= c(ax,by) \\
+    &= c\,\mathtt{S}_{a,b}(x, y).
+    \end{align*}
+    Because $\mathtt{I} = \mathtt{S}_{1,1}$, we have that the identity transformation is linear as well.
     </p>
 
-    <h3>15.4.1 &nbsp; 2D Rotation</h3>
+    <p>One characteristic of a linear transformation is that it must preserve the point $(0,0)$. Let us say that $f$ is linear, then
+    \begin{align*}
+      f(0,0) = f((0,0) + (0,0)) = f(0,0) + f(0,0) = 2f(0,0),
+    \end{align*}
+    which meanes that $f(0,0) = (0,0)$. This is one of the reason why, if $(a,b) \neq (0,0)$, then $\mathtt{C}_{a,b}$ and $\mathtt{T}_{a,b}$ are not linear.
+    </p>
 
-    <h2>15.5 &nbsp; Matrices</h2>
+    <h2>15.5 &nbsp; 2D Rotation</h2>
 
-    <h2>15.6 &nbsp; Affine transformations</h2>
+    <p>In Section 15.1, we learned about two types of transformations that are important to computer graphics: translation and scaling. There is a third type: <b>rotation</b>. In this chapter, we shall learn about rotations in 2D, and we will study rotations in 3D later in Chapter XXX.</p>
 
-    <h2>15.7 &nbsp; Two equivalent views of affine transformations</h2>
+    <p>In 2D, a rotation has a parameter, the angle $\theta$, and is denoted by $\mathtt{R}_\theta$. Given a point $\mathbf{x}$, the action of $\mathtt{R}_\theta$ on $\ve{x}$ is as follows.
+    <ol>
+      <li>Interpret $\ve{x}$ as a vector from point $(0,0)$ to $\ve{x}$.</li>
+      <li>Rotate the vector by angle $\theta$ in the counterclockwise direction.</li>      
+    </ol>
+    </p>
 
-    <h2>15.8 &nbsp; Matrices in GLSL</h2>
+    <h2>15.6 &nbsp; Matrices</h2>
 
-    <h2>15.9 &nbsp; Graphics math in Javascript</h2>
+    <h2>15.7 &nbsp; Affine transformations</h2>
 
-    <h2>15.10 &nbsp; Summary</h2>
+    <h2>15.8 &nbsp; Two equivalent views of affine transformations</h2>
+
+    <h2>15.9 &nbsp; Matrices in GLSL</h2>
+
+    <h2>15.10 &nbsp; Graphics math in Javascript</h2>
+
+    <h2>15.11 &nbsp; Summary</h2>
 
     <hr>
     <p>
