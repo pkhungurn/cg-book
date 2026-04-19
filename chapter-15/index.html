@@ -640,7 +640,7 @@
               <path d="M 10 20 H 290" class="coord-line" />
               <path d="M 10 72 H 290" class="coord-line" />
               <path d="M 10 124 H 290" class="coord-line" />
-              <path d="M 10 176 H 290" class="coord-line" />
+              <pa-th d="M 10 176 H 290" class="coord-line" />
               <path d="M 10 228 H 290" class="coord-line" />
               <path d="M 10 280 H 290" class="coord-line" />
 
@@ -914,6 +914,289 @@
       <li>Interpret $\ve{x}$ as a vector from point $(0,0)$ to $\ve{x}$.</li>
       <li>Rotate the vector by angle $\theta$ in the counterclockwise direction.</li>      
     </ol>
+    </p>
+
+    <p>Let us take the above description step by step. Let us consider a rotation by $\theta = 90^\circ$, and let us apply it to a point, say $(2,2)$. The first thing to do is to visualize $(2,1)$ on the 2D plane.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <svg version="1.1" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 10 V 290" class="coord-line" />
+              <path d="M 72 10 V 290" class="coord-line" />
+              <path d="M 124 10 V 290" class="coord-line" />
+              <path d="M 176 10 V 290" class="coord-line" />
+              <path d="M 228 10 V 290" class="coord-line" />
+              <path d="M 280 10 V 290" class="coord-line" />
+
+              <path d="M 10 20 H 290" class="coord-line" />
+              <path d="M 10 72 H 290" class="coord-line" />
+              <path d="M 10 124 H 290" class="coord-line" />
+              <path d="M 10 176 H 290" class="coord-line" />
+              <path d="M 10 228 H 290" class="coord-line" />
+              <path d="M 10 280 H 290" class="coord-line" />
+
+              <text x="10" y="20" dy="-4" dx="2" text-anchor="end" class="coord-text">3</text>
+              <text x="10" y="72" dy="-4" dx="2" text-anchor="end" class="coord-text">2</text>
+              <text x="10" y="124" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="176" dy="-4" dx="2" text-anchor="end" class="coord-text">0</text>
+              <text x="10" y="228" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="280" dy="-4" dx="2" text-anchor="end" class="coord-text">-2</text>
+
+              <text y="300" x="20" dy="-4" dx="2" text-anchor="start" class="coord-text">-2</text>
+              <text y="300" x="72" dy="-4" dx="2" text-anchor="start" class="coord-text">-1</text>
+              <text y="300" x="124" dy="-4" dx="2" text-anchor="start" class="coord-text">0</text>
+              <text y="300" x="176" dy="-4" dx="2" text-anchor="start" class="coord-text">1</text>
+              <text y="300" x="228" dy="-4" dx="2" text-anchor="start" class="coord-text">2</text>
+              <text y="300" x="280" dy="-4" dx="2" text-anchor="start" class="coord-text">3</text>
+
+              <circle cx="228" cy="124" r="4" />
+            </svg>
+          </td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 14.4</strong> The point $(2,1)$ visualized on the 2D plane.</figcaption>
+    </figure>
+
+    <p>Then, we should interpret the point as a vector from $(0,0)$, the origin. This means we draw an arrow from $(0,0)$ to $(1,2)$ and forget, for the moment, that the point ever exists.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <svg version="1.1" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 10 V 290" class="coord-line" />
+              <path d="M 72 10 V 290" class="coord-line" />
+              <path d="M 124 10 V 290" class="coord-line" />
+              <path d="M 176 10 V 290" class="coord-line" />
+              <path d="M 228 10 V 290" class="coord-line" />
+              <path d="M 280 10 V 290" class="coord-line" />
+
+              <path d="M 10 20 H 290" class="coord-line" />
+              <path d="M 10 72 H 290" class="coord-line" />
+              <path d="M 10 124 H 290" class="coord-line" />
+              <path d="M 10 176 H 290" class="coord-line" />
+              <path d="M 10 228 H 290" class="coord-line" />
+              <path d="M 10 280 H 290" class="coord-line" />
+
+              <text x="10" y="20" dy="-4" dx="2" text-anchor="end" class="coord-text">3</text>
+              <text x="10" y="72" dy="-4" dx="2" text-anchor="end" class="coord-text">2</text>
+              <text x="10" y="124" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="176" dy="-4" dx="2" text-anchor="end" class="coord-text">0</text>
+              <text x="10" y="228" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="280" dy="-4" dx="2" text-anchor="end" class="coord-text">-2</text>
+
+              <text y="300" x="20" dy="-4" dx="2" text-anchor="start" class="coord-text">-2</text>
+              <text y="300" x="72" dy="-4" dx="2" text-anchor="start" class="coord-text">-1</text>
+              <text y="300" x="124" dy="-4" dx="2" text-anchor="start" class="coord-text">0</text>
+              <text y="300" x="176" dy="-4" dx="2" text-anchor="start" class="coord-text">1</text>
+              <text y="300" x="228" dy="-4" dx="2" text-anchor="start" class="coord-text">2</text>
+              <text y="300" x="280" dy="-4" dx="2" text-anchor="start" class="coord-text">3</text>
+
+              <defs>
+                <marker id="arrowhead" markerWidth="7.5" markerHeight="5" 
+                  refX="7.5" refY="2.5" orient="auto">
+                  <polygon points="0 0, 7.5 2.5, 0 5" fill="black" />
+                </marker>
+              </defs>
+
+              <line x1="124" y1="176" x2="228" y2="124" style="stroke: black; stroke-width: 2;" marker-end="url(#arrowhead)" />
+            </svg>
+          </td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 14.5</strong> The point $(2,1)$ interpreted as a vector.</figcaption>
+    </figure>
+
+    <p>Next, we rotate the vector by $90^\circ$ in the counterclockwise rotation, using the point $(0,0)$ as the center of rotation.</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <svg version="1.1" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 10 V 290" class="coord-line" />
+              <path d="M 72 10 V 290" class="coord-line" />
+              <path d="M 124 10 V 290" class="coord-line" />
+              <path d="M 176 10 V 290" class="coord-line" />
+              <path d="M 228 10 V 290" class="coord-line" />
+              <path d="M 280 10 V 290" class="coord-line" />
+
+              <path d="M 10 20 H 290" class="coord-line" />
+              <path d="M 10 72 H 290" class="coord-line" />
+              <path d="M 10 124 H 290" class="coord-line" />
+              <path d="M 10 176 H 290" class="coord-line" />
+              <path d="M 10 228 H 290" class="coord-line" />
+              <path d="M 10 280 H 290" class="coord-line" />
+
+              <text x="10" y="20" dy="-4" dx="2" text-anchor="end" class="coord-text">3</text>
+              <text x="10" y="72" dy="-4" dx="2" text-anchor="end" class="coord-text">2</text>
+              <text x="10" y="124" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="176" dy="-4" dx="2" text-anchor="end" class="coord-text">0</text>
+              <text x="10" y="228" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="280" dy="-4" dx="2" text-anchor="end" class="coord-text">-2</text>
+
+              <text y="300" x="20" dy="-4" dx="2" text-anchor="start" class="coord-text">-2</text>
+              <text y="300" x="72" dy="-4" dx="2" text-anchor="start" class="coord-text">-1</text>
+              <text y="300" x="124" dy="-4" dx="2" text-anchor="start" class="coord-text">0</text>
+              <text y="300" x="176" dy="-4" dx="2" text-anchor="start" class="coord-text">1</text>
+              <text y="300" x="228" dy="-4" dx="2" text-anchor="start" class="coord-text">2</text>
+              <text y="300" x="280" dy="-4" dx="2" text-anchor="start" class="coord-text">3</text>
+
+              <defs>
+                <marker id="arrowhead-green" markerWidth="7.5" markerHeight="5" 
+                  refX="7.5" refY="2.5" orient="auto">
+                  <polygon points="0 0, 7.5 2.5, 0 5" fill="green" />
+                </marker>
+
+                <marker id="arrowhead" markerWidth="7.5" markerHeight="5" 
+                  refX="7.5" refY="2.5" orient="auto">
+                  <polygon points="0 0, 7.5 2.5, 0 5" fill="black" />
+                </marker>
+
+                <marker id="arrowhead-grey" markerWidth="7.5" markerHeight="5" 
+                  refX="7.5" refY="2.5" orient="auto">
+                  <polygon points="0 0, 7.5 2.5, 0 5" fill="#c0c0c0" />
+                </marker>
+              </defs>
+
+              <path d="M 176 150 A 70 70 0 0 0 98 124" marker-end="url(#arrowhead-green)" fill="none" stroke="green" stroke-width="2" />
+              <text x="124" y="176" dy="-24" dx="0" text-anchor="start" style="stroke: green; stroke-width: 1;">90&deg;</text>
+
+              <line x1="124" y1="176" x2="72" y2="72" style="stroke: black; stroke-width: 2;" marker-end="url(#arrowhead)" />
+              <line x1="124" y1="176" x2="228" y2="124" style="stroke: #c0c0c0; stroke-dasharray: 7,3;  stroke-width: 2;" marker-end="url(#arrowhead-grey)" />
+            </svg>
+          </td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 14.6</strong> The vector $(2,1)$ being rotated by $90^\circ$.</figcaption>
+    </figure>
+
+    <p>Lastly, we interpret the rotated vector as a point. The result is $(-1,2)$. In other words, $\mathtt{R}_{90^\circ}(2,1) = (-1,2).$</p>
+
+    <figure class="figure">
+      <table>
+        <tr>
+          <td>
+            <svg version="1.1" width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 20 10 V 290" class="coord-line" />
+              <path d="M 72 10 V 290" class="coord-line" />
+              <path d="M 124 10 V 290" class="coord-line" />
+              <path d="M 176 10 V 290" class="coord-line" />
+              <path d="M 228 10 V 290" class="coord-line" />
+              <path d="M 280 10 V 290" class="coord-line" />
+
+              <path d="M 10 20 H 290" class="coord-line" />
+              <path d="M 10 72 H 290" class="coord-line" />
+              <path d="M 10 124 H 290" class="coord-line" />
+              <path d="M 10 176 H 290" class="coord-line" />
+              <path d="M 10 228 H 290" class="coord-line" />
+              <path d="M 10 280 H 290" class="coord-line" />
+
+              <text x="10" y="20" dy="-4" dx="2" text-anchor="end" class="coord-text">3</text>
+              <text x="10" y="72" dy="-4" dx="2" text-anchor="end" class="coord-text">2</text>
+              <text x="10" y="124" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="176" dy="-4" dx="2" text-anchor="end" class="coord-text">0</text>
+              <text x="10" y="228" dy="-4" dx="2" text-anchor="end" class="coord-text">1</text>
+              <text x="10" y="280" dy="-4" dx="2" text-anchor="end" class="coord-text">-2</text>
+
+              <text y="300" x="20" dy="-4" dx="2" text-anchor="start" class="coord-text">-2</text>
+              <text y="300" x="72" dy="-4" dx="2" text-anchor="start" class="coord-text">-1</text>
+              <text y="300" x="124" dy="-4" dx="2" text-anchor="start" class="coord-text">0</text>
+              <text y="300" x="176" dy="-4" dx="2" text-anchor="start" class="coord-text">1</text>
+              <text y="300" x="228" dy="-4" dx="2" text-anchor="start" class="coord-text">2</text>
+              <text y="300" x="280" dy="-4" dx="2" text-anchor="start" class="coord-text">3</text>
+
+              <defs>
+                <marker id="arrowhead-green" markerWidth="7.5" markerHeight="5" 
+                  refX="7.5" refY="2.5" orient="auto">
+                  <polygon points="0 0, 7.5 2.5, 0 5" fill="green" />
+                </marker>
+
+                <marker id="arrowhead" markerWidth="7.5" markerHeight="5" 
+                  refX="7.5" refY="2.5" orient="auto">
+                  <polygon points="0 0, 7.5 2.5, 0 5" fill="black" />
+                </marker>
+
+                <marker id="arrowhead-grey" markerWidth="7.5" markerHeight="5" 
+                  refX="7.5" refY="2.5" orient="auto">
+                  <polygon points="0 0, 7.5 2.5, 0 5" fill="#c0c0c0" />
+                </marker>
+              </defs>
+
+              <path d="M 176 150 A 70 70 0 0 0 98 124" marker-end="url(#arrowhead-green)" fill="none" stroke="green" stroke-width="2" />
+              <text x="124" y="176" dy="-24" dx="0" text-anchor="start" style="stroke: green; stroke-width: 1;">90&deg;</text>
+
+              <line x1="124" y1="176" x2="72" y2="72" style="stroke: #c0c0c0; stroke-dasharray: 7,3; stroke-width: 2;" marker-end="url(#arrowhead-grey)" />
+              <line x1="124" y1="176" x2="228" y2="124" style="stroke: #c0c0c0; stroke-dasharray: 7,3;  stroke-width: 2;" marker-end="url(#arrowhead-grey)" />
+
+              <circle cx="72" cy="72" r="4" />
+            </svg>
+          </td>
+        </tr>
+      </table>
+      <figcaption class="figure-caption"><strong>Figure 14.7</strong> The rotated vector interpretted as a point.</figcaption>
+    </figure>
+
+    <p>Let us try to derive a formula for rotation. Say, we are given a point $(x,y)$, which we would like to rotate by the angle $\theta$. We know that we can always find a real number $r \geq 0$ and $\phi$ such that
+    \begin{align*}
+      \begin{bmatrix}
+        x \\ y
+      \end{bmatrix}
+      = \begin{bmatrix}
+        r \cos \phi \\
+        r \sin \phi
+      \end{bmatrix}.
+    \end{align*}
+    This is basically writing $(x,y)$ in terms of polar coordinates (<a href="../chapter-04/index.html#polar-coordinate-system">Chapter 4.5.1</a>). In other words, we interpet the point as a vector of length $r$ that makes an anle $\phi$ with the positive $x$-axis. After we rotate this vector  by the angle $\theta$, the vector length remains the same. (In other words, $r$ does not change.) However, the angle that the vector makes with the positive $x$-axis changes from $\phi$ to $\phi + \theta$. Symbolically, this means that
+    \begin{align*}
+      \mathtt{R}_{\theta} \left( \begin{bmatrix} r \cos \phi \\ r \sin \phi \end{bmatrix} \right) 
+      = \begin{bmatrix} r \cos (\phi + \theta) \\ r \sin (\phi + \theta) \end{bmatrix}
+    \end{align*}
+    Let us now recall the rules for sine and cosine addition from high school.
+    \begin{align*}
+      \cos(\phi + \theta) &= \cos \phi \cos\theta - \sin\phi \sin\theta \\
+      \sin(\phi + \theta) &= \sin \phi \cos\theta + \cos\phi \sin\theta.
+    \end{align*}
+    As a result,
+    \begin{align*}
+      \begin{bmatrix} r \cos (\phi + \theta) \\ r \sin (\phi + \theta) \end{bmatrix}
+      &= \begin{bmatrix}
+        r \cos \phi \cos\theta - r \sin\phi \sin\theta \\
+        r \sin \phi \cos\theta + r \cos\phi \sin\theta
+      \end{bmatrix} \\
+      &= \begin{bmatrix}
+        (r \cos \phi) \cos\theta - (r \sin\phi) \sin\theta \\
+        (r \sin \phi) \cos\theta + (r \cos\phi) \sin\theta
+      \end{bmatrix} \\
+      &= \begin{bmatrix}
+        x \cos\theta - y \sin\theta \\
+        y \cos\theta + x \sin\theta
+      \end{bmatrix} \\
+      &= \begin{bmatrix}
+        x \cos\theta - y \sin\theta \\
+        x \sin\theta + y \cos\theta 
+      \end{bmatrix}.
+    \end{align*}
+    In other words,
+    \begin{align*}
+      \mathtt{R}_\theta(x,y) = \begin{bmatrix}
+        x \cos\theta - y \sin\theta \\
+        x \sin\theta + y \cos\theta 
+      \end{bmatrix}.
+    \end{align*}
+    </p>
+
+    <p>From the formula, we can deduce that a rotation is a linear transformation. This is because
+    \begin{align*}
+      \mathtt{R}_{\theta}((a,b) + (c,d)) 
+      &= \mathtt{R}_{\theta}(a+c, b+d)
+      = \begin{bmatrix}
+        (a+c) \cos\theta - (b+d) \sin\theta \\
+        (a+c) \sin\theta + (b+d) \cos\theta 
+      \end{bmatrix}
+    \end{align*}
     </p>
 
     <h2>15.6 &nbsp; Matrices</h2>
