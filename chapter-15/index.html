@@ -845,6 +845,7 @@
     \end{align*}
     </p>
 
+    <a id="linear-tranformation"></a>
     <h2>15.4 &nbsp; Linear Transformations</h2>
 
     <p>We have studied some simple types of transformations. It is time to study another type of transformations that is more complicated than the one we have encountered before: <i>linear transformation</i>. Linear transformations are widely used in computer graphics because they encompass useful transformations and also because they can easily represented by data, not programs.</p>
@@ -1191,15 +1192,397 @@
     <p>From the formula, we can deduce that a rotation is a linear transformation. This is because
     \begin{align*}
       \mathtt{R}_{\theta}((a,b) + (c,d)) 
-      &= \mathtt{R}_{\theta}(a+c, b+d)
-      = \begin{bmatrix}
+      &= \mathtt{R}_{\theta}(a+c, b+d) \\
+      &= \begin{bmatrix}
         (a+c) \cos\theta - (b+d) \sin\theta \\
         (a+c) \sin\theta + (b+d) \cos\theta 
+      \end{bmatrix} \\
+      &= \begin{bmatrix}
+        a \cos\theta - b \sin\theta \\
+        a \sin\theta + b \cos\theta 
       \end{bmatrix}
+      + \begin{bmatrix}
+        c \cos\theta - d \sin\theta \\
+        c \sin\theta + d \cos\theta 
+      \end{bmatrix} \\
+      &= \mathtt{R}_{\theta}(a, b) + \mathtt{R}_{\theta}(c, d),
+    \end{align*}
+    and
+    \begin{align*}
+    \mathtt{R}_{\theta}\big(c\,(a,b)\big)
+    &= \mathtt{R}_{\theta}(ca,cb) \\
+    &= \begin{bmatrix}
+      ca \cos\theta - cb \sin\theta \\
+      ca \sin\theta + cb \cos\theta 
+    \end{bmatrix} \\
+    &= c \begin{bmatrix}
+      a \cos\theta - b \sin\theta \\
+      a \sin\theta + b \cos\theta 
+    \end{bmatrix} \\
+    &= c\, \mathtt{R}_{\theta}(a,b).
+    \end{align*}
+    </p>
+
+    <p>Because a rotation, it is a linear transformation, we have that $\mathtt{R}_{\theta}(0,0)$. This makes sense because, after all, the point $(0,0)$ is the center of rotation, which will not due to the rotation. The rotation by $0^\circ$ leaves all points unchanged because there is no rotation, and so
+    \begin{align*}
+      \mathtt{R}_{0^\circ} = \mathtt{I} = \mathtt{T}_{0,0}.
     \end{align*}
     </p>
 
     <h2>15.6 &nbsp; Matrices</h2>
+
+    <p>We said earlier in <a href="#linear-transformation">Section 15.4</a>, we said that linear transformations are widely used in computer graphics because they can be represented by data. In this section, we shall study <b>matrices</b> (singular: matrix), the mathematical objects and the data type that can be used to repreesent linear transformations.</p>
+
+    <p>Earlier in <a href="../chapter-04/index.html#2d-cartesian-coordinate-system">Section 4.1.1</a>, we learned that all 2D vectors can be written in terms of two special vectors $\hat{\ve{x}} = (1,0)$ and $\hat{\ve{y}} = (0,1)$. More, specifically, we have that 
+    \begin{align*}
+    (x,y) = (x, 0) + (0,y) = x\,(1,0) + y\,(0,1) = x\hat(\ve{x}) + y \hat(\ve{y}).
+    \end{align*}
+    </p>
+
+    <p>Now, let $f$ be a linear transformation, we have that
+    \begin{align*}
+      f(x,y) 
+      = f(x\hat{\ve{x}} + y \hat{\ve{y}})
+      = x\,f(\hat{\ve{x}}) + y\,f(\hat{\ve{y}})
+      = x\,f(1,0) + y\,f(0,1).
+    \end{align*}
+    The above equation is kind of remarkable. It says that, if we know the effect of a linear transformations $f$ on just two vectors&mdash;$\hat{\ve{x}} = (1,0)$ and $\hat{\ve{y}} = (0,1)$&mdash;then we know what it does to all the other vectors. If we are given $(x,y)$, we just multiple $x$ to $f(1,0)$ and $y$ to $f(0,1)$ and then add the results together.
+    </p>
+
+    <p>This means that we can represent any linear transformations $f$ by $4$ numbers. This is because $f(1,0)$ is a 2D vector, which can be represented by 2 numbers, and so is $f(0,1)$. Let us give names to the components of these vectors.
+    \begin{align*}
+      f(1,0) &= \begin{bmatrix} a \\ b \end{bmatrix}, &
+      f(0,1) &= \begin{bmatrix} c \\ d \end{bmatrix}. 
+    \end{align*}
+    The conventional way to write down a representation of $f$ is to take the vectors $f(1,0)$ and $f(0,1)$ side by side
+    \begin{align*}
+    \begin{bmatrix} a \\ b \end{bmatrix}
+    \begin{bmatrix} c \\ d \end{bmatrix}
+    \end{align*}
+    and then remove the borders between them to get a table of numbers
+    \begin{align*}
+    \begin{bmatrix}
+      a & c \\
+      b & d
+    \end{bmatrix}.
+    \end{align*}
+    This is called a <b>matrix</b>.
+    </p>
+
+    <h3>15.6.1 &nbsp; Definitions and Notations</h3>
+
+    <p>Formally, a matrix is a two-dimensional table of numbers. We write down the table and surround them by square brackets. For example,</p>
+    \begin{align*}
+      \begin{bmatrix}
+        1 & 2 & 3 & 4 \\
+        5 & 6 & 7 & 8 \\
+        9 & 10 & 11 & 12
+      \end{bmatrix}.
+    \end{align*} 
+    <p>Each number in the matrix is called an <b>element</b>, so the matrices above has 12 elements. A matrix is divided vertically into <b>rows</b><p>
+
+    <center>
+    <svg width="250" height="180" xmlns="http://www.w3.org/2000/svg">
+      <style>
+        .matrix-text { font: 22px serif; fill: black; text-anchor: middle; }
+        .bracket { stroke: black; stroke-width: 2; fill: none; }
+        .row-bg { stroke: none; }
+      </style>
+
+      <!-- Row Backgrounds (Drawn first to stay behind text) -->
+      <rect x="35" y="25" width="180" height="35" fill="#f8c4c4" class="row-bg" /> <!-- Light Red -->
+      <rect x="35" y="75" width="180" height="35" fill="#c4f8c4" class="row-bg" /> <!-- Light Green -->
+      <rect x="35" y="125" width="180" height="35" fill="#c4dafb" class="row-bg" /> <!-- Light Blue -->
+
+      <!-- Matrix Entries -->
+      <!-- Row 1 -->
+      <text x="55" y="50" class="matrix-text">1</text>
+      <text x="100" y="50" class="matrix-text">2</text>
+      <text x="145" y="50" class="matrix-text">3</text>
+      <text x="190" y="50" class="matrix-text">4</text>
+      
+      <!-- Row 2 -->
+      <text x="55" y="100" class="matrix-text">4</text>
+      <text x="100" y="100" class="matrix-text">6</text>
+      <text x="145" y="100" class="matrix-text">7</text>
+      <text x="190" y="100" class="matrix-text">8</text>
+      
+      <!-- Row 3 -->
+      <text x="55" y="150" class="matrix-text">9</text>
+      <text x="100" y="150" class="matrix-text">10</text>
+      <text x="145" y="150" class="matrix-text">11</text>
+      <text x="195" y="150" class="matrix-text">12</text>
+
+      <!-- Left Square Bracket -->
+      <path d="M 30 15 L 20 15 L 20 170 L 30 170" class="bracket" />
+      
+      <!-- Right Square Bracket -->
+      <path d="M 220 15 L 230 15 L 230 170 L 220 170" class="bracket" />
+    </svg>
+    </center>
+
+    <p>and horizontally into <b>columns</b>.</p>
+    
+    <center>
+    <svg width="250" height="180" xmlns="http://www.w3.org/2000/svg">
+      <style>
+        .matrix-text { font: 22px serif; fill: black; text-anchor: middle; }
+        .bracket { stroke: black; stroke-width: 2; fill: none; }
+        .row-bg { stroke: none; }
+      </style>
+
+      <!-- Row Backgrounds (Drawn first to stay behind text) -->
+      <rect x="40" y="25" width="35" height="140" fill="#ffffaa" class="row-bg" /> <!-- Light Red -->
+      <rect x="85" y="25" width="35" height="140" fill="#aaffff" class="row-bg" /> <!-- Light Green -->
+      <rect x="130" y="25" width="35" height="140" fill="#ffaaff" class="row-bg" /> <!-- Light Blue -->
+      <rect x="175" y="25" width="40" height="140" fill="#cccccc" class="row-bg" /> <!-- Light Blue -->
+
+      <!-- Matrix Entries -->
+      <!-- Row 1 -->
+      <text x="55" y="50" class="matrix-text">1</text>
+      <text x="100" y="50" class="matrix-text">2</text>
+      <text x="145" y="50" class="matrix-text">3</text>
+      <text x="190" y="50" class="matrix-text">4</text>
+      
+      <!-- Row 2 -->
+      <text x="55" y="100" class="matrix-text">4</text>
+      <text x="100" y="100" class="matrix-text">6</text>
+      <text x="145" y="100" class="matrix-text">7</text>
+      <text x="190" y="100" class="matrix-text">8</text>
+      
+      <!-- Row 3 -->
+      <text x="55" y="150" class="matrix-text">9</text>
+      <text x="100" y="150" class="matrix-text">10</text>
+      <text x="145" y="150" class="matrix-text">11</text>
+      <text x="195" y="150" class="matrix-text">12</text>
+
+      <!-- Left Square Bracket -->
+      <path d="M 30 15 L 20 15 L 20 170 L 30 170" class="bracket" />
+      
+      <!-- Right Square Bracket -->
+      <path d="M 220 15 L 230 15 L 230 170 L 220 170" class="bracket" />
+    </svg>
+    </center>
+      
+    <p>A matrix with $m$ rows and $n$ columns are said to be of <b>size</b> $m \times n$, so the matrix above is of size $3 \times $. We index the rows with natural numbers: the top row is Row 1, the second row from the top is Row 2, and so on. We index the columns similarly from left to right: the leftmost column is Column 1, the second leftmost column is Column 2, and so on.</p>
+
+    <center>
+    <svg width="250" height="200" xmlns="http://www.w3.org/2000/svg">
+      <style>
+        .matrix-text { font: 22px serif; fill: black; text-anchor: middle; }
+        .row-indices { font: 22px serif; fill: red; text-anchor: middle; }
+        .column-indices { font: 22px serif; fill: green; text-anchor: middle; }
+        .bracket { stroke: black; stroke-width: 2; fill: none; }
+        .row-bg { stroke: none; }
+        .separator {stroke: #cccccc; stroke-width: 1; fill: none; }
+      </style>
+
+      <!-- Matrix Entries -->
+      <!-- Row 1 -->
+      <text x="55" y="70" class="matrix-text">1</text>
+      <text x="100" y="70" class="matrix-text">2</text>
+      <text x="145" y="70" class="matrix-text">3</text>
+      <text x="190" y="70" class="matrix-text">4</text>
+      
+      <!-- Row 2 -->
+      <text x="55" y="120" class="matrix-text">4</text>
+      <text x="100" y="120" class="matrix-text">6</text>
+      <text x="145" y="120" class="matrix-text">7</text>
+      <text x="190" y="120" class="matrix-text">8</text>
+      
+      <!-- Row 3 -->
+      <text x="55" y="170" class="matrix-text">9</text>
+      <text x="100" y="170" class="matrix-text">10</text>
+      <text x="145" y="170" class="matrix-text">11</text>
+      <text x="195" y="170" class="matrix-text">12</text>
+
+      <!-- Left Square Bracket -->
+      <path d="M 40 35 L 30 35 L 30 190 L 40 190" class="bracket" />
+      
+      <!-- Right Square Bracket -->
+      <path d="M 220 35 L 230 35 L 230 190 L 220 190" class="bracket" />
+    
+      <!-- Row Indices -->
+      <text x="5" y="70" class="row-indices">1</text>
+      <text x="5" y="120" class="row-indices">2</text>
+      <text x="5" y="170" class="row-indices">3</text>
+
+      <!-- Column Indices -->
+      <text x="55" y="20" class="column-indices">1</text>
+      <text x="100" y="20" class="column-indices">2</text>
+      <text x="145" y="20" class="column-indices">3</text>
+      <text x="195" y="20" class="column-indices">4</text>
+
+      <path d="M 0 85 L 250 85" class="separator"/>
+      <path d="M 0 135 L 250 135" class="separator"/>
+
+      <path d="M 80 0 L 80 200" class="separator"/>
+      <path d="M 125 0 L 125 200" class="separator"/>
+      <path d="M 170 0 L 170 200" class="separator"/>
+    </svg>
+    </center>
+
+    <p>We refer to an element in the matrix with the indices of its row and column, in that order. As a result, the top-left entry of the matrix above is Element $(1,1)$, and the bottom-right element is Element $(3,4)$. The Element $(2,3)$ is the element on Row 2 and Column 3, which is $7$. On the other hand, the element $(3,2)$ is the Element on Row 3 and Column 2, which is $10$.  </p>
+  
+    <p>We often use a upper-case letter such as $A$, $B$, and $C$ to represent a matrix, and we use the corresponding lower-case letter to represents its element.The symbol for the row element is subscripted with the indices of the row and the column, in that order. So, Element $(2,3)$ of matrix $A$ is denoted by $a_{23}$, and Element $(3,2)$ is denoted by $a_{32}$. So, if $A$ is a $3 \times 4$ matrix, then it can be written as follows.
+    \begin{align*}
+    A = \begin{bmatrix}
+      a_{11} & a_{12} & a_{13} & a_{14} \\
+      a_{21} & a_{22} & a_{33} & a_{24} \\
+      a_{31} & a_{32} & a_{33} & a_{34} 
+    \end{bmatrix}.
+    \end{align*}
+    In case $A$ is of size $m \times n$, then
+    \begin{align*}
+    A = \begin{bmatrix}
+      a_{11} & a_{12} & a_{13} & \cdots & a_{1n} \\
+      a_{21} & a_{22} & a_{33} & \cdots & a_{2n} \\
+      a_{31} & a_{32} & a_{33} & \cdots & a_{3n} \\
+      \vdots & \vdots &\vdots &\ddots & \vdots \\
+      a_{m1} & a_{m2} & a_{m3} & \cdots & a_{mn}
+    \end{bmatrix}.
+    \end{align*}
+    </p>
+
+    <p>We often write 2D and 3D vectors using the "columm vector notation".
+    \begin{align*}
+      \ve{a} &= \begin{bmatrix} a_x \\ a_y \end{bmatrix}, &
+      \ve{b} &= \begin{bmatrix} b_x \\ b_y \\ b_z \end{bmatrix}.
+    \end{align*}
+    Notice that a 2D vector looks just like a $2 \times 1$ matrix, and a 3D vector a $3 \times 1$ matrix. In fact, while they are not exactly the same thing, we can always interpret an $n$-dimensional vector as a $n \times 1$ matrix, and we shall do so when it is convenient to do so from now on.
+    </p>
+
+    <p>All of the matrices we will deal with in this book, the entries are real numbers. The set of $m \times n$ matrices whose entries are real numbers are denoted by the symbol $\mathbb{R}^{m \times n}$.</p>
+
+    <h3>15.6.2 &nbsp; Matrix representation of 2D transformations</h3>
+
+    <p>As noted earlier briefly before the beginning of the last section, the matrix representation of a 2D linear transformation $f$ is obtained by the following process.</p>
+
+    <ol>
+      <li>Compute $f(1,0)$ and $f(0,1)$.</li>
+      <li>Form a $2 \times 2$ matrix whose first column is the column vector $f(1,0)$ and whose second column is the column vector $f(0,1)$.</li>
+    </ol>
+
+    <p>Let's see what the matrix representations of the 2D linear transformations we have learn so far look like. The simplest of these transformations is the identity transformation $\mathtt{I}$. Because
+    \begin{align*}
+      \mathtt{I}(1,0) &= \begin{bmatrix} 1 \\ 0 \end{bmatrix}, &
+      \mathtt{I}(0,1) &= \begin{bmatrix} 0 \\ 1 \end{bmatrix},&
+    \end{align*}
+    the matrix representation of $\mathtt{I}$ is the matrix
+    \begin{align*}
+      I = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}.
+    \end{align*}
+    The matrix $I$ has a special name: it is called the <b>identity matrix</b> after the transformation that it represents.
+    </p>
+
+    <p>As we will see later, a matrix that represents a linear transformation in an $n$-dimension space will be of size $n \times n$. That is, there are as many rows as there are columns. Such a matrix is called a <b>square matrix</b>.</p>
+
+    <p>Next, let us look at the scaling transformation $\mathtt{S}_{a,b}$. Because
+    \begin{align*}
+      \mathtt{S}_{a,b}(1,0) &= \begin{bmatrix} a \\ 0 \end{bmatrix}, &
+      \mathtt{S}_{a,b}(0,1) &= \begin{bmatrix} 0 \\ b \end{bmatrix},&
+    \end{align*}
+    the matrix representation of $\mathtt{S}_{a,b}$ is the matrix
+    \begin{align*}
+      S_{a,b} = \begin{bmatrix} a & 0 \\ 0 & b \end{bmatrix}.
+    \end{align*}
+    </p>
+
+    <p>The matrix representation for the rotation $\mathtt{R}_{\theta}$ is more complicated. Note that
+    \begin{align*}
+      \mathtt{R}_{\theta}(1,0) &= \begin{bmatrix} \cos \theta \\ \sin\theta \end{bmatrix}, &
+      \mathtt{R}_{\theta}(0,1) &= \begin{bmatrix} -\sin\theta \\ \cos\theta \end{bmatrix}.&
+    \end{align*}
+    As a result, the matrix representation of $\mathtt{R}_\theta$ is
+    \begin{align*}
+      R_{\theta} = \begin{bmatrix} \cos \theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix}.
+    \end{align*}
+    We can substitute angles whose sine and cosine values are well-known to see what the matrices of the rotations by these angles are. For examples,
+    \begin{align*}
+      R_{90^\circ} 
+      &= \begin{bmatrix} \cos 90^\circ & -\sin 90^\circ \\ \sin 90^\circ & \cos 90^\circ \end{bmatrix}
+      = \begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}, \\
+      R_{180^\circ} 
+      &= \begin{bmatrix} \cos 180^\circ & -\sin 180^\circ \\ \sin 180^\circ & \cos 180^\circ \end{bmatrix}
+      = \begin{bmatrix} -1 & 0 \\ 0 & -1 \end{bmatrix}, \\
+      R_{270^\circ} 
+      &= \begin{bmatrix} \cos 270^\circ & -\sin 270^\circ \\ \sin 270^\circ & \cos 270^\circ \end{bmatrix}
+      = \begin{bmatrix} 0 & 1 \\ -1 & 0 \end{bmatrix}, \\
+      R_{45^\circ} 
+      &= \begin{bmatrix} \cos 45^\circ & -\sin 45^\circ \\ \sin 45^\circ & \cos 45^\circ \end{bmatrix}
+      = \begin{bmatrix} \frac{\sqrt{2}}{2} & -\frac{\sqrt{2}}{2} \\ \frac{\sqrt{2}}{2} & \frac{\sqrt{2}}{2} \end{bmatrix}, \\
+      R_{30^\circ} 
+      &= \begin{bmatrix} \cos 30^\circ & -\sin 30^\circ \\ \sin 30^\circ & \cos 30^\circ \end{bmatrix}
+      = \begin{bmatrix} \frac{\sqrt{3}}{2} & -\frac{1}{2} \\ \frac{1}{2} & \frac{\sqrt{3}}{2} \end{bmatrix}, \\
+      R_{60^\circ} 
+      &= \begin{bmatrix} \cos 60^\circ & -\sin 60^\circ \\ \sin 60^\circ & \cos 60^\circ \end{bmatrix}
+      = \begin{bmatrix} \frac{1}{2} & -\frac{\sqrt{3}}{2} \\ \frac{\sqrt{3}}{2} & \frac{1}{2} \end{bmatrix}.
+    \end{align*}
+    </p>
+
+    <p>We have seen that, given a linear transformation, we can write down the $2 \times 2$ matrix that represents it. On the other hand, if we are given a $2 \times 2$ matrix
+    \begin{align*}
+      A = \begin{bmatrix}
+        a_{11} & a_{12} \\
+        a_{21} & a_{22}
+    \end{bmatrix},
+    \end{align*}
+    then we can ask what is the linear transformation that this matrix represent. Let us call this transformation $f$. By reverse engineering the process of writing down the matrix representation of $f$, we know that the first column of $A$ gives us the value of $f(1,0)$. So,
+    \begin{align*}
+      f(1,0) = \begin{bmatrix} a_{11} \\ a_{21} \end{bmatrix}.
+    \end{align*}
+    Moreover, the second column gives us the value of $f(0,1):$
+    \begin{align*}
+      f(0,1) = \begin{bmatrix} a_{12} \\ a_{22} \end{bmatrix}.
+    \end{align*}
+    Because $f$ is a linear transformation, we have that
+    \begin{align*}
+      f(x,y) 
+      = x\, f(1,0) + y\, f(0,1)
+      = x\begin{bmatrix} a_{11} \\ a_{21} \end{bmatrix} + y \begin{bmatrix} a_{12} \\ a_{22} \end{bmatrix}
+      = \begin{bmatrix}
+        a_{11} x + a_{12}y \\
+        a_{21} x + a_{22}y
+      \end{bmatrix}
+    \end{align*}
+    For example, consider the matrix
+    \begin{align*}
+      B = \begin{bmatrix}
+      1 & 2 \\
+      3 & 4 
+      \end{bmatrix}.
+    \end{align*}
+    The linear transformation it represents is
+    \begin{align*}
+      g(x,y) = \begin{bmatrix} x + 2y \\ 3x + 4y \end{bmatrix}.
+    \end{align*}
+    This transformation is neither a scaling nor a rotation though. It is just a random linear transformation.
+    </p>
+
+    <h3>15.6.3 &nbsp; Linear transformation in general</h3>
+
+    <p>We just learned that a $2 \times 2$ matrix represents a 2D linear transformation. That is, it represents a function $f: \Real^2 \ra \Real^2$ that is <i>linear</i>. In other words, the function $f$ satisfies the following key properties.</p>
+
+    <ol>
+      <li>$f(\ve{x} + \ve{y}) = f(\ve{x}) + f(\ve{y})$ for all $\ve{x}, \ve{y} \in \Real^2$.</li>
+      <li>$f(c\ve{x}) = c\,f(\ve{x})$ for all $c \in \Real$ and $\ve{x} \in \Real^2$.</li>
+    </ol>
+
+    <p>In general, an $m \times n$ matrix <b>represents a linear tranformation from $\Real^n$ to $\Real^m$</b>. (Notice that the orders $n$ and $m$ swap.) In other words, it represents a function $f: \Real^n \ra \Real^m$ that is linear; i.e., satisfying the following properties.</p>
+    
+    <ol>
+      <li>$f(\ve{x} + \ve{y}) = f(\ve{x}) + f(\ve{y})$ for all $\ve{x}, \ve{y} \in \Real^n$.</li>
+      <li>$f(c\ve{x}) = c\,f(\ve{x})$ for all $c \in \Real$ and $\ve{x} \in \Real^n$.</li>
+    </ol>
+
+    <h3>15.6.3 &nbsp; Matrix-vector multiplication</h3>
+
+    <p>A matrix is a mathematical object which naturally has a number of operations like addition, subtraction, multiplication, and so on that we can perform on it. In discussing operations on matrices, it is best to start with the operation that captures the essense of the matrix itself: <b>matrix-vector multiplication.</b></p>
+    
+
+    <h3>15.6.4 &nbsp; Matrix-matrix multiplication</h3>
+
+    <h3>15.6.5 &nbsp; Other matrix operations</h3>
 
     <h2>15.7 &nbsp; Affine transformations</h2>
 
