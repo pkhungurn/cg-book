@@ -1724,7 +1724,11 @@
         a_{m1}x_1 + a_{m2}x_2 + a_{m3}x_3 + \dotsb + a_{mn}x_n
       \end{bmatrix}.
     \end{align*}
-    Again, we take the the $n$ numbers in $\ve{x}$ and multiply them with the $n$ corresponding columns of $A$. Then, we add the multipled columns together to form a single $m$-dimensional vector. In fact, <b>the matrix-vector product is exactly the same $A\ve{x}$ as the value $f(\ve{x})$ where $f$ is the linear transformation represented by $A$.</b>
+    Again, we take the the $n$ numbers in $\ve{x}$ and multiply them with the $n$ corresponding columns of $A$. Then, we add the multipled columns together to form a single $m$-dimensional vector. In fact, <b>the matrix-vector product is exactly the same $A\ve{x}$ as the value $f(\ve{x})$ where $f$ is the linear transformation represented by $A$.</b> Because a matrix is a representation of a linear transformation, and matrix-vector multiplication captures the effect of the represented linear transformation on the vector, this operation is what a linear transformation is all about. <b>A linear transformation is a multiplcation of a vector by a matrix.</b> Symbolically. for any linear transformation $f:\Real^n \ra \Real^m$ and for any $\ve{x} \in \Real^n$, we have that
+    \begin{align*}
+      f(\ve{x}) = A\ve{x}
+    \end{align*}
+    for some matrix $A$ of size $m \times n$. The last section tells us how to find what the matrix $A$ is based on the behavior of $f$ on $n$ fixed vectors $\hat{\ve{e}}_1$, $\hat{\ve{e}}_2$, $\dotsc$, $\hat{\ve{e}}_n$.
     </p>
     
 
