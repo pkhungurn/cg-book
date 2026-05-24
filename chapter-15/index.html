@@ -82,7 +82,11 @@
 
     <h2>15.1 &nbsp; Definitions and examples</h2>
 
-    <p>Mathematically, a <b>2D transformation</b> is a function that consumes a 2D point and outputs a 2D point. More formally, we say that $f$ is a 2D transformation if its maps $\Real^2$ to $\Real^2$. In other words, its signature is $$f: \Real^2 \ra \Real^2.$$ Let us look at some examples. One of the simplest transformations is the <b>identity transformation</b> $\mathtt{I}$, which simply outputs whatever the input is:
+    <p>Mathematically, a <b>2D transformation</b> is a function that consumes a 2D point and outputs a 2D point. More formally, we say that $f$ is a 2D transformation if its maps $\Real^2$ to $\Real^2$. In other words, its signature is $$f: \Real^2 \ra \Real^2.$$</p>
+
+    <h3>15.1.1 &nbsp; The simplest transformations</h3>
+
+    <p>Let us look at some examples. One of the simplest transformations is the <b>identity transformation</b> $\mathtt{I}$, which simply outputs whatever the input is:
     \begin{align*}
     \mathtt{I}( \ve{x} ) = \ve{x}
     \end{align*}
@@ -108,6 +112,8 @@
     (Again, when the parameter is a 2D point, we may drop the parantheses around it to make the notation simpler. That is, we may write $\mathtt{C}_{2,1}$ to mena $\mathtt{C}_{(2,1)}$.) Note that, while there is only one identity transformation, there are as many constants functions as there are points in $\Real^2$.
     </p>
 
+    <h3>15.1.2 &nbsp; Translation and scaling</h3>
+
     <p>A type of transformation that is used extensively in computer graphics is the <b>translation</b>. Like a constant function, a translation $\mathtt{T}_{\ve{a}}$ is parametered by a point $\mathbf{a} \in \Real^2$. What it does is to add $\ve{a}$ to the input:
     \begin{align*}
         \mathtt{T}_{\ve{a}}(\ve{x}) = \ve{x} + \ve{a}.
@@ -131,6 +137,12 @@
         \mathtt{S}_{20,10}(-1,-2) &= (-20, -20).
     \end{align*}
     </p>
+
+    <h3>15.1.4 &nbsp; Transformations in general</h3>
+
+    <p>In general, a transformation is a function $f: \Real^n \ra \Real^m$ that maps a point from an $n$-dimension space $\Real^n$ to an $m$-dimension space $\Real^m$. The set $\Real^n$ of the input points to $f$ is called the <b>domain</b>, and the set $\Real^m$ of output points of $f$ is the called the <b>range</b>.</p>
+
+    <p>When $n = m$ (in other words, the function signature is $f: \Real^n \ra \Real^n$), we call $f$ an $n$-dimensional transformation. While this chapter is exclusively about 2-dimensional (2D) transformations, we will inevitably have to deal with 3D transformations when we talk about a certain type of 2D transformations. Similarly, when we talk about 3D transformations in a later chapter, we will have to discuss 4D transformations as well.</p>
 
     <h2>15.2 &nbsp; Why transformations matter</h2>
 
@@ -679,13 +691,13 @@
 
     <p>Like many other mathematical objects, we can perform operations such as addition, subtraction, and multiplication on transformations to another transformation. This allows us to build more complex transformations from simpler transformations, and it makes transformation another kind of "numbers," much like vectors. In this section, we will learn about three operations on transformations that are used widely in computer graphics: composition, addition, and scalar multiplication.</p>
 
-    <h3>15.3.1 &nbsp; Transformation Equality</h3>
+    <h3>15.3.1 &nbsp; Transformation equality</h3>
 
-    <p>Let us talk, though, about how to decide whether two transformations are the same or not first. This will help us make more sense of the operations we are about to learn. We say that two transformations $f$ and $g$ are <b>equal</b> if the results of applying $f$ and $g$ to 2D any point $\ve{x}$ are the same. In mathematcal notations:
+    <p>Let us talk, though, about how to decide whether two transformations are the same or not first. This will help us make more sense of the operations we are about to learn. We say that two transformations $f: \Real^n \ra \Real^m$ and $g: \Real^n \ra \Real^m$ are <b>equal</b> if the results of applying $f$ and $g$ to any point $\ve{x} \in \Real^m$ are the same. In mathematcal notations:
     </p>
 
     <p style="text-align: center;">
-    $f = g$ if $f(\ve{x}) = g(\ve{x})$ for all $\ve{x} \in \Real^2$.
+    $f = g$ if $f(\ve{x}) = g(\ve{x})$ for all $\ve{x} \in \Real^n$.
     </p>
 
     <p>In other words, $f$ and $g$ have the exact same effect on every point. We can swap $g$ in place of $f$, apply the function, and no one would notice any differences in the result. If there is a point $\ve{x}$ where $f(\ve{x}) \neq g(\ve{x})$, then $f$ and $g$ are not equal, and we would write $f \neq g$.</p>
@@ -698,16 +710,25 @@
     \end{align*}
     </p>
 
-    <h3>15.3.2 &nbsp; Transformation Composition</h3>
+    <h3>15.3.2 &nbsp; Transformation composition</h3>
 
-    <p>With the discussion on equality out of the way, let us talk about the first operation on transformations. Given a 2D transformation $f: \Real^2 \ra \Real^2$ and another 2D transformation $g: \Real^2 \ra \Real^2$, we can create another transformation $h$ by just applying $f$ and then $g$. So, the defintion of $h$ is given by the equation $$h(\ve{x}) = g(f(\ve{x}))$$ for all $\ve{x} \in \Real^2$. Here, $h$ is called the <b>composition of $f$ and $g$</b> and is denoted by $g \circ f$. As a result, we can write: $$(g \circ f)(\ve{x}) = g(f(\ve{x})).$$</p>
+    <p>With the discussion on equality out of the way, let us talk about the first operation on transformations. Given a transformation $f: \Real^n \ra \Real^m$ and another 2D transformation $g: \Real^m \ra \Real^r$, we can create another transformation $h: \Real^n \ra \Real^r$ by just applying $f$ and then $g$. So, the deintion of $h$ is given by the equation $$h(\ve{x}) = g(f(\ve{x}))$$ for all $\ve{x} \in \Real^n$. Here, $h$ is called the <b>composition of $f$ and $g$</b> and is denoted by $g \circ f$. As a result, we can write: $$(g \circ f)(\ve{x}) = g(f(\ve{x})).$$</p>
 
     <p>Let us see an example. Let $f = \mathtt{T}_{1,0}$ and $g = \mathtt{S}_{2,2}$. We have that
     \begin{align*}
-      (g \circ f)(x,y) &= g(f(x,y)) =  \mathtt{S}_{2,2}(\mathtt{T}_{1,0}(x,y)) = \mathtt{S}_{2,2}(x+1, y) = (2x+2, 2y), \\
+      (g \circ f)(x,y) &= g(f(x,y)) =  \mathtt{S}_{2,2}(\mathtt{T}_{1,0}(x,y)) = \mathtt{S}_{2,2}(x+1, y) = (2x+2, 2y).
+    \end{align*}
+    </p>
+
+    <p>Notice we can only compose $f$ with $g$ only if the range of $f$ has the same number of dimensions as the domain of $g$. In this example, $f$ has signature $\Real^2 \ra \Real^2$, and $g$ has signature $\Real^2 \ra \Real^2$. We can form $g \circ f$ because the number of dimensions <i>after the arrow</i> in the signature of $f$ is the same as the number of dimensions <i>before the arrow</i> in the signature of $g$.</p>
+    
+    <p>In this case, it also valid to form $f \circ g$, where, here, the order we apply the function is reversed.
+    \begin{align*}
       (f \circ g)(x,y) &= f(g(x,y)) =  \mathtt{T}_{1,0}(\mathtt{S}_{2,2}(x,y)) = \mathtt{T}_{1,0}(2x, 2y) = (2x+1, 2y). 
     \end{align*}
-    It should be clear that, in this case, $f \circ g \neq g \circ f$ because their effects are different on all points. In generally, scaling then translation is not the same as translation then scaling. <b>Composition is not commutative</b>. The order at which we apply transformations matters.</p>
+    We see can that $f \circ g \neq g \circ f$ because their effects are different on all points.</p>
+
+    <p>Composition is generally <b>not commutative</b>. The order at which we apply transformations does matter. To begin with, let us say that $f$ has signature $\Real^n \ra \Real^m$ and $g$ has signature $\Real^m \ra \Real^r$. If $n \neq r$, then, the composition $g \circ f$ is well define, but it does not not make sense to talk about the composition $f \circ g$. This is because $g(\ve{x})$ would be a point with $r$ components, but $f$ only takes points with $n$ components. So, we can say that $g \circ f$ is not equal to $f \circ g$ because the former exists, but the latter does not. In cases where $n = r$ and $f \circ g$ is well defined, then we cannot guarantee that $g \circ f = f \circ g$ either, just like what happens in the example above.</p>
 
     <p>On the other hand, if the order of transformations is fixed, it does not matter how we group the transformations in this order. More concretely, suppose we have three transformation $f$, $g$, and $h$ that we will apply to a point $\ve{x}$ in that order. The result is always $$h(g(f(\ve{x}))).$$ It does not matter if we first compose $f$ and $g$ to get $g\circ f$ and then compose it with $h$ before applying the result. In other words, 
     \begin{align*}
@@ -723,7 +744,7 @@
     \end{align*}
     for any transformations $f$, $g$, and $h$. As a result, when we a long chain of transformations such as $f_5 \circ f_4 \circ f_3 \circ f_2 \circ f_1$, there is no need to write any parentheses between them because any parenthesization would yield the same transformation nonetheless. To repeat, <b>composition is associative.</b> As long as the order does not change, different groupings of transformations within the order do not produce different results.</p>
 
-    <p>While composition is in general not commutative, there are special cases where they are. The first special case is that <b>the identity transformation commutes with any transformation</b>: for any $f \in \Real^2 \ra \Real^2$, we have that
+    <p>While composition is in general not commutative, there are special cases where they are. The first special case is that <b>the identity transformation commutes with any 2D transformation</b>: for any $f \in \Real^2 \ra \Real^2$, we have that
     \begin{align*}
       \mathtt{I} \circ f = f \circ \mathtt{I}.
     \end{align*}
@@ -738,19 +759,20 @@
     Commutativity generally breaks when you start mixing different types of transformations together.
     </p>
 
-    <h3>15.3.3 &nbsp; Transformation Addition</h3>
+    <h3>15.3.3 &nbsp; Transformation addition</h3>
 
-    <p>A 2D transformation produces a 2D vector, which can be added. We can take this operation on vectors and then "lift" it to become an operation on transforamtions. More precisely, let $f$ and $g$ be two 2D transformations, the <b>sum of $f$ and $g$</b> is the transformation $h$ such that
+    <p>A transformation produces a vector, which can be added. We can take this operation on vectors and then "lift" it to become an operation on transforamtions. More precisely, let $f$ and $g$ be two transformations with the same signature (say $\Real^n \ra \Real^m$), the <b>sum of $f$ and $g$</b> is the transformation $h$ such that
     \begin{align*}
-      h(\ve{x}) = f(\ve{x}) + g(\ve{x}).
+      h(\ve{x}) = f(\ve{x}) + g(\ve{x})
     \end{align*}
+    for all $x \in \Real^n$. 
     For convenience, we shall write the sum of $f$ and $g$ as $f + g$. This gives:
     \begin{align*}
       (f+g)(\ve{x}) = f(\ve{x}) + g(\ve{x}).
     \end{align*}
     Transformation addition inherits many properties from vector addition (and addition in general). It is <b>commutative</b> and <b>associative</b>.</p>
 
-    <p>For the composition operator, the identity transformation $\mathtt{I}$ is the magic transformation that, when composed with another transformation, would leave the other transformation unchanged. For addition, this is no longer the case. This is because
+    <p>For the composition operator, the identity transformation $\mathtt{I}$ is the magic transformation that, when composed with another 2D ransformation, would leave the other transformation unchanged. For addition, this is no longer the case. This is because
     \begin{align*}
       (\mathtt{I} + f)(\ve{x}) = \mathtt{I}(\ve{x}) + f(\ve{x}) = \ve{x} + f(\ve{x}).
     \end{align*}
@@ -802,16 +824,16 @@
       \mathtt{T}_{a,b} = \mathtt{I} + \mathtt{C}_{a,b}.
     \end{align*}
 
-    <h3>15.3.4 &nbsp; Transformation Scalar Multiplication</h3>
+    <h3>15.3.4 &nbsp; Transformation scalar multiplication</h3>
 
     <p>Similar to the previous section, we can take another vector operation, multiplication by a scalar, and define an operation on transformation with it.
-    Let $f$ be a 2D transformation and $c \in \Real$ be a scalar. The <b>product of $f$ and $c$</b> is a transformation $g$ such that
+    Let $f: \Real^n \ra \Real^m$ be a transformation and $c \in \Real$ be a scalar. The <b>product of $f$ and $c$</b> is a transformation $g$ such that
     \begin{align*}
       g(\ve{x}) = c f(\ve{x})
     \end{align*}
-    for all $\ve{x} \in \Real^2$. We write the product as $cf$. Note that the scalar multiplication is conducted to <i>after</i> we apply the transformation. The order is important here.</p>
+    for all $\ve{x} \in \Real^n$. We write the product as $cf$. Note that the scalar multiplication is conducted to <i>after</i> we apply the transformation. The order is important here.</p>
 
-    <p>In fact, muliplication by scalar is actually the same as composition with a scaling:
+    <p>If $f: \Real^2 \ra \Real^2$ is a 2D transformation, then muliplication by scalar is actually the same as composition with a scaling:
     \begin{align*}
       (c f)(\ve{x}) = cf(\ve{x}) = \mathtt{S}_{c,c}(f(\ve{x})) = (\mathtt{S}_{c,c} \circ f)(\ve{x}),
     \end{align*}
@@ -846,19 +868,19 @@
     </p>
 
     <a id="linear-tranformation"></a>
-    <h2>15.4 &nbsp; Linear Transformations</h2>
+    <h2>15.4 &nbsp; Linear transformations</h2>
 
     <p>We have studied some simple types of transformations. It is time to study another type of transformations that is more complicated than the one we have encountered before: <i>linear transformation</i>. Linear transformations are widely used in computer graphics because they encompass useful transformations and also because they can easily represented by data, not programs.</p>
 
-    <p>We say that a transformation (or a function) $f: \Real^2 \ra \Real^2$ is <b>linear</b> if the following conditions are true:
+    <p>We say that a transformation (or a function) $f: \Real^n \ra \Real^m$ is <b>linear</b> if the following conditions are true:
     <ol>
-      <li>$f(\ve{x} + \ve{y}) = f(\ve{x}) + f(\ve{y})$ for any $\ve{x}, \ve{y} \in \Real^2$, and</li>
-      <li>$f(c\ve{x}) = cf(\ve{x})$ for all $\ve{x} \in \Real^2$ and $c \in \Real$.</li>
+      <li>$f(\ve{x} + \ve{y}) = f(\ve{x}) + f(\ve{y})$ for any $\ve{x}, \ve{y} \in \Real^n$, and</li>
+      <li>$f(c\ve{x}) = cf(\ve{x})$ for all $\ve{x} \in \Real^n$ and $c \in \Real$.</li>
     </ol>
     Condition (1) says that the transformation $f$ "distributes" like how a multiplication with scalar interacts with addition. Condition (2) says that the function "commutes" with scalar multiplcation.
     </p>
 
-    <p>Let's classify the transformations we have seen so far whether they are linear or not. The constant function is generally not linear. If $(a,b) \neq (0,0)$ we have that
+    <p>Let's classify the 2D transformations we have seen so far whether they are linear or not. The constant function is generally not linear. If $(a,b) \neq (0,0)$ we have that
     \begin{align*}
       \mathtt{C}_{a,b}\big((x,y) + (0,0)\big) &= \mathtt{C}_{a,b}(x,y) \\
       &= (a,b) \\
@@ -906,7 +928,7 @@
     which meanes that $f(0,0) = (0,0)$. This is one of the reason why, if $(a,b) \neq (0,0)$, then $\mathtt{C}_{a,b}$ and $\mathtt{T}_{a,b}$ are not linear.
     </p>
 
-    <h2>15.5 &nbsp; 2D Rotation</h2>
+    <h2>15.5 &nbsp; 2D rotation</h2>
 
     <p>In Section 15.1, we learned about two types of transformations that are important to computer graphics: translation and scaling. There is a third type: <b>rotation</b>. In this chapter, we shall learn about rotations in 2D, and we will study rotations in 3D later in Chapter XXX.</p>
 
@@ -1233,45 +1255,9 @@
 
     <p>We said earlier in <a href="#linear-transformation">Section 15.4</a>, we said that linear transformations are widely used in computer graphics because they can be represented by data. In this section, we shall study <b>matrices</b> (singular: matrix), the mathematical objects and the data type that can be used to repreesent linear transformations.</p>
 
-    <p>Earlier in <a href="../chapter-04/index.html#2d-cartesian-coordinate-system">Section 4.1.1</a>, we learned that all 2D vectors can be written in terms of two special vectors $\hat{\ve{x}} = (1,0)$ and $\hat{\ve{y}} = (0,1)$. More, specifically, we have that 
-    \begin{align*}
-    (x,y) = (x, 0) + (0,y) = x\,(1,0) + y\,(0,1) = x\hat(\ve{x}) + y \hat(\ve{y}).
-    \end{align*}
-    </p>
+    <h3>15.6.1 &nbsp; Definitions and notations</h3>
 
-    <p>Now, let $f$ be a linear transformation, we have that
-    \begin{align*}
-      f(x,y) 
-      = f(x\hat{\ve{x}} + y \hat{\ve{y}})
-      = x\,f(\hat{\ve{x}}) + y\,f(\hat{\ve{y}})
-      = x\,f(1,0) + y\,f(0,1).
-    \end{align*}
-    The above equation is kind of remarkable. It says that, if we know the effect of a linear transformations $f$ on just two vectors&mdash;$\hat{\ve{x}} = (1,0)$ and $\hat{\ve{y}} = (0,1)$&mdash;then we know what it does to all the other vectors. If we are given $(x,y)$, we just multiple $x$ to $f(1,0)$ and $y$ to $f(0,1)$ and then add the results together.
-    </p>
-
-    <p>This means that we can represent any linear transformations $f$ by $4$ numbers. This is because $f(1,0)$ is a 2D vector, which can be represented by 2 numbers, and so is $f(0,1)$. Let us give names to the components of these vectors.
-    \begin{align*}
-      f(1,0) &= \begin{bmatrix} a \\ b \end{bmatrix}, &
-      f(0,1) &= \begin{bmatrix} c \\ d \end{bmatrix}. 
-    \end{align*}
-    The conventional way to write down a representation of $f$ is to take the vectors $f(1,0)$ and $f(0,1)$ side by side
-    \begin{align*}
-    \begin{bmatrix} a \\ b \end{bmatrix}
-    \begin{bmatrix} c \\ d \end{bmatrix}
-    \end{align*}
-    and then remove the borders between them to get a table of numbers
-    \begin{align*}
-    \begin{bmatrix}
-      a & c \\
-      b & d
-    \end{bmatrix}.
-    \end{align*}
-    This is called a <b>matrix</b>.
-    </p>
-
-    <h3>15.6.1 &nbsp; Definitions and Notations</h3>
-
-    <p>Formally, a matrix is a two-dimensional table of numbers. We write down the table and surround them by square brackets. For example,</p>
+    <p>Formally, a <b>matrix</b> is a two-dimensional table of numbers. We write down the table and surround them by square brackets. For example,</p>
     \begin{align*}
       \begin{bmatrix}
         1 & 2 & 3 & 4 \\
@@ -1456,7 +1442,42 @@
 
     <h3>15.6.2 &nbsp; Matrix representation of 2D transformations</h3>
 
-    <p>As noted earlier briefly before the beginning of the last section, the matrix representation of a 2D linear transformation $f$ is obtained by the following process.</p>
+    <p>Earlier in <a href="../chapter-04/index.html#2d-cartesian-coordinate-system">Section 4.1.1</a>, we learned that all 2D vectors can be written in terms of two special vectors $\hat{\ve{x}} = (1,0)$ and $\hat{\ve{y}} = (0,1)$. More, specifically, we have that 
+    \begin{align*}
+    (x,y) = (x, 0) + (0,y) = x\,(1,0) + y\,(0,1) = x\hat(\ve{x}) + y \hat(\ve{y}).
+    \end{align*}
+    </p>
+
+    <p>Now, let $f$ be a linear transformation, we have that
+    \begin{align*}
+      f(x,y) 
+      = f(x\hat{\ve{x}} + y \hat{\ve{y}})
+      = x\,f(\hat{\ve{x}}) + y\,f(\hat{\ve{y}})
+      = x\,f(1,0) + y\,f(0,1).
+    \end{align*}
+    The above equation is kind of remarkable. It says that, if we know the effect of a linear transformations $f$ on just two vectors&mdash;$\hat{\ve{x}} = (1,0)$ and $\hat{\ve{y}} = (0,1)$&mdash;then we know what it does to all the other vectors. If we are given $(x,y)$, we just multiple $x$ to $f(1,0)$ and $y$ to $f(0,1)$ and then add the results together.
+    </p>
+
+    <p>This means that we can represent any linear transformations $f$ by $4$ numbers. This is because $f(1,0)$ is a 2D vector, which can be represented by 2 numbers, and so is $f(0,1)$. Let us give names to the components of these vectors.
+    \begin{align*}
+      f(1,0) &= \begin{bmatrix} a \\ b \end{bmatrix}, &
+      f(0,1) &= \begin{bmatrix} c \\ d \end{bmatrix}. 
+    \end{align*}
+    The conventional way to write down a representation of $f$ is to take the vectors $f(1,0)$ and $f(0,1)$ side by side
+    \begin{align*}
+    \begin{bmatrix} a \\ b \end{bmatrix}
+    \begin{bmatrix} c \\ d \end{bmatrix}
+    \end{align*}
+    and then remove the borders between them to get a matrix
+    \begin{align*}
+    \begin{bmatrix}
+      a & c \\
+      b & d
+    \end{bmatrix}.
+    \end{align*}
+    </p>
+
+    <p>To recap, the matrix representation of a 2D linear transformation $f$ is obtained by the following process.</p>
 
     <ol>
       <li>Compute $f(1,0)$ and $f(0,1)$.</li>
@@ -1559,25 +1580,152 @@
     This transformation is neither a scaling nor a rotation though. It is just a random linear transformation.
     </p>
 
-    <h3>15.6.3 &nbsp; Linear transformation in general</h3>
+    <h3>15.6.3 &nbsp; Matrix representation of linear tranformation in general</h3>
 
-    <p>We just learned that a $2 \times 2$ matrix represents a 2D linear transformation. That is, it represents a function $f: \Real^2 \ra \Real^2$ that is <i>linear</i>. In other words, the function $f$ satisfies the following key properties.</p>
+    <p>In general, an $m \times n$ matrix <b>represents a linear tranformation from $\Real^n$ to $\Real^m$</b>. (Notice that the orders $n$ and $m$ swap here.) In other words, any $f:\Real^n \times m$ can be represented by an $m \times n$ table of numbers. To see this, observe that a point $\ve{x}$ \in $\Real^n$ is a vector
+    \begin{align*}
+      \ve{x} = \begin{bmatrix}
+        x_1 \\ x_2 \\ x_3 \\ \vdots \\ x_n
+      \end{bmatrix}
+    \end{align*}
+    where $x_1, x_2, x_3, \dotsc, x_n \in \Real$. Let $\hat{\ve{e}}_i$ denote the $n$-dimensional vector such that its $i$th component is $1$ and all the other components are $0$. This definition gives us the following $n$ vectors:
+    \begin{align*}
+      \hat{\ve{e}}_1 &= \begin{bmatrix}
+        1 \\ 0 \\ 0 \\ \vdots \\ 0
+      \end{bmatrix}, &
+      \hat{\ve{e}}_2 &= \begin{bmatrix}
+        0 \\ 1 \\ 0 \\ \vdots \\ 0
+      \end{bmatrix}, &
+      \hat{\ve{e}}_3 &= \begin{bmatrix}
+        0 \\ 0 \\ 1 \\ \vdots \\ 0
+      \end{bmatrix}, &
+      & \dotsb &
+      \hat{\ve{e}}_n &= \begin{bmatrix}
+        0 \\ 0 \\ 0 \\ \vdots \\ 1
+      \end{bmatrix}.
+    \end{align*}
+    We can use them to rewrite $\ve{x}$ as follows.
+    \begin{align*}
+      \ve{x} 
+      &= \begin{bmatrix}
+        x_1 \\ x_2 \\ x_3 \\ \vdots \\ x_n
+      \end{bmatrix} \\
+      &= \begin{bmatrix}
+        x_1 \\ 0 \\ 0 \\ \vdots \\ 0
+      \end{bmatrix}
+      + \begin{bmatrix}
+        0 \\ x_2 \\ 0 \\ \vdots \\ 0
+      \end{bmatrix}
+      + \begin{bmatrix}
+        0 \\ 0 \\ x_3 \\ \vdots \\ 0
+      \end{bmatrix}
+      + \dotsb
+      + \begin{bmatrix}
+        0 \\ 0 \\ 0 \\ \vdots \\ x_n
+      \end{bmatrix} \\
+      &= x_1 \begin{bmatrix}
+        1\\ 0 \\ 0 \\ \vdots \\ 0
+      \end{bmatrix}
+      + x_2 \begin{bmatrix}
+        0 \\ 1 \\ 0 \\ \vdots \\ 0
+      \end{bmatrix}
+      + x_3 \begin{bmatrix}
+        0 \\ 0 \\ 1 \\ \vdots \\ 0
+      \end{bmatrix}
+      + \dotsb,
+      + x_n \begin{bmatrix}
+        0 \\ 0 \\ 0 \\ \vdots \\ 1
+      \end{bmatrix} \\
+      &= x_1\,\hat{\ve{e}}_1 + x_2\,\hat{\ve{e}}_2 + x_3\,\hat{\ve{e}}_3 + \dotsb + x_n\,\hat{\ve{e}}_n.    
+    \end{align*}
+    Given that $f$ is a linear transformation, we have that
+    \begin{align*}
+      f(\ve{x}) 
+      &= f(x_1\,\hat{\ve{e}}_1 + x_2\,\hat{\ve{e}}_2 + x_3\,\hat{\ve{e}}_3 + \dotsb + x_n\,\hat{\ve{e}}_n) \\
+      &= f(x_1\,\hat{\ve{e}}_1) + f(x_2\,\hat{\ve{e}}_2) + f(x_3\,\hat{\ve{e}}_3) + \dotsb + f(x_n\,\hat{\ve{e}}_n) \\
+      &= x_1\,f(\hat{\ve{e}}_1) + x_2\,f(\hat{\ve{e}}_2) + x_3\,f(\hat{\ve{e}}_3) + \dotsb + x_n\,f(\hat{\ve{e}}_n).
+    \end{align*}
+    As a result, the behavior of $f$ is determined completely by the values $f(\hat{\ve{e}}_1)$, $f(\hat{\ve{e}}_2)$, $\dotsc$, and $f(\hat{\ve{e}}_n)$. Because each of $f(\hat{\ve{e}}_i)$ is an $m$-dimensional vector, we can represent $f$ by $n \times m$ numbers. To write down the representation, let us first fix the symbols for the entries of the vectors.
+    \begin{align*}
+    f(\hat{\ve{e}}_1) &= \begin{bmatrix} a_{11} \\ a_{21} \\ a_{31} \\ \vdots \\ a_{m1} \end{bmatrix}, & 
+    f(\hat{\ve{e}}_2) &= \begin{bmatrix} a_{12} \\ a_{22} \\ a_{32} \\ \vdots \\ a_{m2} \end{bmatrix}, &
+    & \dotsc, & 
+    f(\hat{\ve{e}}_n) &= \begin{bmatrix} a_{1n} \\ a_{2n} \\ a_{3n} \\ \vdots \\ a_{mn} \end{bmatrix}.
+    \end{align*}
+    We then do the same thing we did in the case of 2D transformations: we stick the vectors together horizontally and remove the brackets between them.
+    What we get in the end is an $m \times n$ matrix.
+    \begin{align*}
+    A = 
+    \begin{bmatrix}
+      a_{11} & a_{12} & a_{13} & \cdots & a_{1n} \\
+      a_{21} & a_{22} & a_{23} & \cdots & a_{2n} \\
+      a_{31} & a_{32} & a_{33} & \cdots & a_{3n} \\
+      \vdots & \vdots & \vdots & \ddots & \vdots \\
+      a_{m1} & a_{m2} & a_{m3} & \cdots & a_{mn}
+    \end{bmatrix}.
+    \end{align*}
 
-    <ol>
-      <li>$f(\ve{x} + \ve{y}) = f(\ve{x}) + f(\ve{y})$ for all $\ve{x}, \ve{y} \in \Real^2$.</li>
-      <li>$f(c\ve{x}) = c\,f(\ve{x})$ for all $c \in \Real$ and $\ve{x} \in \Real^2$.</li>
-    </ol>
-
-    <p>In general, an $m \times n$ matrix <b>represents a linear tranformation from $\Real^n$ to $\Real^m$</b>. (Notice that the orders $n$ and $m$ swap.) In other words, it represents a function $f: \Real^n \ra \Real^m$ that is linear; i.e., satisfying the following properties.</p>
-    
-    <ol>
-      <li>$f(\ve{x} + \ve{y}) = f(\ve{x}) + f(\ve{y})$ for all $\ve{x}, \ve{y} \in \Real^n$.</li>
-      <li>$f(c\ve{x}) = c\,f(\ve{x})$ for all $c \in \Real$ and $\ve{x} \in \Real^n$.</li>
-    </ol>
-
+    <p>Conversely, if we start with an $m \times n$ matrix $A$ above, then the matrix gives rise to a linear transformation $f$ where
+    \begin{align*}
+    f(\ve{x})
+    &= f\left(\begin{bmatrix}
+        x_1 \\ x_2 \\ x_3 \\ \vdots \\ x_n
+      \end{bmatrix}\right)
+    = x_1 \begin{bmatrix} a_{11} \\ a_{21} \\ a_{31} \\ \vdots \\ a_{m1} \end{bmatrix} +
+    x_2 \begin{bmatrix} a_{12} \\ a_{22} \\ a_{32} \\ \vdots \\ a_{m2} \end{bmatrix} +
+    x_3 \begin{bmatrix} a_{13} \\ a_{23} \\ a_{33} \\ \vdots \\ a_{m3} \end{bmatrix} +
+    \dotsb + 
+    x_n \begin{bmatrix} a_{1n} \\ a_{2n} \\ a_{3n} \\ \vdots \\ a_{mn} \end{bmatrix} \\
+    &=
+    \begin{bmatrix}
+      a_{11}x_1 + a_{12}x_2 + a_{13}x_3 + \dotsb + a_{1n}x_n\\
+      a_{21}x_1 + a_{22}x_2 + a_{23}x_3 + \dotsb + a_{2n}x_n\\
+      a_{31}x_1 + a_{32}x_2 + a_{33}x_3 + \dotsb + a_{3n}x_n\\
+      \vdots \\
+      a_{m1}x_1 + a_{m2}x_2 + a_{m3}x_3 + \dotsb + a_{mn}x_n
+    \end{bmatrix}.
+    \end{align*}
+    The above formula might seem complicated. A way to remember it is as follows: we multiply the $n$ numbers in the vector $\ve{x}$ with the $n$ columns of $A$, and then add the products together.
+    </p>
+  
     <h3>15.6.3 &nbsp; Matrix-vector multiplication</h3>
 
     <p>A matrix is a mathematical object which naturally has a number of operations like addition, subtraction, multiplication, and so on that we can perform on it. In discussing operations on matrices, it is best to start with the operation that captures the essense of the matrix itself: <b>matrix-vector multiplication.</b></p>
+
+    <p>A matrix-vector mutliplication is only defined for a matrix and a vector of certain sizes. That is, if the matrix of size $m \times n$, then the vector must have $n$ dimensions. In other words, the number of columns much match the number of dimensions of the vectors. Given a $m \times n$ matrix
+    \begin{align*}
+        A = 
+        \begin{bmatrix}
+          a_{11} & a_{12} & a_{13} & \cdots & a_{1n} \\
+          a_{21} & a_{22} & a_{23} & \cdots & a_{2n} \\
+          a_{31} & a_{32} & a_{33} & \cdots & a_{3n} \\
+          \vdots & \vdots & \vdots & \ddots & \vdots \\
+          a_{m1} & a_{m2} & a_{m3} & \cdots & a_{mn}
+        \end{bmatrix},
+    \end{align*}
+    and a $n$-dimensional vector
+    \begin{align*}
+      \ve{x} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ \vdots \\ x_n \end{bmatrix},
+    \end{align*}
+    the matrix-vector product between $A$ and $\ve{x}$, denoted by $A\ve{x}$, is defined to be the $m$-dimensional vector
+    \begin{align*}
+      A\ve{x} 
+      &= x_1 \begin{bmatrix} a_{11} \\ a_{21} \\ a_{31} \\ \vdots \\ a_{m1} \end{bmatrix} +
+      x_2 \begin{bmatrix} a_{12} \\ a_{22} \\ a_{32} \\ \vdots \\ a_{m2} \end{bmatrix} +
+      x_3 \begin{bmatrix} a_{13} \\ a_{23} \\ a_{33} \\ \vdots \\ a_{m3} \end{bmatrix} +
+      \dotsb + 
+      x_n \begin{bmatrix} a_{1n} \\ a_{2n} \\ a_{3n} \\ \vdots \\ a_{mn} \end{bmatrix} \\
+      &=
+      \begin{bmatrix}
+        a_{11}x_1 + a_{12}x_2 + a_{13}x_3 + \dotsb + a_{1n}x_n\\
+        a_{21}x_1 + a_{22}x_2 + a_{23}x_3 + \dotsb + a_{2n}x_n\\
+        a_{31}x_1 + a_{32}x_2 + a_{33}x_3 + \dotsb + a_{3n}x_n\\
+        \vdots \\
+        a_{m1}x_1 + a_{m2}x_2 + a_{m3}x_3 + \dotsb + a_{mn}x_n
+      \end{bmatrix}.
+    \end{align*}
+    Again, we take the the $n$ numbers in $\ve{x}$ and multiply them with the $n$ corresponding columns of $A$. Then, we add the multipled columns together to form a single $m$-dimensional vector. In fact, <b>the matrix-vector product is exactly the same $A\ve{x}$ as the value $f(\ve{x})$ where $f$ is the linear transformation represented by $A$.</b>
+    </p>
     
 
     <h3>15.6.4 &nbsp; Matrix-matrix multiplication</h3>
