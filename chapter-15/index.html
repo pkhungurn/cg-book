@@ -1687,12 +1687,145 @@
     \end{align*}
     The above formula might seem complicated. A way to remember it is as follows: we multiply the $n$ numbers in the vector $\ve{x}$ with the $n$ columns of $A$, and then add the products together.
     </p>
+
+    <h2>15.7 &nbsp; Matrix Operations</h2>
+
+    <p>A matrix is a mathematical object which naturally has a number of operations like addition, subtraction, multiplication, and so on that we can perform on it. In this section, we will discuss these operations in details.</p>
+
+    <h3>15.7.1 &nbsp; Transposition</h3>
+
+    <p>The first operation we shall study is probably the easiest one because it does not involved any calculation. Given an $m \times n$ matrix $A$, the <b>transpose</b> of $A$, denoted by $A^T$, is a matrix whose $(i,j)$-entry is $a_{ji}$. More concretely, if
+    \begin{align*}
+      A = \begin{bmatrix}
+        a_{11} & a_{12} & a_{13} & a_{14} & \cdots & a_{1n} \\
+        a_{21} & a_{22} & a_{23} & a_{24} & \cdots & a_{2n} \\
+        \vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+        a_{m1} & a_{m2} & a_{m3} & a_{m4} & \cdots & a_{mn}
+      \end{bmatrix},
+    \end{align*}
+    then
+    \begin{align*}
+      A^T = \begin{bmatrix}
+        a_{11} & a_{21} & \cdots & a_{m1} \\
+        a_{12} & a_{22} & \cdots & a_{m2} \\
+        a_{13} & a_{23} & \cdots & a_{m3} \\
+        a_{14} & a_{24} & \cdots & a_{m4} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{1n} & a_{2n} & \cdots & a_{mn}
+      \end{bmatrix}.
+    \end{align*}
+    </p>
+
+    <p>The symbols in the above two equations might be confusing. Let us see a concrete example. Let
+    \begin{align*}
+      A = \begin{bmatrix}
+        1 & 11 & 111 & 1111 & 11111 \\
+        2 & 22 & 222 & 2222 & 22222 \\
+        3 & 33 & 333 & 3333 & 33333
+      \end{bmatrix}.
+    \end{align*}
+    Then, we have that
+    \begin{align*}
+      A^T = \begin{bmatrix}
+        1 & 11 & 111 & 1111 & 11111 \\
+        2 & 22 & 222 & 2222 & 22222 \\
+        3 & 33 & 333 & 3333 & 33333
+      \end{bmatrix}^T
+      = \begin{bmatrix}
+        1 & 2 & 3 \\
+        11 & 22 & 33 \\
+        111 & 222 & 333 \\
+        1111 & 2222 & 3333 \\
+        11111 & 22222 & 33333
+      \end{bmatrix}.
+    \end{align*}
+    One can see that, when we transpose a matrix, <b>we exchange the rows with the columns</b> in the sense that the $i$th row of $A^T$ is the $i$th column of $A$, and the $i$th column of $A^T$ is the $i$th row of $A$.</p>
+
+    <p>If $A$ is a square matrix, the effect of transpoation is that we "flip" the matrix along its top-left-to-bottom-right diagonal (also known as the <b>main diagonal</b>):
+    \begin{align*}
+      \begin{bmatrix}
+        0 & 1 & 2 & 3 \\
+        -1 & 0 & 1 & 2 \\
+        -2 & -1 & 0 & 1 \\
+        -3 & -2 & -1 & 0
+      \end{bmatrix}^T
+      &= \begin{bmatrix}
+        0 & -1 & -2 & -3 \\
+        1 & 0 & -1 & -2 \\
+        2 & 1 & 0 & -1 \\
+        3 & 2 & 1 & 0
+      \end{bmatrix}.
+    \end{align*}
+    </p>
+
+    <p>We noted earlier that an $n$-dimensional vector can be thought of as a $n \times 1$ matrix. Let $\ve{a}$ be such a vector.
+    \begin{align*}
+      \ve{a} = \begin{bmatrix}
+        a_1 \\ a_2 \\ a_3 \\ \vdots \\ a_n
+      \end{bmatrix}
+    \end{align*}.
+    We can transpose a vector like we transpose a matrix. The result is an $1 \times n$ matrix:
+    \begin{align*}
+      \ve{a}^T 
+      &= \begin{bmatrix}
+        a_1 \\ a_2 \\ a_3 \\ \vdots \\ a_n
+      \end{bmatrix}^T
+      = \begin{bmatrix}
+        a_1 & a_2 & a_3 & \cdots & a_n
+      \end{bmatrix}.
+    \end{align*}
+    Despite the fact that $\ve{a}$ and $\ve{a}^T$ have the exact same elements, we must maintain that $\ve{a} \neq \ve{a}^T$ because they have different shapes. We also have different names for them. We call a vector like $\ve{a}$ a "column vector" because it looks like a column of a matrix, and we call $\ve{a}^T$ a "row vector" because it looks like a row of a matrix. We can add two column vectors together to get a column vector. Similarly, we can add two rows vectors together to get a new row vector. However, we cannot add a column vector to a row vector because they have different shapes. In the next section, though, we will learn about an operation that can be performed between a row vector and a column vector. 
+    </p>
+
+    <p>When we apply two transpositions in succession, we get the same matrix back. In other words, for any matrix $A$,
+    \begin{align*}
+      (A^T)^T = A.
+    \end{align*}
+    This is because transposition involves exchanging rows with columns. If we do this two times in a row, the $i$th column becomes the $i$th row after the first transposition and then becomes the $i$th column again after the second.
+    </p>
+
+    <p>One interesting thing to note is that, for a square matrix, the transposition leaves the main diagonal unchanged and exchanges the triangle below the diagonal the triangle above it. If the matrix is symmetric around the main diagonal, then it remains unchanged under transposition. Such a matrix is called <b>symmetric matrix</b>. Formally, it is a matrix $A$ such that
+    \begin{align*}
+      A^T = A.
+    \end{align*}
+    An example of a symmmetric is the identity matrix $I$. This is because 
+    \begin{align*}
+      I^T = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}^T = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = I.
+    \end{align*}
+    The scaling matrix $S_{a,b}$ is also symmetric.
+    \begin{align*}
+      S_{a,b}^T = \begin{bmatrix} a & 0 \\ 0 & b \end{bmatrix}^T = \begin{bmatrix} a & 0 \\ 0 & b \end{bmatrix} = S_{a,b}.
+    \end{align*}
+    The rotation matrix $R_{\theta}$ is generally not symmetric. This is because
+    \begin{align*}
+      R_{\theta} &= \begin{bmatrix}
+        \cos \theta & -\sin \theta \\
+        \sin \theta & \cos \theta 
+      \end{bmatrix}, \\
+      R_{\theta}^T &= \begin{bmatrix}
+        \cos \theta & \sin \theta \\
+        -\sin \theta & \cos \theta 
+      \end{bmatrix}.
+    \end{align*}
+    We can see that $R_{\theta} = R_{\theta}^T$ if only if $\sin \theta = -\sin \theta$. This only happens if $\sin \theta = 0$, which means that $\theta = 2\pi k$ for some integer $k$. When this happens, $\cos \theta = 1$, so $R_{\theta} = I$, which is indeed symmetric. While $R_{\theta}^T \neq R_\theta$ in general, it is interesting to note that, because $\sin(-\theta) = -\sin \theta$ and $\cos(-\theta) = \cos\theta$, we have that
+    \begin{align*}
+      R_{\theta}^T &= \begin{bmatrix}
+        \cos \theta & \sin \theta \\
+        -\sin \theta & \cos \theta 
+      \end{bmatrix}
+      = \begin{bmatrix}
+        \cos (-\theta) & -\sin (-\theta) \\
+        \sin (-\theta) & \cos (-\theta) 
+      \end{bmatrix}
+      = R_{-\theta}.
+    \end{align*}
+    So, the matrices $R_{\theta}$, representing the rotation by the angle $\theta$ in the counter-clockwise direction, is closely related to the matrix $R_{-\theta}$, which represents the rotation also by the $\theta$ but in the clockwise direction.
+    </p> 
+
   
-    <h3>15.6.3 &nbsp; Matrix-vector multiplication</h3>
+    <h3>15.7.2 &nbsp; Matrix-vector multiplication</h3>
 
-    <p>A matrix is a mathematical object which naturally has a number of operations like addition, subtraction, multiplication, and so on that we can perform on it. In discussing operations on matrices, it is best to start with the operation that captures the essense of the matrix itself: <b>matrix-vector multiplication.</b></p>
-
-    <p>A matrix-vector mutliplication is only defined for a matrix and a vector of certain sizes. That is, if the matrix of size $m \times n$, then the vector must have $n$ dimensions. In other words, the number of columns much match the number of dimensions of the vectors. Given a $m \times n$ matrix
+    <p>The operation that we shall discuss in this section is the core operation that captures the essense of a matrix. A <b>matrix-vector mutliplication</b> is only defined for a matrix and a vector of certain sizes. That is, if the matrix of size $m \times n$, then the vector must have $n$ dimensions. In other words, the number of columns much match the number of dimensions of the vectors. Given a $m \times n$ matrix
     \begin{align*}
         A = 
         \begin{bmatrix}
@@ -1730,9 +1863,205 @@
     \end{align*}
     for some matrix $A$ of size $m \times n$. The last section tells us how to find what the matrix $A$ is based on the behavior of $f$ on $n$ fixed vectors $\hat{\ve{e}}_1$, $\hat{\ve{e}}_2$, $\dotsc$, $\hat{\ve{e}}_n$.
     </p>
-    
 
-    <h3>15.6.4 &nbsp; Matrix-matrix multiplication</h3>
+    <p>Let us see some examples of matrix-vector multiplication calculations. Consider the matrix
+    \begin{align*}
+      \begin{bmatrix}
+        1 & 2 \\
+        0 & 1 
+      \end{bmatrix}.
+    \end{align*}
+    Let us multiply it with a 2D vector $(3, -1)$. We have that
+    \begin{align*}
+      \begin{bmatrix}
+        1 & 2 \\
+        0 & 1 
+      \end{bmatrix}
+      \begin{bmatrix}
+        3 \\ -1 
+      \end{bmatrix}
+      &= 3 \begin{bmatrix} 1 \\ 0 \end{bmatrix} + (-1) \begin{bmatrix} 2 \\ 1 \end{bmatrix} 
+      = \begin{bmatrix} 3 \\ 0 \end{bmatrix} + \begin{bmatrix} -2 \\ -1 \end{bmatrix} 
+      = \begin{bmatrix} 1 \\ -1 \end{bmatrix}.
+    \end{align*}
+    If the vector is $(-2, 3)$, the result is
+    \begin{align*}
+      \begin{bmatrix}
+        1 & 2 \\
+        0 & 1 
+      \end{bmatrix}
+      \begin{bmatrix}
+        -2 \\ 3 
+      \end{bmatrix}
+      &= (-2) \begin{bmatrix} 1 \\ 0 \end{bmatrix} + 3 \begin{bmatrix} 2 \\ 1 \end{bmatrix} 
+      = \begin{bmatrix} -2 \\ 0 \end{bmatrix} + \begin{bmatrix} 6 \\ 3 \end{bmatrix} 
+      = \begin{bmatrix} 4 \\ 3 \end{bmatrix}.
+    \end{align*}
+    If we multiply the matrix with $\hat{\ve{e}}_1 = (1,0)$ and $\hat{\ve{e}}_2 = (0,1)$, we have
+    \begin{align*}
+      \begin{bmatrix}
+        1 & 2 \\
+        0 & 1 
+      \end{bmatrix}
+      \hat{\ve{e}}_1
+      = \begin{bmatrix}
+        1 & 2 \\
+        0 & 1 
+      \end{bmatrix}
+      \begin{bmatrix}
+        1 \\ 0 
+      \end{bmatrix}
+      &= 1 \begin{bmatrix} 1 \\ 0 \end{bmatrix} + 0 \begin{bmatrix} 2 \\ 1 \end{bmatrix} 
+      = \begin{bmatrix} 1 \\ 0 \end{bmatrix} + \begin{bmatrix} 0 \\ 0 \end{bmatrix} 
+      = \begin{bmatrix} 1 \\ 0 \end{bmatrix},
+    \end{align*}
+    and
+    \begin{align*}
+      \begin{bmatrix}
+        1 & 2 \\
+        0 & 1 
+      \end{bmatrix}
+      \hat{\ve{e}}_2
+      = \begin{bmatrix}
+        1 & 2 \\
+        0 & 1 
+      \end{bmatrix}
+      \begin{bmatrix}
+        0 \\ 1 
+      \end{bmatrix}
+      &= 0 \begin{bmatrix} 1 \\ 0 \end{bmatrix} + 1 \begin{bmatrix} 2 \\ 1 \end{bmatrix} 
+      = \begin{bmatrix} 0 \\ 0 \end{bmatrix} + \begin{bmatrix} 2 \\ 1 \end{bmatrix} 
+      = \begin{bmatrix} 2 \\ 1 \end{bmatrix}.
+    \end{align*}
+    So, from the two calculations above, we can easily infer that
+    \begin{align*}
+      A \hat{\ve{e}}_i = \mbox{the }i\mbox{th column of A},
+    \end{align*}
+    given that $i$ is betwen 1 and the number of columns $A$.
+    </p>
+
+    <h3>15.7.3 &nbsp; Dot product as matrix-vector multiplication and vice versa</h3>
+
+    <p>Interestingly, we can get a new insight onto matrix-vector multiplication by considering the special case of multiplying a row vector with a column vector. Recall again that a row vector $\ve{a}$ can be seen as an $n \times 1$ matrix:
+    \begin{align*}
+      \ve{a} = \begin{bmatrix}
+        a_1 \\ a_2 \\ a_3 \\ \vdots \\ a_n
+      \end{bmatrix}
+    \end{align*}
+    As a result, its transpose $\ve{a}^T$ is a $1 \times n$ matrix.
+    \begin{align*}
+      \ve{a}^T = \begin{bmatrix}
+        a_1 & a_2 & a_3 & \cdots & a_n
+      \end{bmatrix},
+    \end{align*}
+    and we call it a row vector. Given another $n$-dimensional column vector $\ve{b}$, 
+    \begin{align*}
+      \ve{b} = \begin{bmatrix}
+        b_1 \\ b_2 \\ b_3 \\ \vdots \\ b_n
+      \end{bmatrix},
+    \end{align*}
+    we can certainly multiply $\ve{a}^T$, a $1 \times n$ matrix, to $\ve{b}$, an $n \times 1$ matrix. The result would be a $1 \times 1$ matrix below:
+    \begin{align*}
+      \ve{a}^T \ve{b}
+      &= \begin{bmatrix}
+        a_1 & a_2 & a_3 & \cdots & a_n
+      \end{bmatrix} \begin{bmatrix}
+        b_1 \\ b_2 \\ b_3 \\ \vdots \\ b_n
+      \end{bmatrix} \\
+      &= b_1 \begin{bmatrix} a_1 \end{bmatrix} + b_2 \begin{bmatrix} a_2 \end{bmatrix} + \dotsb + b_n \begin{bmatrix} a_n \end{bmatrix} \\
+      &= \begin{bmatrix} a_1 b_1 + a_2 b_2 + \dotsb + a_n b_n \end{bmatrix}.
+    \end{align*} 
+    A $1 \times 1$ matrix is just a table with one number; in other words, a scalar. Mathematicians thus prefers it to just treat just like a scalar. As a result, they simply remove the parentheses on the RHS and treat the result like a number. In other words,
+    \begin{align*}
+      \ve{a}^T \ve{b} = a_1 b_1 + a_2 b_2 + \dotsb + a_n b_n = \sum_{i=1}^n a_i b_i.
+    \end{align*}
+    So, multiplying a row vector with a column vector of the same size results in a scalar, and the process involves multiplying the corresponding entries together and adding up the products. 
+    </p>
+
+    <p>Note that, in Section 4.2.3, we learned about an operation called the "dot product" that is defined betwen two 3D vectors. In particular, given two vectors in $\ve{a} = (a_1, a_2, a_3)$ and $\ve{b} = (b_1, b_2, b_3)$, we have that
+    \begin{align*}
+      \ve{a} \cdot \ve{b} = a_1 b_1 + a_2 b_2 + a_3 b_3 = \sum_{i=1}^3 a_i b_i.
+    \end{align*}
+    In general, we can define the dot product between $n$-dimensional in a similar fashion: given $\ve{a} = (a_1, a_2, \dotsc, a_n)$ and $\ve{b}_n = (b_1, b_2, \dotsc, b_n)$, then we may define their dot product as
+    \begin{align*}
+      \ve{a} \cdot \ve{b} = a_1 b_1 + a_2 b_2 + \dotsb + a_n b_n = \sum_{i=1}^n a_i b_i.
+    \end{align*}
+    Obviously,
+    \begin{align*}
+      \ve{a} \cdot \ve{b} = \ve{a}^T \ve{b},
+    \end{align*}
+    so the dot product between two (column) vectors can be seen as a matrix-vector multiplication between a row vector, obtained by transposing a vector, with the other vector.
+    </p>
+
+    <p>Interestingly, the dot product can help us understand the formula for matrix-vector multiplication in a new light: it is a series of dot products! To see this, we need to interpret the matrix $A$ as a collection of $m$ rows.
+    \begin{align*}
+      A = \begin{bmatrix}
+        a_{11} & a_{12} & a_{13} & \cdots & a_{1n} \\
+        a_{21} & a_{22} & a_{23} & \cdots & a_{2n} \\
+        \vdots & \vdots & \vdots & \ddots & \vdots \\ 
+        a_{m1} & a_{m2} & a_{m3} & \cdots & a_{mn} 
+      \end{bmatrix}
+      &= \begin{bmatrix}
+        \ve{a}_1^T \\
+        \ve{a}_2^T \\
+        \vdots \\
+        \ve{a}_m^T
+      \end{bmatrix}.
+    \end{align*}
+    Here, $\ve{a}_1$, $\ve{a}_2$, $\dotsc$, $\ve{a}_m$ are $n$-dimensional column vectors such that $a_i^T$ is equal to the $i$th row of $A$. In other words,
+    \begin{align*}
+      \ve{a}_1^T &= \begin{bmatrix}  a_{11} & a_{12} & a_{13} & \cdots & a_{1n} \end{bmatrix} \\
+      \ve{a}_2^T &= \begin{bmatrix}  a_{21} & a_{22} & a_{23} & \cdots & a_{2n} \end{bmatrix} \\
+      & \qquad \qquad \qquad \vdots \\
+      \ve{a}_m^T &= \begin{bmatrix}  a_{m1} & a_{m2} & a_{m3} & \cdots & a_{mn} \end{bmatrix}.
+    \end{align*} 
+    Now, recall the formula for matrix-vector multiplication
+    \begin{align*}
+    A\ve{x}      
+      &= \begin{bmatrix}
+        a_{11} & a_{12} & a_{13} & \cdots & a_{1n} \\
+        a_{21} & a_{22} & a_{23} & \cdots & a_{2n} \\
+        \vdots & \vdots & \vdots & \ddots & \vdots \\ 
+        a_{m1} & a_{m2} & a_{m3} & \cdots & a_{mn} 
+      \end{bmatrix}
+      \begin{bmatrix}
+        x_1 \\ x_2 \\ \vdots \\ x_n
+      \end{bmatrix} \\
+      &=
+      \begin{bmatrix}
+        a_{11}x_1 + a_{12}x_2 + a_{13}x_3 + \dotsb + a_{1n}x_n\\
+        a_{21}x_1 + a_{22}x_2 + a_{23}x_3 + \dotsb + a_{2n}x_n\\
+        a_{31}x_1 + a_{32}x_2 + a_{33}x_3 + \dotsb + a_{3n}x_n\\
+        \vdots \\
+        a_{m1}x_1 + a_{m2}x_2 + a_{m3}x_3 + \dotsb + a_{mn}x_n
+      \end{bmatrix}. 
+    \end{align*}
+    Upon close inspect, we see that
+    \begin{align*}
+       a_{11}x_1 + a_{12}x_2 + a_{13}x_3 + \dotsb + a_{1n}x_n &= \ve{a}_1^T \ve{x}, \\
+       a_{21}x_1 + a_{22}x_2 + a_{23}x_3 + \dotsb + a_{2n}x_n &= \ve{a}_1^T \ve{x}, \\
+      & \vdots \\
+       a_{m1}x_1 + a_{m2}x_2 + a_{m3}x_3 + \dotsb + a_{mn}x_n &= \ve{a}_m^T \ve{x}.
+    \end{align*}
+    So, we may write
+    \begin{align*}
+      A\ve{x}
+      &= \begin{bmatrix}
+        \ve{a}_1^T \\
+        \ve{a}_2^T \\
+        \vdots \\
+        \ve{a}_m^T
+      \end{bmatrix} \ve{x}
+      = \begin{bmatrix}
+        \ve{a}_1^T \ve{x} \\
+        \ve{a}_2^T \ve{x}\\
+        \vdots \\
+        \ve{a}_m^T \ve{x}
+      \end{bmatrix}.
+    \end{align*}
+    In other words, we can see a matrix-vector multiplication as a series of dot products. We treat the rows of $A$ as row vectors. When we multiply $A$ with a vector $\ve{x}$, we compute the dot product of the first row with $\ve{x}$ and put the resulting number as the first entry of the resulting vector. Then, we do the same for the second row, the third row, the fourth row, and so on.
+    </p>
+
 
     <h3>15.6.5 &nbsp; Other matrix operations</h3>
 
