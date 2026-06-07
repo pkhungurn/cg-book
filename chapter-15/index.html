@@ -2008,7 +2008,7 @@
         \ve{a}_m^T
       \end{bmatrix}.
     \end{align*}
-    Here, $\ve{a}_1$, $\ve{a}_2$, $\dotsc$, $\ve{a}_m$ are $n$-dimensional column vectors such that $a_i^T$ is equal to the $i$th row of $A$. In other words,
+    Here, $\ve{a}_1$, $\ve{a}_2$, $\dotsc$, $\ve{a}_m$ are $n$-dimensional column vectors such that $\ve{a}_i^T$ is equal to the $i$th row of $A$. In other words,
     \begin{align*}
       \ve{a}_1^T &= \begin{bmatrix}  a_{11} & a_{12} & a_{13} & \cdots & a_{1n} \end{bmatrix} \\
       \ve{a}_2^T &= \begin{bmatrix}  a_{21} & a_{22} & a_{23} & \cdots & a_{2n} \end{bmatrix} \\
@@ -2062,16 +2062,184 @@
     In other words, we can see a matrix-vector multiplication as a series of dot products. We treat the rows of $A$ as row vectors. When we multiply $A$ with a vector $\ve{x}$, we compute the dot product of the first row with $\ve{x}$ and put the resulting number as the first entry of the resulting vector. Then, we do the same for the second row, the third row, the fourth row, and so on.
     </p>
 
+    <h3>15.7.4 &nbsp; Matrix-matrix multiplcation</h3>
+    
+    <p>Matrix-matrix multiplication is an operation that takes in two matrices and produces a new matrix as a result. We can multiply a matrix $A$ with matrix $B$ only if the number of columns of $A$ is equal the number of rows of $B$. In other words, it must be the case that $A \in \Real^{m \times n}$ and $B \in \Real^{n \times r}$ for some integers $n$, $m$, and $r$. The product between $A$ and $B$ is denoted by $AB$, and it is matrix of dimension $m \times r$. (In other words, the middle number $n$ disappears.)</p>
+
+    <p>Let us talk about thes standard definition of matrix multiplication first. Let $C = AB$. Moreover, $a_{ij}$, $b_{jk}$, and $c_{jk}$ denote the entries of $A$, $B$, and $C$ respectively. In other words, when we write $C = AB$, we mean that 
+    \begin{align*}
+      \begin{bmatrix}
+        c_{11} & c_{12} & \cdots & c_{1r} \\
+        c_{21} & c_{22} & \cdots & c_{2r} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        c_{m1} & c_{m2} & \cdots & c_{mr}
+      \end{bmatrix}
+      = \begin{bmatrix}
+        a_{11} & a_{12} & \cdots & a_{1n} \\
+        a_{21} & a_{22} & \cdots & a_{2n} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{m1} & a_{m2} & \cdots & a_{mn}
+      \end{bmatrix}
+      \begin{bmatrix}
+        b_{11} & b_{12} & \cdots & b_{1r} \\
+        b_{21} & b_{22} & \cdots & b_{2r} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        b_{n1} & b_{n2} & \cdots & b_{nr}
+      \end{bmatrix}.
+    \end{align*} 
+    The standard way to define matrix-matrix multiplication to relate the entries of $C$ to the entries of $A$ and $B$, and it is done with the following equation:
+    \begin{align*}
+      c_{ik} = \sum_{j=1}^n a_{ij}b_{jk}.
+    \end{align*}
+    </p>
+    
+    <p>Let us slow down and see in more details the computation that the equation prescribes. It says that the entry on the Row $i$ and Column $j$ of $C$ is a sum of products of $n$ pairs of numbers. For each pair, one number comes from matrix $A$, and the other comes from matrix $B$. The numbers that comes from $A$ are $a_{i1}$, $a_{i2}$, $a_{i3}$, $\dotsc$, $a_{in}$. Upon closer inspection, these are the numbers on Row $i$ of $A$.
+    \begin{align*}
+      \begin{bmatrix}
+        \vdots & \vdots & \vdots & & \vdots \\
+        a_{i1} & a_{i2} & a_{i3} & \cdots & a_{in} \\
+        \vdots & \vdots & \vdots & & \vdots 
+      \end{bmatrix}
+    \end{align*}
+    The numbers that come from $B$ are $b_{1k}$, $b_{2k}$, $b_{3k}$, and $b_{nk}$, and these are the numbers of in Column $k$ of $B$.
+    \begin{align*}
+      \begin{bmatrix}
+        \cdots & b_{1k} & \cdots \\
+        \cdots & b_{2k} & \cdots \\
+        \cdots & b_{3k} & \cdots \\
+        & \vdots & \\
+        \cdots & b_{nk} & \cdots
+      \end{bmatrix}.
+    \end{align*}
+    Now that we have two lists of numbers, we multiple numbers at the same positions together to get another list of $n$ numbers:
+    \begin{align*}
+      a_{i1} b_{1k},\quad a_{i2} b_{2k},\quad a_{i3} b_{3k},\quad \dotsc,\quad a_{in} b_{nk}. 
+    \end{align*}
+    Then, we add everything in the above list together to get $c_{ik}$
+    \begin{align*}
+      c_{ik} = a_{i1} b_{1k} + a_{i2} b_{2k} + a_{i3} b_{3k} + \dotsb + a_{in} b_{nk} = \sum_{j=1}^n a_{ij}b_{jk}.
+    \end{align*}
+    </p>
+
+    <p>Applying the knowledge from the last section, we can also say that $c_{ij}$ is equal to the dot product of Row $i$ of $A$ and Column $k$ of $B$.
+    \begin{align*}
+      c_{ij} = \begin{bmatrix}
+        a_{i1} & a_{i2} & a_{i3} & \cdots & a_{in}
+      \end{bmatrix}
+      \begin{bmatrix}
+         b_{1k} \\
+         b_{2k} \\
+         b_{3k} \\
+        \vdots \\
+         b_{nk}
+      \end{bmatrix}
+    \end{align*}
+    So, if we write $A$ is a vertical stack of row vectors like in the last section
+    \begin{align*}
+      A = \begin{bmatrix}
+        \ve{a}_1^T \\
+        \ve{a}_2^T \\
+        \vdots \\
+        \ve{a}_m^T
+      \end{bmatrix},
+    \end{align*}
+    and we write $B$ as a horizontal stack of column vectors 
+    \begin{align*}
+      B = \begin{bmatrix}
+        \ve{b}_1 &
+        \ve{b}_2 &
+        \cdots &
+        \ve{b}_r
+      \end{bmatrix},
+    \end{align*}
+    then there is another way to write an equation for $c_{ij}:$
+    \begin{align*}
+      c_{ik} = \ve{a}^T_i \ve{b}_k.
+    \end{align*}
+    This gives us another way to write down the definition of matrix-matrix multiplication.
+    \begin{align*}
+      AB = \begin{bmatrix}
+        \ve{a}_1^T \\
+        \ve{a}_2^T \\
+        \vdots \\
+        \ve{a}_m^T
+      \end{bmatrix}
+      \begin{bmatrix}
+        \ve{b}_1 &
+        \ve{b}_2 &
+        \cdots &
+        \ve{b}_r
+      \end{bmatrix}
+      &= \begin{bmatrix}
+        \ve{a}^T_1 \ve{b}_1 & \ve{a}^T_1 \ve{b}_2 & \cdots & \ve{a}^T_1 \ve{b}_r \\
+        \ve{a}^T_2 \ve{b}_1 & \ve{a}^T_2 \ve{b}_2 & \cdots & \ve{a}^T_2 \ve{b}_r \\
+        \vdots & \vdots & \ddots & \vdots \\
+        \ve{a}^T_m \ve{b}_1 & \ve{a}^T_m \ve{b}_2 & \cdots & \ve{a}^T_m \ve{b}_r
+      \end{bmatrix}.
+    \end{align*}
+    I think this formula is a lot more memorizable than the equation that involves $c_{ij}$.
+    </p>
+
+    <p>Let us also talk about another way to view matrix-matrix multiplication that is less discussed than the standard defintion. Looking at the RHS of the last equation. We see that the columns of $AB$ are 
+    \begin{align*}
+      \begin{bmatrix}
+        \ve{a}^T_1 \ve{b}_1 \\
+        \ve{a}^T_2 \ve{b}_1 \\
+        \vdots \\
+        \ve{a}^T_m \ve{b}_1
+      \end{bmatrix}, \quad
+      \begin{bmatrix}
+        \ve{a}^T_1 \ve{b}_2 \\
+        \ve{a}^T_2 \ve{b}_2 \\
+        \vdots \\
+        \ve{a}^T_m \ve{b}_2
+      \end{bmatrix}, \quad
+      \begin{bmatrix}
+        \ve{a}^T_1 \ve{b}_3 \\
+        \ve{a}^T_2 \ve{b}_3 \\
+        \vdots \\
+        \ve{a}^T_m \ve{b}_3
+      \end{bmatrix}, \quad
+      \dotsc, \quad
+      \begin{bmatrix}
+        \ve{a}^T_1 \ve{b}_r \\
+        \ve{a}^T_2 \ve{b}_r \\
+        \vdots \\
+        \ve{a}^T_m \ve{b}_r
+      \end{bmatrix}.
+    \end{align*}
+    We also learned in the last section that these are equal to
+    \begin{align*}
+      A\ve{b}_1, \quad
+      A\ve{b}_2, \quad
+      A\ve{b}_3, \quad
+      \dotsc, \quad
+      A\ve{b}_r.
+    \end{align*}
+    Hence,
+    \begin{align*}
+      A B
+      = A \begin{bmatrix}
+        \ve{b}_1 &
+        \ve{b}_2 &
+        \cdots &
+        \ve{b}_r
+      \end{bmatrix}
+      = \begin{bmatrix}
+        A \ve{b}_1 &
+        A \ve{b}_2 &
+        \cdots &
+        A \ve{b}_r
+      \end{bmatrix}. 
+    \end{align*}
+    In other words, $AB$ is matrix with the same number of columns as $B$, and the Column $k$ of $AB$ is the result of multiplying $A$ with Column $k$ of $B$. Writing matrix-matrix multiplication this ways allows us to see that it is a generalization of matrix-vector multiplication. To repeat, matrix-matrix multiplication is just muliplying the matrix on the left to the columns of the matrix on the right and then stitching the results together.
+    </p>
 
     <h3>15.6.5 &nbsp; Other matrix operations</h3>
 
     <h2>15.7 &nbsp; Affine transformations</h2>
 
     <h2>15.8 &nbsp; Two equivalent views of affine transformations</h2>
-
-    <h2>15.9 &nbsp; Matrices in GLSL</h2>
-
-    <h2>15.10 &nbsp; Graphics math in Javascript</h2>
 
     <h2>15.11 &nbsp; Summary</h2>
 
