@@ -2235,7 +2235,57 @@
     In other words, $AB$ is matrix with the same number of columns as $B$, and the Column $k$ of $AB$ is the result of multiplying $A$ with Column $k$ of $B$. Writing matrix-matrix multiplication this ways allows us to see that it is a generalization of matrix-vector multiplication. To repeat, matrix-matrix multiplication is just muliplying the matrix on the left to the columns of the matrix on the right and then stitching the results together.
     </p>
 
-    <h3>15.6.5 &nbsp; Other matrix operations</h3>
+    <p>Let's see some examples of matrix multiplications. Let
+    \begin{align*}
+      A &= \begin{bmatrix} 1 & -1 \\ 0 & 1 \\ -2 & 1 \end{bmatrix}, &
+      B &= \begin{bmatrix} 1 & 2 & 3 & 4 \\ 5 & 6 & 7 & 8 \end{bmatrix}.
+    \end{align*}
+    We have that $A$ is of size $3 \times 2$ and $B$ is of size $2 \times 4$. So, we can multiple $A$ and $B$ together, and the product $AB$ is a matrix of size $3 \times 4$:
+    \begin{align*}
+      AB &= \begin{bmatrix}
+        -4 & -4 & -4 & -4 \\
+        5 & 6 & 7 & 8 \\
+        3 & 2 & 1 & 0
+      \end{bmatrix}.
+    \end{align*}
+    The first row's entries are all $-4$. This is because the entries are, from left to right,
+    \begin{align*}
+      \begin{bmatrix} 1 & -1 \end{bmatrix} \begin{bmatrix} 1 \\ 5 \end{bmatrix} &= 1 \times 1 + (-1) \times 5 = -4, \\
+      \begin{bmatrix} 1 & -1 \end{bmatrix} \begin{bmatrix} 2 \\ 6 \end{bmatrix} &= 1 \times 2 + (-1) \times 6 = -4, \\
+      \begin{bmatrix} 1 & -1 \end{bmatrix} \begin{bmatrix} 3 \\ 7 \end{bmatrix} &= 1 \times 3 + (-1) \times 7 = -4, \\
+      \begin{bmatrix} 1 & -1 \end{bmatrix} \begin{bmatrix} 4 \\ 8 \end{bmatrix} &= 1 \times 4 + (-1) \times 8 = -4.
+    \end{align*}
+    So, the first row of $A$ tells us to take the first row of $B$ and subtract the second row of $B$ from it.
+    </p>
+
+    <p>Similarly, the second row of $AB$ is equal to the second row of $B$ because the second row of $A$ tells us to multiply the first row of $B$ by $0$ and add the second row of $B$ to it. The result is a copy of the second row of $B$ in the second row of $AB$. The third row of $AB$ can be calculated in a similar fashion.</p>
+
+    <p>Note that $BA$ is undefined because the sizes, $2 \times 4$ and then $3 \times 2$, does not match the rule we have for matrix-matrix multiplication. However, we can compute $B^T A^T$ because $B^T \in \Real^{4 \times 2}$ and $A^T \in \Real^{2 \times 3}$. The result would be a $4 \times 3$ matrix:
+    \begin{align*}
+      B^T A^T 
+      = \begin{bmatrix} 1 & 5 \\ 2 & 6 \\ 3 & 7 \\ 4 & 8 \end{bmatrix} \begin{bmatrix} 1 & 0 & 2 \\ -1 & 1 & 1 \end{bmatrix}
+      = \begin{bmatrix} -4 & 5 & 3 \\ -4 & 6 & 2 \\ -4 & 7 & 1 \\ -4 & 8 & 0 \end{bmatrix}.
+    \end{align*}
+    We can see that $$B^T A^T = (AB)^T.$$
+    The equation above does not only apply to the $A$ and $B$ matrices above. It applies to all $A$ and $B$ such that $AB$ can be computed. The reader can convince themself that this is true by observing that the calculation being done is exactly the same, but the results are just arranged differently.
+    </p>
+
+    <h3>15.6.6 &nbsp; Matrix-matrix mutliplication and composition</h3>
+
+    <p>One of the most important property of matrix-matrix multiplication is that the numerical embodiment of composition of linear transformations. What we mean by this is the following. If we have to matrices $A$ and $B$ that can be multiplied together, then we know from one of the previous section that $A$ and $B$ both represent some linear transformations, say $f$ and $g$, respectively. The product of $AB$ is another matrix, so it represents a linear transformation. It turns about that <b>the linear transformation that the matrix-matrix product $AB$ represents is the composition $f \circ g$</b>.</p>
+
+    <p>Before we go on to discuss why this property is true, let us think about its significance in terms of computer graphics applications. In order to create a scene, we often need to apply multiple linear transformations to a mesh. We might start with scaling a mesh so that it is of the right size, and then we might rotate it so that it is facing the right way. We then might decide to place it somewhere else by translating it to a certain position (which we will learn soon that translation can be represented by a linear transformation too). Applying multiple linear transformations in succession, say $f(g(h(\ve{x})))$, is equivalent to applying a single transformation that is the composition of all of them, $(f \circ g \circ h)(\ve{x})$. Now, if $A$, $B$, and $C$ are the matrices that represent linear transformations $f$, $g$, and $h$, then we have that $$f(g(h(\ve{x}))) = A(B(C\ve{x})).$$ The equivalence between matrix-matrix multiplication and composition tells us that
+    \begin{align*}
+      (f \circ g \circ h)(\ve{x}) = (ABC)(\ve{x}).
+    \end{align*}
+    Incorporating the other two equations, we have that
+    \begin{align*}
+    f(g(h(\ve{x}))) = (f \circ g \circ h)(\ve{x}) = (ABC)(\ve{x}) = A(B(C\ve{x})).
+    \end{align*}
+    So, all the quantities we discussed are equivalent to one another. The equation tells us that the effect of a long sequence of linear transformations $f \circ g \circ h$ and a sequence of matrix-vector multiplicaton $A(B(C \square ))$ can always be compressed to a single matrix $ABC$. <b>Matrix-matrix multiplication are important because it allows us to combine multiple linear transformations into one.</b>
+    </p>
+
+    <h3>15.6.7 &nbsp; Other matrix operations</h3>
 
     <h2>15.7 &nbsp; Affine transformations</h2>
 
