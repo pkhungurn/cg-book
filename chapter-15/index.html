@@ -1580,9 +1580,10 @@
     This transformation is neither a scaling nor a rotation though. It is just a random linear transformation.
     </p>
 
+    <a name="matrix-representation"></a>
     <h3>15.6.3 &nbsp; Matrix representation of linear tranformation in general</h3>
 
-    <p>In general, an $m \times n$ matrix <b>represents a linear tranformation from $\Real^n$ to $\Real^m$</b>. (Notice that the orders $n$ and $m$ swap here.) In other words, any $f:\Real^n \times m$ can be represented by an $m \times n$ table of numbers. To see this, observe that a point $\ve{x}$ \in $\Real^n$ is a vector
+    <p>In general, an $m \times n$ matrix <b>represents a linear tranformation from $\Real^n$ to $\Real^m$</b>. (Notice that the orders $n$ and $m$ swap here.) In other words, any $f:\Real^n \times m$ can be represented by an $m \times n$ table of numbers. To see this, observe that a point $\ve{x} \in \Real^n$ is a vector
     \begin{align*}
       \ve{x} = \begin{bmatrix}
         x_1 \\ x_2 \\ x_3 \\ \vdots \\ x_n
@@ -1822,7 +1823,7 @@
     So, the matrices $R_{\theta}$, representing the rotation by the angle $\theta$ in the counter-clockwise direction, is closely related to the matrix $R_{-\theta}$, which represents the rotation also by the $\theta$ but in the clockwise direction.
     </p> 
 
-  
+    <a name="matrix-vector-multiplication"></a>
     <h3>15.7.2 &nbsp; Matrix-vector multiplication</h3>
 
     <p>The operation that we shall discuss in this section is the core operation that captures the essense of a matrix. A <b>matrix-vector mutliplication</b> is only defined for a matrix and a vector of certain sizes. That is, if the matrix of size $m \times n$, then the vector must have $n$ dimensions. In other words, the number of columns much match the number of dimensions of the vectors. Given a $m \times n$ matrix
@@ -1861,10 +1862,10 @@
     \begin{align*}
       f(\ve{x}) = A\ve{x}
     \end{align*}
-    for some matrix $A$ of size $m \times n$. The last section tells us how to find what the matrix $A$ is based on the behavior of $f$ on $n$ fixed vectors $\hat{\ve{e}}_1$, $\hat{\ve{e}}_2$, $\dotsc$, $\hat{\ve{e}}_n$.
+    for some matrix $A$ of size $m \times n$. Section <a href="#matrix-representation">15.6.3</a> tells us how to find what the matrix $A$ is based on the behavior of $f$ on $n$ fixed vectors $\hat{\ve{e}}_1$, $\hat{\ve{e}}_2$, $\dotsc$, $\hat{\ve{e}}_n$.
     </p>
 
-    <p>Let us see some examples of matrix-vector multiplication calculations. Consider the matrix
+    <p>Let us see some examples of matrix-vector multiplication calculations.
     \begin{align*}
       \begin{bmatrix}
         1 & 2 \\
@@ -1934,9 +1935,9 @@
       = \begin{bmatrix} 2 \\ 1 \end{bmatrix}.
     \end{align*}
     So, from the two calculations above, we can easily infer that
-    \begin{align*}
-      A \hat{\ve{e}}_i = \mbox{the }i\mbox{th column of A},
-    \end{align*}
+    \begin{align}
+      A \hat{\ve{e}}_i = \mbox{the }i\mbox{th column of A}, \label{eqn:matrix-column}
+    \end{align}
     given that $i$ is betwen 1 and the number of columns $A$.
     </p>
 
@@ -2088,9 +2089,9 @@
       \end{bmatrix}.
     \end{align*} 
     The standard way to define matrix-matrix multiplication to relate the entries of $C$ to the entries of $A$ and $B$, and it is done with the following equation:
-    \begin{align*}
-      c_{ik} = \sum_{j=1}^n a_{ij}b_{jk}.
-    \end{align*}
+    \begin{align}
+      c_{ik} = \sum_{j=1}^n a_{ij}b_{jk}. \label{eqn:matrix-multiplication-entry}
+    \end{align}
     </p>
     
     <p>Let us slow down and see in more details the computation that the equation prescribes. It says that the entry on the Row $i$ and Column $j$ of $C$ is a sum of products of $n$ pairs of numbers. For each pair, one number comes from matrix $A$, and the other comes from matrix $B$. The numbers that comes from $A$ are $a_{i1}$, $a_{i2}$, $a_{i3}$, $\dotsc$, $a_{in}$. Upon closer inspection, these are the numbers on Row $i$ of $A$.
@@ -2217,7 +2218,7 @@
       A\ve{b}_r.
     \end{align*}
     Hence,
-    \begin{align*}
+    \begin{align}
       A B
       = A \begin{bmatrix}
         \ve{b}_1 &
@@ -2230,8 +2231,9 @@
         A \ve{b}_2 &
         \cdots &
         A \ve{b}_r
-      \end{bmatrix}. 
-    \end{align*}
+      \end{bmatrix}.
+      \label{matrix-multiplication-column} 
+    \end{align}
     In other words, $AB$ is matrix with the same number of columns as $B$, and the Column $k$ of $AB$ is the result of multiplying $A$ with Column $k$ of $B$. Writing matrix-matrix multiplication this ways allows us to see that it is a generalization of matrix-vector multiplication. To repeat, matrix-matrix multiplication is just muliplying the matrix on the left to the columns of the matrix on the right and then stitching the results together.
     </p>
 
@@ -2270,7 +2272,8 @@
     The equation above does not only apply to the $A$ and $B$ matrices above. It applies to all $A$ and $B$ such that $AB$ can be computed. The reader can convince themself that this is true by observing that the calculation being done is exactly the same, but the results are just arranged differently.
     </p>
 
-    <h3>15.6.6 &nbsp; Matrix-matrix mutliplication and composition</h3>
+
+    <h3>15.7.5 &nbsp; Matrix-matrix mutliplication and composition</h3>
 
     <p>One of the most important property of matrix-matrix multiplication is that the numerical embodiment of composition of linear transformations. What we mean by this is the following. If we have to matrices $A$ and $B$ that can be multiplied together, then we know from one of the previous section that $A$ and $B$ both represent some linear transformations, say $f$ and $g$, respectively. The product of $AB$ is another matrix, so it represents a linear transformation. It turns about that <b>the linear transformation that the matrix-matrix product $AB$ represents is the composition $f \circ g$</b>.</p>
 
@@ -2283,6 +2286,75 @@
     f(g(h(\ve{x}))) = (f \circ g \circ h)(\ve{x}) = (ABC)(\ve{x}) = A(B(C\ve{x})).
     \end{align*}
     So, all the quantities we discussed are equivalent to one another. The equation tells us that the effect of a long sequence of linear transformations $f \circ g \circ h$ and a sequence of matrix-vector multiplicaton $A(B(C \square ))$ can always be compressed to a single matrix $ABC$. <b>Matrix-matrix multiplication are important because it allows us to combine multiple linear transformations into one.</b>
+    </p>
+
+    <p>Now, let's see <i>why</i> matrix multiplication corresponds to function composition. Consider matrices $A \in \Real^{m \times n}$ and $B \in \Real^{n \times p}$. We learned from the last section that that the product $AB$ can be written as follows.
+    \begin{align*}
+      AB = \begin{bmatrix}
+        A\ve{b}_1 & A\ve{b}_2 & \cdots & A\ve{b}_p 
+      \end{bmatrix}
+    \end{align*}   
+    where $\ve{b}_i$ denotes the $i$th column of $B$. As a result,
+    \begin{align*}
+      \mbox{the $i$ column of }AB = A \ve{b}_i.
+    \end{align*}
+    Now, Equation $\eqref{eqn:matrix-column}$ from Section <a href="matrix-vector-multiplication">15.7.2</a> tells us that
+    \begin{align*}
+      \mbox{the $i$ column of }AB &= (AB) \hat{\ve{e}}_i,\mbox{ and} \\
+      \mbox{the $i$ column of }B &= B \hat{\ve{e}}_i,
+    \end{align*}
+    where $\hat{\ve{e}}_i$ is a column vector whose entries are all zeros except the entry on the $i$th row, which is $1$.
+    In other words,
+    \begin{align*}
+      \mbox{the $i$ column of }AB = (AB) \hat{\ve{e}}_i = A \ve{b}_i = A(B \hat{\ve{e}}_i).
+    \end{align*}
+    </p>
+
+    <p>Let the linear transformations $A$ and $B$ represented be denoted by $f: \Real^n \ra \Real^m$ and $g: \Real^p \ra \Real^n$, respectively. We learned from Section <a href="#matrix-representation">15.6.3</a> that
+    \begin{align*}
+      A\ve{y} &= f(\ve{y}), \\
+      B\ve{x} &= g(\ve{x})
+    \end{align*} 
+    for all vectors $\ve{x} \in \Real^p$ and $\ve{y} \in \Real^n$. In particular, we have that
+    \begin{align*}
+      \mbox{the $i$th columnb of }B = B\hat{\ve{e}}_i = g(\hat{\ve{e}}_i).
+    \end{align*}
+    </p>
+    
+    <p>Now, let $h = f \circ g$. We know that $h$ is a linear transformation, and $h$'s signature is $h: \Real^p \ra \Real^m$. Moreover, Section <a href="#matrix-representation">15.6.3</a> tells us that there is a matrix $C: \Real^{m \times p}$ that represents $h$, and
+    \begin{align*}
+      \mbox{the $i$th columnb of }C = h(\hat{\ve{e}}_i).
+    \end{align*}
+    Inspecting the RHS more closely, we have that
+    \begin{align*}
+      \mbox{the $i$th columnb of }C &= h(\hat{\ve{e}}_i) 
+      = (f \circ g)(\hat{\ve{e}}_i) 
+      = f(g(\hat{\ve{e}}_i))
+      = f(B \hat{\ve{e}}_i)
+      = A(B \hat{\ve{e}}_i) \\
+      &= \mbox{the $i$ column of }AB.
+    \end{align*}
+    Because the above equation is true for all column index $i$, we have that the corresponding columns of $C$ and $AB$ are equal. This means that all the the corresponding entries are equal, which means that
+    \begin{align*}
+      C = AB.
+    \end{align*}
+    In other words,
+    \begin{align*}
+      &\mbox{matrix representation of }f\circ g \\
+      &= (\mbox{matrix representation of }f)(\mbox{matrix representation of }g).
+    \end{align*}
+    </p>
+
+    <p>Knowing that matrix-matrix multiplication corresponds to composition of linear transformation allows us to show, with very little difficultly, the <b>associativity of matrix-matrix multiplication</b>. This is the property that, for any matrices $A$, $B$, and $C$, we have that
+    \begin{align*}
+      (AB)C = A(BC)
+    \end{align*}
+    given that all the products in the above equations are well defined. To see why this is true, let $f$, $g$, and $h$ be the linear transformations that $A$, $B$, and $C$ represents, respectively. We have that
+    \begin{align*}
+      (AB)C&\mbox{ represents }(f \circ g) \circ h,\mbox{ and }\\
+      A(BC)&\mbox{ represents }f \circ( g \circ h).
+    \end{align*}
+    However, we know from our discussion on composition that $(f \circ g) \circ h = f \circ (g \circ h)$, so $(AB)C$ and $A(BC)$ represent the exact same linear transformation. Because there is only one matrix that represents a linear transformation, it must be the case that $(AB)C = A(BC)$.
     </p>
 
     <h3>15.6.7 &nbsp; Other matrix operations</h3>
