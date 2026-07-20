@@ -2489,10 +2489,19 @@
     <p>Calculating the inverse of a matrix is quite simple for $2 \times 2$ matrices. We have that
     \begin{align*}
       \left( \begin{bmatrix} a & b \\ c & d \end{bmatrix}  \right)^{-1}
-      &=  \begin{bmatrix} \frac{d}{ad-bc} & \frac{-b}{ad-bc} \\ \frac{-c}{ad-bc} & \frac{d}{ad-bc} \end{bmatrix}
-    \end{align*}.
-    Notice that the determinant appears in the RHS as the denominator of all the entries on the RHS, so the inverse is only defined when the determinant is non-zero. It is really cumbersome to write down the formula for the inverse of a $3 \times 3$ and even more so for the $n \times n$ matrix in general. In practice, computation of matrix inverses do not use a fixed formula, and computer scientists have developed more sophisticated algorithms that can adapt to the entries of the matrices under computation. We will not discuss thme in this book and will rely on ready-made functions provided by the software libraries we use. 
-    </p>
+      &=  \begin{bmatrix} \frac{d}{ad-bc} & \frac{-b}{ad-bc} \\ \frac{-c}{ad-bc} & \frac{d}{ad-bc} \end{bmatrix}.
+    \end{align*}
+    Notice that the determinant appears in the RHS as the denominator of all the entries on the RHS, so the inverse is only defined when the determinant is non-zero. It is really cumbersome to write down the formula for the inverse of a $3 \times 3$ and even more so for the $n \times n$ matrix in general. In practice, computation of matrix inverses do not use a fixed formula, and computer scientists have developed more sophisticated algorithms that can adapt to the entries of the input matrix. We will not discuss these algorithms in this book and will rely on ready-made functions provided by the software libraries we use.</p>
+
+    <p>While we will leave the computation of matrix inverse to the computer, it is still important to understand what a matrix inverse does at a high level and to be able to compute simple matrix inverses by ourselves.</p>
+
+    <p>Let us start with the high-level understanding. We said earlier that a matrix $A$ represents a linear transformation $f$. Then, if $A$ is invertible, then what linear transformation does $A^{-1}$ repreesent? Let $g$ denote the linear transformation that $A^{-1}$ represents. Because $$A^{-1}A = I,$$ then we must have that $$g \circ f = \mathtt{I}$$ where $\mathtt{I}$ is the identity transformation, which is represented by the identity matrix $I$. In other words, for any vector $\ve{x}$, it is true that
+    \begin{align*}
+      g(f(\ve{x})) = (g \circ f)(x) = \mathtt{I}(\ve{x}) = \ve{x}.
+    \end{align*}
+    In other words, $g$ undoes what every $f$ does its input. Mathematically, $g$ is called the <b>inverse</b> of $f$ and is denoted by $f^{-1}$. In the same way that $A^{-1}$ undoes what $A$ does to a vector, $A^{-1}$ represents a linear transformation that undoes what the linear transformation of $A$ does to its input.</p>
+
+    <p>The above understanding allows us to compute the inverses of matrices of well-known linear transformations. For example, for the rotation matrix, $$(S_{a,b})^{-1} = S_{1/a, 1/b}.$$ This is because the scaling matrix $S_{a,b}$ represents the scaling transformation $\mathtt{S}_{a,b}$, which multiples the first component of the input vector by $a$ and the second by $b$.</p>
 
 
     <h2>15.7 &nbsp; Affine transformations</h2>
