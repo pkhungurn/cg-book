@@ -2357,7 +2357,143 @@
     However, we know from our discussion on composition that $(f \circ g) \circ h = f \circ (g \circ h)$, so $(AB)C$ and $A(BC)$ represent the exact same linear transformation. Because there is only one matrix that represents a linear transformation, it must be the case that $(AB)C = A(BC)$.
     </p>
 
-    <h3>15.6.7 &nbsp; Other matrix operations</h3>
+    <h3>15.7.6 &nbsp; Matrix Inverses</h3>
+
+    <p>In this section, we focus on a square matrix $A \in \Real^{n \times n}$. We know that it represents a linear transformation $f: \Real^n \ra \Real^n$, and that $A\ve{x} = f(\ve{x})$ for all $\ve{x} \in \Real^n$.</p>
+
+    <p>There are many situation in computer graphics where we want to <i>undo</i> the effect of $A$ on the input vector $\ve{x}$. In other words, someone computed $\ve{y} = A\ve{x}$ and gives $\ve{y}$ to us, and we want to find what $\ve{x}$ is. For example, we might be given a mesh where a linear transformation (scaling, rotation, or a combination of these) has been applied to all of its vertex positions, and we want to find what the original vertex positions.</p>
+
+    <p>Depending on what $\ve{y}$ and $A$ are, there are three types of answers of the problem of "findind $\ve{x}$ where $\ve{y} = A \ve{x}$."</p>
+
+    <ol>
+      <li><b>There is no such $\ve{x}$</b>. For example, if
+      \begin{align*}
+        \ve{y} &= \begin{bmatrix}
+          1 \\ 1
+        \end{bmatrix}, &
+        A &= \begin{bmatrix}
+          0 & 1 \\ 
+          0 & 0
+        \end{bmatrix},
+      \end{align*}
+      </li>
+      then we would not be able to find $\ve{x}$ that satisfies the equation. This is the because, for any $\ve{x}$, the second component of $A\ve{x}$ would be $0$, but the second component of $\ve{y}$ is $1$.
+
+      <li><b>There are many $\ve{x}$s.</b> For example, if 
+      \begin{align*}
+        \ve{y} &= \begin{bmatrix}
+          1 \\ 0
+        \end{bmatrix}, &
+        A &= \begin{bmatrix}
+          0 & 1 \\ 
+          0 & 0
+        \end{bmatrix},
+      \end{align*}
+      then $\ve{x} = (0,1), (1,1), (2,1)$ or any other vector of the form $(c,1)$ would satisfy the equation.
+      </li>
+
+      <li><b>There is exactly one $\ve{x}$.</b> For example, if 
+      \begin{align*}
+        \ve{y} &= \begin{bmatrix}
+          1 \\ 0
+        \end{bmatrix}, &
+        A &= \begin{bmatrix}
+          0 & 1 \\ 
+          1 & 0
+        \end{bmatrix},
+      \end{align*}
+      then $x = (0, 1)$ is the one and only one vector that satisfies the equation $\ve{y} = A\ve{x}$.
+      </li>
+    </ol>
+
+    <p>The third type of answer is the most desirable because there is a single, unambiguous answer. Moreover, whether this type of answer arises depends only on $A$ and not on $\ve{y}$. It happens when the matrix $A$ is "invertible."</p>
+
+    <p>Let $A \in \Real^{n \times n}$. be a square matrix. We say that $A$ is <b>invertible</b> if there is another matrix $B \in \Real^{n \times n}$ such that $$AB = BA = I$$ where $I$ is the identity matrix of size $n \times n$:
+    \begin{align*}
+      I = \begin{bmatrix}
+        1 & 0 & 0 & \cdots & 0 \\
+        0 & 1 & 0 & \cdots & 0 \\
+        0 & 0 & 1 & \cdots & 0 \\
+        \vdots & \vdots & \vdots & \ddots & \vdots \\ 
+        0 & 0 & 0 & \cdots & 1
+      \end{bmatrix}.
+    \end{align*}
+    Here, all the elements of $I$ are zeros except the ones on the diagonal from the top-left to the bottom-right, which are ones. The matrix $B$ where $AB = BA = I$ is called $A$'s <b>inverse</b> and is denoted by $A^{-1}$.
+    </p>
+
+    <p>For examples, we have that the following $2 \times 2$ matrices,
+    \begin{align*}
+      \begin{bmatrix}
+        2 & 0 \\
+        0 & 3 \\
+      \end{bmatrix},
+      & &
+      \begin{bmatrix}
+        4/5 & -3/5 \\
+        3/5 & 4/5 \\
+      \end{bmatrix},
+      & &
+      \begin{bmatrix}
+        1 & 1 \\
+        0 & 1 \\
+      \end{bmatrix},
+    \end{align*}
+    are invertible because there inverses are
+    \begin{align*}
+      \begin{bmatrix}
+        1/2 & 0 \\
+        0 & 1/3 \\
+      \end{bmatrix},
+      & &
+      \begin{bmatrix}
+        4/5 & 3/5 \\
+        -3/5 & 4/5 \\
+      \end{bmatrix},
+      & &
+      \begin{bmatrix}
+        1 & -1 \\
+        0 & 1 \\
+      \end{bmatrix},
+    \end{align*} 
+    respectively. (The reader can check by computing the matrix-matrix multiplications.)
+    </p>
+
+    <p>If $A$ is invertible, then we can always find $\ve{x}$ in the equation $\ve{y} = A\ve{x}$. This is because we can multiply $A^{-1}$ to both size of the equations to get
+    \begin{align*}
+      A^{-1}(A\ve{x}) &= A^{-1}\ve{y} \\
+      (A^{-1} A)\ve{x} &= A^{-1}\ve{y} \\
+      I\ve{x} &= A^{-1}\ve{y} \\
+      \ve{x} &= A^{-1}\ve{y}.
+    \end{align*}
+    </p>
+
+    <p>One can determine whether a square matrix $A$ is invertible or not by computing a number called the <b>determinant</b> of $A$, which is tyically denoted by $\det(A)$ or just $\det A$. The formula for the determinant of an $n \times n$ matrix is very complicated, so we will not discuss it in this book. However, the determinant of a $2 \times 2$ matrix is quite simple:
+    \begin{align*}
+      \det  \begin{bmatrix} a & b \\ c & d \end{bmatrix} = ad - bc.
+    \end{align*}
+    </p>
+
+    <p><b>A square matrix is invertible if and only if its determinant is not zero.</b> The three matrices we discussed before have
+    \begin{align*}
+      \det \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix} &= 2 \times 3 - 0 \times 0 = 6 \neq 0, \\ 
+      \det \begin{bmatrix} 4/5 & 3/5 \\ -3/5 & 4/5 \end{bmatrix} &= \frac{4}{5} \times \frac{4}{5} + \frac{3}{5} \times \frac{3}{5} = 1 \neq 0, \\ 
+      \det \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} &= 1 \times 1 - 1 \times 0 = 1 \neq 0,  
+    \end{align*}
+    and so they are invertible. On the other hand, we have that
+    \begin{align*}
+      \det \begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix} = 0 \times 0 - 1 \times 0 = 0,
+    \end{align*}
+    and so the matrix is not invertible. If $A$ is not invertiable, then the problem of solving for $\ve{x}$ in $\ve{y} = A\ve{x}$ either falls into Case 1 (no $\ve{x}$) or Case 2 (multiple $\ve{x}$s) depending on what $\ve{y}$ is.
+    </p>
+
+    <p>Calculating the inverse of a matrix is quite simple for $2 \times 2$ matrices. We have that
+    \begin{align*}
+      \left( \begin{bmatrix} a & b \\ c & d \end{bmatrix}  \right)^{-1}
+      &=  \begin{bmatrix} \frac{d}{ad-bc} & \frac{-b}{ad-bc} \\ \frac{-c}{ad-bc} & \frac{d}{ad-bc} \end{bmatrix}
+    \end{align*}.
+    Notice that the determinant appears in the RHS as the denominator of all the entries on the RHS, so the inverse is only defined when the determinant is non-zero. It is really cumbersome to write down the formula for the inverse of a $3 \times 3$ and even more so for the $n \times n$ matrix in general. In practice, computation of matrix inverses do not use a fixed formula, and computer scientists have developed more sophisticated algorithms that can adapt to the entries of the matrices under computation. We will not discuss thme in this book and will rely on ready-made functions provided by the software libraries we use. 
+    </p>
+
 
     <h2>15.7 &nbsp; Affine transformations</h2>
 
