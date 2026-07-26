@@ -2503,6 +2503,169 @@
 
     <p>The above understanding allows us to compute the inverses of matrices of well-known linear transformations. For example, for the rotation matrix, $$(S_{a,b})^{-1} = S_{1/a, 1/b}.$$ This is because the scaling matrix $S_{a,b}$ represents the scaling transformation $\mathtt{S}_{a,b}$, which multiples the first component of the input vector by $a$ and the second by $b$.</p>
 
+    <p>Another matrix whose inverse is worth remembering is the rotation matrix $R_{\theta}$. We have that
+    \begin{align*}
+      (R_{\theta})^{-1} = R_{-\theta}.
+    \end{align*}
+    The justification for the above equation is that $R_{\theta}$ represents the rotation transformation $\mathtt{R}_\theta$, which is the rotation in the <i>counterclockwise</i> direction by the angle $\theta$. The transformation that undoes this rotation is the rotation also by the angle $\theta$ in the <i>clockwise</i> direction. By the convention about angles in <a href="../chapter-03/index.html#angles">Section 3.2</a>, this is the rotation by the angle $-\theta$ in the <i>counterclockwise</i> direction. As a result, the undoing rotation is $\mathtt{R}^{-\theta}$, which means that the inverse of $R_{\theta}$ is $R_{-\theta}$.
+    </p>
+
+    <p>One more proporty of inverses that is worth remembering is that <b>the inverse of a produce is the produce of the inverses in the reverse order.</b> More concretely, it holds that $$(AB)^{-1} = B^{-1} A^{-1}.$$ The reader can check whether this is true by multiplying $AB$ with $B^{-1}A^{-1}$ and use the property that $IA = AI = A$ for any matrix $A$. We can use this to find the inverse of a product of well-known transformation matrices above. For example,
+    \begin{align*}
+      (S_{2,4} R_{30^\circ} S_{0.2, 0.4})^{-1} = (S_{0.2, 0.4})^{-1}(R_{30^\circ})^{-1} (S_{2,4})^{-1} = S_{5,2.5} R_{-30^\circ} S_{0.5, 0.25}.
+    \end{align*}
+    </p>
+
+    <p>Lastly, <b>the inverse of the transpose is the transpose of the inverse</b>. That is,
+    \begin{align*}
+      (A^T)^{-1} = (A^{-1})^T.
+    \end{align*}
+    In other words, the order in which we apply the transpose and the inverse does not matter. Sometimes, we may fuse these two operations together to get what is called the <b>inverse transpose</b>, which is denoted by $A^{-T}$. We will discuss this operator again when we talk about transformation of normal vectors.
+    </p>
+
+    <h3>15.6.7 &nbsp; Other Matrix Operations</h3>
+  
+    <p>Matrices represent linear transformations, and we know that we can (1) add two transformations together, and (2) multiply a transformation by a constant. We can do the same for matrices.</p>
+
+    <ul>
+      <li><b>Matrix addition.</b> Let $A$ and $B$ be two matrices of the same size, say $m \times n$, then the sum of $A$ and $B$, denoted by $A+B$, is the matrix whose entries are the sum of the corresponding entries of $A$ and $B$. Symbolically, if
+      \begin{align*}
+        A & = \begin{bmatrix}
+          a_{11} & a_{12} & a_{13} & \cdots & a_{1n} \\
+          a_{21} & a_{22} & a_{23} & \cdots & a_{2n} \\
+          \vdots & \vdots & \vdots & \ddots & \vdots \\
+          a_{m1} & a_{m2} & a_{m3} & \cdots & a_{mn}
+        \end{bmatrix}, &
+        B & = \begin{bmatrix}
+          b_{11} & b_{12} & b_{13} & \cdots & b_{1n} \\
+          b_{21} & b_{22} & b_{23} & \cdots & b_{2n} \\
+          \vdots & \vdots & \vdots & \ddots & \vdots \\
+          b_{m1} & b_{m2} & b_{m3} & \cdots & b_{mn}
+        \end{bmatrix},
+      \end{align*}
+      then
+      \begin{align*}
+        A + B = \begin{bmatrix}
+          a_{11} + b_{11} & a_{12} + b_{12} & a_{13} + b_{13} & \cdots & a_{1n} + b_{1n} \\
+          a_{21} + b_{21} & a_{22} + b_{22} & a_{23} + b_{23} & \cdots & a_{2n} + b_{2n} \\
+          \vdots & \vdots & \vdots & \ddots & \vdots \\
+          a_{m1} + b_{m1} & a_{m2} + b_{m2} & a_{m3} + b_{m3} & \cdots & a_{mn} + b_{mn}
+        \end{bmatrix}.
+      \end{align*}
+      </li>
+
+      <li><b>Matrix scalar multiplication</b>. Let $A$ be an $m\times n$ matrix and let $c$ by a real number. The product of $A$ and $c$, denoted by either $Ac$ or $cA$, whose entries are the entries of $A$ multiplied by $c$. In other words,
+      \begin{align*}
+        Ac = cA = \begin{bmatrix}
+          ca_{11} & ca_{12} & ca_{13} & \cdots & ca_{1n} \\
+          ca_{21} & ca_{22} & ca_{23} & \cdots & ca_{2n} \\
+          \vdots & \vdots & \vdots & \ddots & \vdots \\
+          ca_{m1} & ca_{m2} & ca_{m3} & \cdots & ca_{mn}
+        \end{bmatrix}.
+      \end{align*}
+      </li>
+    </ul>
+
+    <p>One can check through calculation that, for any vector $\ve{x} \in \Real^n$, we have that
+    \begin{align*}
+      (A +B)\ve{x} &= A\ve{x} + B\ve{x}, \\
+      (cA)\ve{x} &= c(A\ve{x}) = A(c\ve{x}) = (Ac)\ve{x}.
+    \end{align*}
+    So, if $A$ and $B$ represent linear transformations $f$ and $g$, respectively, then $A+B$ represents $f+g$, and $cA$ represents $cf$.
+    </p>
+
+    <p>Using the above properties, we can show that matrix multiplication and addition satisfy the <b>distributive laws</b>. In other words,
+    \begin{align*}
+      A(B+C) &= AB + AC, \\
+      (A+B)C &= AC + BC, \\
+      c(A+B) &= cA + cB = (A+B)c
+    \end{align*}
+    for any real number $c$ and matrices $A, B, C$ that can be multiplied and added together.
+    </p>
+
+    <p>Let us see some examples. Consider the uniform scaling matrix $S_{2,2}$, we have that
+    \begin{align*}
+      S_{2,2} 
+      = \begin{bmatrix} 2 & 0 \\ 0 & 2 \end{bmatrix} 
+      = \begin{bmatrix} 2 \times 1 & 2 \times 0 \\ 2 \times 0 & 2 \times 1 \end{bmatrix} 
+      = 2 \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+      = 2I.
+    \end{align*}
+    We also know that the sum of two scaling transformation is a scaling transformation whose factors are the sum of the factors. This is also true for scaling matrices.
+    \begin{align*}
+      S_{a,b} + S_{c,b} 
+      = \begin{bmatrix} a & 0 \\ 0 & b \end{bmatrix} + \begin{bmatrix} c & 0 \\ 0 & d \end{bmatrix}
+      = \begin{bmatrix} a+c & 0 \\ 0 & b+d \end{bmatrix}
+      = S_{a+c, b+d}.
+    \end{align*}
+    </p>
+    
+    <p>
+    Now, let us consider the rotation matrix $R_\theta$. We have that
+    \begin{align*}
+      R_{\theta}
+      &= \begin{bmatrix}
+        \cos \theta & -\sin\theta \\
+        \sin \theta & \cos\theta
+      \end{bmatrix} \\
+      &= \begin{bmatrix}
+        \cos \theta & 0 \\
+        0 & \cos\theta
+      \end{bmatrix} 
+      + \begin{bmatrix}
+        0 & -\sin\theta \\
+        \sin \theta & 0
+      \end{bmatrix} \\
+      &=  \begin{bmatrix}
+        1 & 0 \\
+        0 & 1
+      \end{bmatrix} \cos \theta
+      + \begin{bmatrix}
+        0 & -1 \\
+        1 & 0
+      \end{bmatrix} \sin\theta \\
+      &= I \cos \theta
+      + J \sin\theta
+    \end{align*}
+    where we define $J$ to be the matrix
+    \begin{align*}
+      J = \begin{bmatrix}
+        0 & -1 \\
+        1 & 0
+      \end{bmatrix}.
+    \end{align*}
+    This matrix has an interesting property that
+    \begin{align*}
+      JJ = \begin{bmatrix}
+        -1 & 0 \\
+        0 & -1
+      \end{bmatrix}
+      = (-1)I.
+    \end{align*}
+    To simplify the notation above further, let us use the "power notation" to denote repeated multiplications of the same matrix, so we may write $J^2$ in place of $JJ$. Also, let us denote $(-1)I$ and $I(-1)$ with just $-I$. We have that
+    \begin{align*}
+      J^2 = -I.
+    \end{align*}
+    The matrix $I$ is very similar to the number $1$ because they are both the <i>multiplicative identity:</i> when you multiply $I$ (1) to any other matrix (number), you get that matrix (number) back. In this sense, $-I$ is similar to the number $-1$: when you multiply $-I$ (-1) to any other matrix (number), you get the negative of that matrix (number). Now, we know that $J$ is a square root of $-I$. So, $J$ is very similar to the imaginary unit $i$ (which is even sometimes denoted by $j$), which is a square root of $-1$. 
+    </p>
+
+    <p>The similarity goes even further. We know that any imaginary number with unit magnitude is of the form
+    \begin{align*}
+      e^{i\theta} = \cos\theta + i \sin\theta.
+    \end{align*}
+    We also know that, given a complex number $a$, the produce $e^{i\theta} a$ is equal to the rotation of $a$ in the counterclockwise direction in the complex plane by the angle $\theta$. If we write
+    \begin{align*}
+      e^{i\theta} = 1 \cos\theta + i \sin\theta,
+    \end{align*}
+    then we can see that it has the same from as
+    \begin{align*}
+      R_{\theta} = I \cos\theta + J \sin\theta.
+    \end{align*}
+    More advanced linear algebra textbook might discuss the concept of "matrix expontial" where we raise the Euler constant $e$ to the power of a matrix (that is, $e^A$). When such a concept is defined carefully so that it agrees with existing conventions of exponential function, we will have that
+    \begin{align*}
+      e^{J\theta} = R_\theta = I \cos\theta + J \sin\theta.
+    \end{align*}
+    </p>
 
     <h2>15.7 &nbsp; Affine transformations</h2>
 
