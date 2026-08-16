@@ -2671,16 +2671,16 @@
 
     <p>In this chapter, we have introduced three classes of transformations that are important to computer graphics: translation, scaling, and rotation. However, as we have observed earlier, only scaling and rotation are linear transformation. In 2D, this means that we can represent scaling, rotation, and any of their compositions with $2 \times 2$ meatrices. However, we cannot do the same for translation: there is no $2 \times 2$ matrix that can represent it.</p>
 
-    <p>It turns out that, with the help of the concept of <i>homogeneous coordinates</i> that we learned in <a href="../chapter-04/index.html#homegeneous-coordinates">Section 4.3</a>, we can represent a class of transformations that include 2D translation and all 2D linear transformations with $3 \times 3\$ matrices. This new class of transformation is called the "affine transformations." Let us study them in more details.</p>
+    <p>It turns out that, with the help of the concept of <i>homogeneous coordinates</i> that we learned in <a href="../chapter-04/index.html#homegeneous-coordinates">Section 4.3</a>, we can represent a class of transformations that include 2D translation and all 2D linear transformations with $3 \times 3$ matrices. This new class of transformation is called the "affine transformations." Let us study them in more details.</p>
 
 
     <h3>15.7.1 &nbsp; Definition</h3>
 
     <p>A transformation from $g: \Real^n \ra \Real^n$ is called an <b>affine transformation</b> if
     \begin{align*}
-      g(\ve[x]) = f(\ve{x}) + \mathbf{b}
+      g(\ve{x}) = f(\ve{x}) + \mathbf{b}
     \end{align*}
-    where $g: \Real^n \ra \Real^n$ is a linear transformation, and $\ve{b} \in \Real^n$ is a constant vector. Equivalently, a transformation $g: \Real^n \ra \Real^n$ is an affine transformation if there is a matrix $A \in \Real^n \times \Real^n$ and a vector $\ve{b} \in \Real^n$ such that
+    where $f: \Real^n \ra \Real^n$ is a linear transformation, and $\ve{b} \in \Real^n$ is a constant vector. Equivalently, a transformation $g: \Real^n \ra \Real^n$ is an affine transformation if there is a matrix $A \in \Real^n \times \Real^n$ and a vector $\ve{b} \in \Real^n$ such that
     \begin{align*}
       g(\ve{x}) = A\ve{x} + \ve{b}.
     \end{align*}
@@ -2697,7 +2697,112 @@
     where $\ves{0}$ denote the vector in $\Real^n$ whose entries are all zero.
     </p>
 
-    
+    <p>A remarkable property of affine transformations is that, a composition of two affine transformations (or any number of affine transformations) is also affine. We can see this by letting $g_1(\ve{x}) = f_1(\ve{x}) + \ve{b}_1$ and $g_2(\ve{x}) = f_2(\ve{x}) + \ve{b}_2$ be two affine transformations. Then,
+    \begin{align*}
+      (g_2 \circ g_1)(\ve{x}) 
+      &= g_2(g_1(\ve{x})) \\ 
+      &= g_2\big(f_1(\ve{x}) + \ve{b}_1\big) \\
+      &= f_2\big(f_1(\ve{x}) + \ve{b}_1\big) + \ve{b}_2 \\
+      &= f_2\big(f_1(\ve{x})) + f_2(\ve{b}_1) + \ve{b}_2 \\
+      &= (f_2 \circ f_1)(\ve{x}) + \big( f_2(\ve{b}_1) + \ve{b}_2 \big).
+    \end{align*}
+    Because $f_1$ and $f_2$ are linear transformations, it follows that $f_2 \circ f_1$ is a linear transformation. We also know that $f_2(\ve{b}_1) + \ve{b}_1$ is a constant (in other words, it has not change when $\ve{x}$ changes). As a result, $g_2 \circ g_1$ is an affine transformation.</p>
+
+    <p>So, the class of affine transformations, it seems, is tailor made to combine linear transformations with translations. The grouping is also useful because, like linear transformations, we can also represent affine transformations with matrices.</p>
+
+    <h3>15.7.2 &nbsp; Matrix Representation of Affine Transformation</h3>
+
+    <p>An affine transformation in $n$ dimensions can be presented by a $(n + 1) \times (n+1)$ matrix. This means that all 2D affine transformations can be represented by a $3 \times 3$ matrix.</p>
+
+    <p>We learned in <a href="../chapter-04/index.html#homegeneous-coordinates">Section 4.3</a> that we can represent both 3D points and 3D vectors under the same representation called <i>homogeneous coordinates</i>: the homogeneous coordinate $(x,y,z,0)$ represents $(x,y,z)$ interpretted as a vector, and $(x,y,z,1)$ represents $(x,y,z)$ inpretted as a point. Let us call homogeneous coordinates for 3D points and vectors the "3D homomgeneous coordinates."</p>
+
+    <p>The same trick we use with 3D points and vectors also apply to 2D points and vectors as well. A <b>2D homogeneous coordinates</b> is either a 3D vector of the from $(x,y,0)$, which represents a 2D vector $(x,y)$, or a 3D vector $(x,y,1)$, which represents a 2D point $(x,y)$. Homogeneous coordinates allows us to view 2D vectors and points as a 3D vector when it is convenient to do so.</p>
+
+    <p>As you may have guessed, it is convenient to use homogeneous coordinates when we deal with affine transformations. We know that we cannot represent a 2D translation $\mathtt{T}_{b_1, b_2}$ with a $2 \times 2$ matrix. However, consider the matrix 
+    \begin{align*}
+      T_{b_1, b_2} = \begin{bmatrix}
+        1 & 0 & b_1 \\
+        0 & 1 & b_2 \\
+        0 & 0 & 1
+      \end{bmatrix}.
+    \end{align*}
+    If we apply it to the 3D vector $(x,y,1)$ which is the homogeneous coordinate of the 2D point $(x,y1)$, we get
+    \begin{align*}
+      \begin{bmatrix}
+        1 & 0 & b_1 \\
+        0 & 1 & b_2 \\
+        0 & 0 & 1
+      \end{bmatrix}
+      \begin{bmatrix}
+        x \\
+        y \\
+        1
+      \end{bmatrix}
+      &= \begin{bmatrix}
+        x + b_1 \\
+        y + b_2 \\ 
+        1
+      \end{bmatrix}.
+    \end{align*}
+    We can see that the RHS is $(x+b_1, y+b_2, 1)$, which is the homogeneous coordinates of the 2D point $(x+b_1, y+b_2) = \mathtt{T}_{b_1, b_2}(x,y)$. <b>As a result, by using homegeneous coordinates to represent points, we have unlocked a way to represent translation with a matrix.</b></p>
+
+    <p>In fact, through the use of homogeneous coordinates, we can represent <i>all</i> 2D affine transformation with $3 \times 3$ matrices. Recall from the last section that, if $g$ is a 2D affine transformation, then we have that $g(\ve{x}) = A\ve{x} + \ve{b}$ for some $A \in \Real^{2 \times 2}$ and $\ve{b} \in \Real^2$. Let
+    \begin{align*}
+      A &= \begin{bmatrix}
+        a_{11} & a_{21} \\
+        a_{21} & a_{22}
+      \end{bmatrix}, &
+      \ve{b} &= \begin{bmatrix}
+        b_1 \\ b_2
+      \end{bmatrix}.
+    \end{align*}</p>
+    Then, we have
+    \begin{align*}
+      g\bigg( \begin{bmatrix} x \\ y \end{bmatrix} \bigg) = 
+      \begin{bmatrix}
+        a_{11} & a_{21} \\
+        a_{21} & a_{22}
+      \end{bmatrix}
+      \begin{bmatrix} 
+        x \\ 
+        y 
+      \end{bmatrix}
+      + 
+      \begin{bmatrix}
+        b_1 \\ b_2
+      \end{bmatrix}
+      &= \begin{bmatrix}
+        a_{11} x + a_{12}y + b_1 \\
+        a_{21} x + a_{22}y + b_2.
+      \end{bmatrix}.
+    \end{align*}
+    Now, consider the matrix
+    \begin{align*}
+      M = \begin{bmatrix}
+        a_{11} & a_{12} & b_1 \\ 
+        a_{21} & a_{22} & b_2 \\ 
+        0 & 0 & 1  
+      \end{bmatrix}.
+    \end{align*}
+    When we apply $M$ to $(x,y,1)$, we get
+    \begin{align*}
+      \begin{bmatrix}
+        a_{11} & a_{12} & b_1 \\ 
+        a_{21} & a_{22} & b_2 \\ 
+        0 & 0 & 1  
+      \end{bmatrix}
+      \begin{bmatrix}
+        x \\ y \\ 1
+      \end{bmatrix}
+      = \begin{bmatrix}
+        a_{11}x + a_{12}y + b_1 \\ 
+        a_{21}x + a_{22}y + b_2 \\
+        1
+      \end{bmatrix},
+    \end{align*}
+    which is the homogeneous coordinates of $g(x,y)$ that we just derived above. As a result, we can treat the $3 \times 3$ matrix $M$ as a representation of the affine transformation $g$.
+    </p>
+
     <h2>15.8 &nbsp; Two equivalent views of affine transformations</h2>
 
     <h2>15.11 &nbsp; Summary</h2>
