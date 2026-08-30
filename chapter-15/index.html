@@ -860,7 +860,7 @@
       c(f + g) &= cf + cg \\
       (c + d)f &= cf + df
     \end{align*}
-    In fact, one may show that the distributive rules also apply to scaling transformations.
+    In fact, one may show that the distributive rules also applies to scaling transformations.
     \begin{align*}
       \mathtt{S}_{a,b} \circ (f + g) &= \mathtt{S}_{a,b} \circ f + \mathtt{S}_{a,b} \circ g \\
       (\mathtt{S}_{a,b} + \mathtt{S}_{c,d}) \circ f &= \mathtt{S}_{a,b} \circ f + \mathtt{S}_{c,d} \circ f
@@ -2718,7 +2718,7 @@
 
     <p>The same trick we use with 3D points and vectors also apply to 2D points and vectors as well. A <b>2D homogeneous coordinates</b> is either a 3D vector of the from $(x,y,0)$, which represents a 2D vector $(x,y)$, or a 3D vector $(x,y,1)$, which represents a 2D point $(x,y)$. Homogeneous coordinates allows us to view 2D vectors and points as a 3D vector when it is convenient to do so.</p>
 
-    <p>As you may have guessed, it is convenient to use homogeneous coordinates when we deal with affine transformations. We know that we cannot represent a 2D translation $\mathtt{T}_{b_1, b_2}$ with a $2 \times 2$ matrix. However, consider the matrix 
+    <p>As you may have guessed, it is convenient to use homogeneous coordinates when we deal with affine transformations. We know that we cannot represent a 2D translation $\mathtt{T}_{b_1, b_2}$ with a $2 \times 2$ matrix. However, consider the <b>translation matrix</b> 
     \begin{align*}
       T_{b_1, b_2} = \begin{bmatrix}
         1 & 0 & b_1 \\
@@ -2802,6 +2802,85 @@
     \end{align*}
     which is the homogeneous coordinates of $g(x,y)$ that we just derived above. As a result, we can treat the $3 \times 3$ matrix $M$ as a representation of the affine transformation $g$.
     </p>
+
+    <p>According to what we just derived, a linear transformation $f$ can be represent by <i>both</i> a $2 \times 2$ matrix and a $3 \times 3$ matrix. More specifically, if $$\begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix}$$ is the $2 \times 2$ matrix representation of $f$, then the $3\times 3$ matrix representation of $f$ is
+    \begin{align*}
+      \begin{bmatrix}
+        a_{11} & a_{12} & 0 \\
+        a_{21} & a_{22} & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}.
+    \end{align*}
+    because $f(\ve{x}) = f(\ve{x}) + \mathbf{0}$. We can choose between the two representations based on convenience and context. Hence, when we talk about the scaling matrix $S_{a,b}$ or the rotation matrix $R_{\theta}$, we might mean the following $3 \times 3$ versions:
+    \begin{align*}
+      S_{a,b} &= \begin{bmatrix} a & 0 & 0 \\ 0 & b & 0 \\ 0 & 0 & 1 \end{bmatrix}, &
+      R_\theta &= \begin{bmatrix} \cos \theta & -\sin\theta & 0 \\ \sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{bmatrix}.
+    \end{align*}
+    </p>
+
+    <p>Inverses of the translation, scaling, and rotation matrices are as follows.</p>
+    \begin{align*}
+      (T_{b_1, b_2})^{-1} &= T_{-b_1, -b_2} = = \begin{bmatrix}
+        1 & 0 & -b_1 \\
+        0 & 1 & -b_2 \\
+        0 & 0 & 1
+      \end{bmatrix}, \\
+      (S_{a,b})^{-1} &= S_{1/a, 1/b} =   \begin{bmatrix} 1/a & 0 & 0 \\ 0 & 1/b & 0 \\ 0 & 0 & 1 \end{bmatrix}, \\
+      (R^{\theta})^{-1} &= R_{-\theta} = \begin{bmatrix} \cos \theta & \sin\theta & 0 \\ -\sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{bmatrix}.
+    \end{align*}
+
+    <h3>15.7.3 &nbsp; Effects of Affine Transformations on Points and Vectors</h3>
+
+    <p>As mentioned earlier, homogeneous coordinates represents both points and vectors. Affine transformations have different effects on these two types of data. Consider an affine transformation $g$ with the matrix representation
+    \begin{align*}
+      G = \begin{bmatrix}
+        a_{11} & a_{12} & b_1 \\ 
+        a_{21} & a_{22} & b_2 \\
+        0 & 0 & 1 
+      \end{bmatrix}.
+    \end{align*}
+    If we apply this matrix to the point $(x,y,1)$, we get
+    \begin{align*}
+      \begin{bmatrix}
+        a_{11} & a_{12} & b_1 \\ 
+        a_{21} & a_{22} & b_2 \\
+        0 & 0 & 1 
+      \end{bmatrix}
+      \begin{bmatrix}
+        x \\
+        y \\
+        1
+      \end{bmatrix}
+      &= \begin{bmatrix}
+        a_{11} x + a_{12} y + b_1 \\
+        a_{21} x + a_{22} y + b_2 \\
+        1
+      \end{bmatrix}.
+    \end{align*} 
+    We can see that the result is a point because the third coordinate is $1$. Moreover, the first two coordinates have $b_1$ and $b_2$ in them, meaning that the result is affected by the translation part of the affine transformation.</p>
+
+    <p>On the other hand, if we apply the matrix to the vector $(x,y,0)$, we get something different:
+    \begin{align*}
+      \begin{bmatrix}
+        a_{11} & a_{12} & b_1 \\ 
+        a_{21} & a_{22} & b_2 \\
+        0 & 0 & 1 
+      \end{bmatrix}
+      \begin{bmatrix}
+        x \\
+        y \\
+        0
+      \end{bmatrix}
+      &= \begin{bmatrix}
+        a_{11} x + a_{12} y \\
+        a_{21} x + a_{22} y \\
+        0
+      \end{bmatrix}.
+    \end{align*}
+    Here, the result is a vector because the third coordinate is $0$. The first two coordinates do not have $b_1$ and $b_2$ in them, so the vector is not affected by the translation part of the affine transformation at all.
+    </p>
+
+    <p>So, when we talk about applying an affine transformation, we need to be clear what the input type is. In this chapter and the next chapter, we focus on transformation points. However, later on, we will talk about transformating vectors (especially normal vectors) as well.</p>
 
     <h2>15.8 &nbsp; Two equivalent views of affine transformations</h2>
 
