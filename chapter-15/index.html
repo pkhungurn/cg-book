@@ -2880,9 +2880,98 @@
     Here, the result is a vector because the third coordinate is $0$. The first two coordinates do not have $b_1$ and $b_2$ in them, so the vector is not affected by the translation part of the affine transformation at all.
     </p>
 
+    <p>Let us see a concrete example of this phenomenon. Consider an affine transformation that is a composition of a translation, a rotation, and a scaling, whose matrix representation is given by:
+    \begin{align*}
+      G 
+      &= T_{0,1} R_{90^\circ} S_{2,3} \\
+      &= \begin{bmatrix}
+        1 & 0 & 0 \\
+        0 & 1 & 1 \\
+        0 & 0 & 1
+      \end{bmatrix}
+      \begin{bmatrix}
+        0 & -1 & 0 \\
+        1 & 0 & 1 \\
+        0 & 0 & 1
+      \end{bmatrix}
+      \begin{bmatrix}
+        2 & 0 & 0 \\
+        0 & 3 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix} \\
+      &= \begin{bmatrix}
+        0 & -3 & 0 \\
+        2 & 0 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}.
+    \end{align*}
+    Consider applying this affine transformation to $(1, 1)$. When we interprest it as a point, we have that the result is
+    \begin{align*}
+      \begin{bmatrix}
+        0 & -3 & 0 \\
+        2 & 0 & 1 \\
+        0 & 0 & 1
+      \end{bmatrix}
+      \begin{bmatrix}
+        1 \\ 1 \\ 1
+      \end{bmatrix}
+      = \begin{bmatrix}
+        -3 \\ 3 \\ 1
+      \end{bmatrix}.
+    \end{align*}
+    On the other hand, if we interpret $(1,1)$ as a point, then the result is
+    \begin{align*}
+      \begin{bmatrix}
+        0 & -3 & 0 \\
+        2 & 0 & 1 \\
+        0 & 0 & 1
+      \end{bmatrix}
+      \begin{bmatrix}
+        1 \\ 1 \\ 0
+      \end{bmatrix}
+      = \begin{bmatrix}
+        -3 \\ 2 \\ 0
+      \end{bmatrix}.
+    \end{align*}
+    </p>
+
     <p>So, when we talk about applying an affine transformation, we need to be clear what the input type is. In this chapter and the next chapter, we focus on transformation points. However, later on, we will talk about transformating vectors (especially normal vectors) as well.</p>
 
     <h2>15.8 &nbsp; Two equivalent views of affine transformations</h2>
+
+    <p>Recall that in <a href="../chapter-04/index.html">Section 4.4</a> that we discuss "affine coordinate systems," another concept with the word "affine" in it. In two dimensions, an affine coordinate system has three members: the origin point $\ve{o}$ and two basis vectors $\hat{\ve{x}}$ and $\hat{\ve{y}}$.  With these members, one can convert a homogenous coordinate $(x,y,w)$ where $w \in \{0,1\}$ into a point in 3D Euclidean space:
+    \begin{align*}
+      \begin{bmatrix}
+        x \\
+        y \\
+        w 
+      \end{bmatrix}
+      \qquad \mbox{ corresponds to }
+      \qquad \begin{bmatrix}
+        \hat{\ve{x}} & \hat{\ve{y}} & \ve{o}
+      \end{bmatrix}
+      \begin{bmatrix}
+        x \\ y \\ w
+      \end{bmatrix}
+      = x \hat{\ve{x}} + y \hat{\ve{y}} + \ve{o}.
+    \end{align*}
+    </p>
+
+    <p>
+    One can see that, in the equation after "corresponds to", the LHS is a product of two matrices. The right column matrix has entries that are real numbers $x$, $y$, and $w$. The left row matrix has entries that are points and vectors. (As a result, this matrix does not conform to the definition of matrix we discussed earlier in this chapter, but let us entertain the notion that wa can put variables inside a matrix entry, and we can manipulate them like numbers for now.)
+    </p>
+
+    <p>
+    In a sense, an affine coordinates system is a bridge between the world of "geometry," which is the world of positions, shapes, and spaces, to the world of "arithmetic," which is the world of numbers and calculations. So far, we have been discussing points and vectors in terms of coordinates, which are just a collection of numbers. Howver, numbers alone are not enough, one also needs a coordinate system to map numbers to positions. So far, we have assumed a standard 2D coordinate system: an origin point $\ve{o}$ that corresponds to the coordinates $(0,0)$, a unit vector $\hat{\ve{x}}$ that points in the direction of 3 o' clock, and a unit vector $\hat{\ve{y}}$ that points in the direction of 12 o' clock. However, there are other cooorinate systems that maps the same coordinates to different positions in space. Hence, the complete picture of a point (or a vector) has two aspects: the coordinates and the coordinate system.
+    </p>
+
+    <p>We just discussed in the last section that an affine transformation changes a point (or a vector). What of the above aspect does it change then? The answer is that, depends on how we look, we either interpret the transformation as a change to the coordinates or a change to the coordinate system itself.</p>
+
+    <h3>15.8.1 &nbsp; Affine transformation as a change to homogeneous coordinates</h3>
+
+    <h3>15.8.2 &nbsp; Affine transformation as a change to affine coordinate system</h3>
+
+
 
     <h2>15.11 &nbsp; Summary</h2>
 

@@ -609,7 +609,7 @@
     \end{bmatrix}
     \end{align*}
     $$
-    The expression on the right is a product of two matrices. We will discuss matrix multiplication in more details in Chapter 13. For now, it suffices to do the computation according to Figure 4.7, and the result would be exactly $a_x \hat{\mathbf{x}} + a_y \hat{\mathbf{y}} + a_z \hat{\mathbf{z}} + a_w O$.
+    The expression on the right is a product of two matrices. We will discuss matrix multiplication in more details in <a href="../chapter-15/index.html">Chapter 15</a>. For now, it suffices to do the computation according to Figure 4.7, and the result would be exactly $a_x \hat{\mathbf{x}} + a_y \hat{\mathbf{y}} + a_z \hat{\mathbf{z}} + a_w O$.
     </p>
     
     <figure>
@@ -649,6 +649,7 @@
     
     <p>The rules for manipulating 2D homogeneous coordinates are the same as 3D ones: scaling and adding the components independently. Moreover, as usual, the dot product and the cross products needs to be dealt with in special ways. Most importantly, computing cross products of two 2D vectors results in a 3D vector, and the result cannot be represented with homogeneous coordinates for a 2D vector. Hence, we suggest the reader to lift 2D vectors into 3D spaces (by setting the $z$-coordinate to $0$) before computing any cross products.</p>
 
+    <a name="affine-coordinate-system"></a>
     <h2>4.4 &nbsp; Affine coordinate system</h2>
 
     <p>The affine coordinate system is a generalization of the Cartesian coordinate system. It is used very frequently in computer graphics. While computer graphics usually use 3D affine coordinate system, it is much easier to introduce the concept with the 2D version. So, we will mainly discuss the 2D version in this section.</p>
@@ -727,7 +728,7 @@
 
     <p>Looking at Figure 4.9, we can see the importance of the constraints placed on $\mathbf{x}'$ and $\mathbf{y}'$. If one of the vectors have length $0$, then the grid lines for the corresponding coordinate would collapse to a single line, and the points that can be represented by the coordinates system would consist of those on the line corresponding to non-zero vector, not the whole plane. (Mathematically, we say that the $\mathbf{x}'$ and $\mathbf{y}'$ does not <strong>span</strong> the whole 2D plane.) The same thing happens if the two vectors are parallel to each other.</p>
 
-    <p>It should also become clear that there are many affine coordinate systems because we have much more freedom in the way we chooose $\mathbf{x}'$ and $\mathbf{y}'$. On the other hand, we tend to think that there is only one Cartesian coordinate system for each fixed number of dimensions. This is not quite true because we can move the origin $O$ around and rotate $\hat{\mathbf{x}}$ arbitrarily. However, once we fix $O$ and $\hat{\mathbf{x}}$, it becomes the reference points from which we can describe other affine coordinate system. We will discuss conversion between coordinate systems in Chapter 13.</p>
+    <p>It should also become clear that there are many affine coordinate systems because we have much more freedom in the way we chooose $\mathbf{x}'$ and $\mathbf{y}'$. On the other hand, we tend to think that there is only one Cartesian coordinate system for each fixed number of dimensions. This is not quite true because we can move the origin $O$ around and rotate $\hat{\mathbf{x}}$ arbitrarily. However, once we fix $O$ and $\hat{\mathbf{x}}$, it becomes the reference points from which we can describe other affine coordinate system. We will discuss conversion between coordinate systems in <a href="../chapther-15/index.html">Chapter 15</a>.</p>
 
     <h3>4.4.1 &nbsp; 3D affine coordinate systems</h3>
 
@@ -867,7 +868,7 @@
 
     <p>We see clearly that the dot product formula 
     $$ (a_x, a_y) \cdot (b_x, b_y) = a_x b_x + a_y b_y $$
-    does not work in this affine coordinate system. In fact, the formula only works in coordinate systems where *the axes vectors are of unit length and are mutually perpedicular to one another.* Such coordinate systems are called <strong>orthonormal.</strong> The Cartesian coordinate system is orthonomal, but the coordinate system in Figure 4.10 is not. In general, we must be careful not to use the dot product formula in an arbitrary affine coordinate system. The safest way is to convert affine coordinates into Cartesian coordinates first before computing a dot product. Again. we will discuss transformation between coordinate systems in Chapter 13.
+    does not work in this affine coordinate system. In fact, the formula only works in coordinate systems where *the axes vectors are of unit length and are mutually perpedicular to one another.* Such coordinate systems are called <strong>orthonormal.</strong> The Cartesian coordinate system is orthonomal, but the coordinate system in Figure 4.10 is not. In general, we must be careful not to use the dot product formula in an arbitrary affine coordinate system. The safest way is to convert affine coordinates into Cartesian coordinates first before computing a dot product. Again. we will discuss transformation between coordinate systems in Chapter 15.
     </p>
 
     <p><strong>Cross product.</strong> Continuing from the last example. Let us expand the coordinate system in Figure 4.10 into a 3D coordinate system by adding a vector $\mathbf{z}'$ that is perpendicular to both $\mathbf{x}'$ and $\mathbf{y}'$ with $\| \mathbf{z}' \| = 2$.</p>
