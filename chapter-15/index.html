@@ -2969,7 +2969,149 @@
 
     <h3>15.8.1 &nbsp; Affine transformation as a change to homogeneous coordinates</h3>
 
-    <h3>15.8.2 &nbsp; Affine transformation as a change to affine coordinate system</h3>
+    <p>This is the way we have been looking at affine transformation throughout this chapter. This is best illustrated by examining the process under which we transform a 2D mesh and then render it in a coordinate system. This is a three step process.</p>
+
+    <ol>
+      <li>We describe the mesh as a collection of points in 2D and connections between these points. Each point is specified with homogeneous coordinates.</li>
+      <li>We apply a transformation to each point, chaning its homogeneous coordinates to new ones.</li>
+      <li>We then plot the transformated homogeneous coordinates on the standard affine coordinate system, featuring $\ve{o}$, $\hat{\ve{x}}$, $\hat{\ve{y}}$, and $\hat{\ve{z}}$.</li>
+    </ol>
+
+    <p>The above process is best illustrated with an example. We have a 2D mesh that is made up by the following points.
+    \begin{align*}
+      \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}, 
+      \begin{bmatrix} 3 \\ 0 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 3 \\ 3 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 0 \\ 3 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 1 \\ 1.5 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 2 \\ 1.5 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 2 \\ 0 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 1.5 \\ 4 \\ 1 \end{bmatrix}.        
+    \end{align*}
+    Let us number the points from left to right with integers from $0$ to $8$. The mesh is made up of line primitives, and, as we know, a line is just a connection between two points, which can be specified by a tuple of indices. The lines are:
+    \begin{align*}
+      (0,1), (1,2), (2,3), (3,0), (4,5), (5,6), (6,7), (3,8), (8,2).
+    \end{align*}
+    The numbers seems incomprehensible, but if we plot the points and draw the lines on the standard affine coordinate system, it looks like a house.
+    </p>
+
+    <canvas width="600" height="600" id="world-space-mesh-canvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("world-space-mesh-canvas");
+
+      // 2. Get the 2D rendering context (the actual drawing engine)
+      const ctx = canvas.getContext('2d');
+
+      ctx.save();
+      ctx.scale(60.0, 60.0);
+      ctx.translate(3.1, 8.1)
+      ctx.scale(1, -1)
+      
+      ctx.strokeStyle = '#ff0000';
+      ctx.lineWidth = 1.0 / 100;
+      ctx.beginPath();
+      ctx.moveTo(-10,0);
+      ctx.lineTo(10,0);
+      ctx.closePath();
+      ctx.stroke();
+
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 1.0 / 100;
+      ctx.beginPath();
+      ctx.moveTo(0,-10);
+      ctx.lineTo(0,10);
+      ctx.closePath();
+      ctx.stroke();
+
+      for (let x=-2;x<7;x++) {
+        ctx.save();
+        ctx.translate(x, 0);
+        ctx.translate(-0.3, -0.3);
+        ctx.scale(1, -1);
+        ctx.font = '0.25px sans-serif';
+        ctx.fillStyle = '#808080';
+        ctx.fillText(x.toString(), 0, 0);
+        ctx.restore();
+      }
+
+      for (let y=-2;y<10;y++) {
+        ctx.save();
+        ctx.translate(0, y);
+        ctx.translate(-0.3, -0.3);
+        ctx.scale(1, -1);
+        ctx.font = '0.25px sans-serif';
+        ctx.fillStyle = '#808080';
+        ctx.fillText(y.toString(), 0, 0);
+        ctx.restore();
+      }
+
+
+      ctx.strokeStyle = '#c0c0c0'
+      ctx.lineWidth = 0.5 / 100;
+
+      ctx.beginPath();
+      for (let x=-10;x<=50;x++) {
+        ctx.moveTo(x, -10);
+        ctx.lineTo(x, 10);
+      }
+      ctx.closePath();
+      ctx.stroke();
+
+      ctx.beginPath();
+      for (let y=-10;y<=10;y++) {
+        ctx.moveTo(-10, y);
+        ctx.lineTo(10, y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      
+
+      ctx.fillStyle = '#00000'
+      const points = [
+        [0,0], [3,0], [3,3], [0,3], [1,0], [1,1.5], [2,1.5], [2,0], [1.5,4]
+      ];
+      for (let point of points) {
+        ctx.beginPath();
+        ctx.arc(point[0], point[1], 0.1, 0, 2*Math.PI);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      ctx.strokeStyle = '#000000'
+      ctx.lineWidth = 3 / 100.0;
+
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.lineTo(3,0);
+      ctx.lineTo(3,3);
+      ctx.lineTo(0,3);
+      ctx.lineTo(0,0);
+      ctx.closePath();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(1,0);
+      ctx.lineTo(1,1.5);
+      ctx.lineTo(2,1.5);
+      ctx.lineTo(2,0);
+      ctx.closePath();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0,3);
+      ctx.lineTo(1.5,4);
+      ctx.lineTo(3,3);
+      ctx.closePath();
+      ctx.stroke();
+
+      ctx.restore();
+
+      
+    </script>
+
+    <h3>15.8.2 &nbsp; Affine transformation as a change to affine coordinate systems</h3>
 
 
 
