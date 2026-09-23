@@ -2993,123 +2993,309 @@
     \begin{align*}
       (0,1), (1,2), (2,3), (3,0), (4,5), (5,6), (6,7), (3,8), (8,2).
     \end{align*}
-    The numbers seems incomprehensible, but if we plot the points and draw the lines on the standard affine coordinate system, it looks like a house.
     </p>
 
-    <canvas width="600" height="600" id="world-space-mesh-canvas"></canvas>
+    <p>These numbers by themselves are incomprehensible. In order to "see" them, we need an affine coordinate system. For the Euclidean space $\Real^2$, the coordinate system consists of the origin point $\ve{o}$ located somewhere, a vector $\hat{\ve{x}}$ (red) pointing to the east, and $\hat{\ve{y}}$ (green) pointing to the north.</p>
+
+    <div align="center">
+      <canvas width="90" height="90" id="standard-affine-coordinate-system"></canvas>
+    </div>
 
     <script>
-      const canvas = document.getElementById("world-space-mesh-canvas");
-
-      // 2. Get the 2D rendering context (the actual drawing engine)
-      const ctx = canvas.getContext('2d');
-
-      ctx.save();
-      ctx.scale(60.0, 60.0);
-      ctx.translate(3.1, 8.1)
-      ctx.scale(1, -1)
-      
-      ctx.strokeStyle = '#ff0000';
-      ctx.lineWidth = 1.0 / 100;
-      ctx.beginPath();
-      ctx.moveTo(-10,0);
-      ctx.lineTo(10,0);
-      ctx.closePath();
-      ctx.stroke();
-
-      ctx.strokeStyle = '#00ff00';
-      ctx.lineWidth = 1.0 / 100;
-      ctx.beginPath();
-      ctx.moveTo(0,-10);
-      ctx.lineTo(0,10);
-      ctx.closePath();
-      ctx.stroke();
-
-      for (let x=-2;x<7;x++) {
-        ctx.save();
-        ctx.translate(x, 0);
-        ctx.translate(-0.3, -0.3);
-        ctx.scale(1, -1);
-        ctx.font = '0.25px sans-serif';
-        ctx.fillStyle = '#808080';
-        ctx.fillText(x.toString(), 0, 0);
-        ctx.restore();
-      }
-
-      for (let y=-2;y<10;y++) {
-        ctx.save();
-        ctx.translate(0, y);
-        ctx.translate(-0.3, -0.3);
-        ctx.scale(1, -1);
-        ctx.font = '0.25px sans-serif';
-        ctx.fillStyle = '#808080';
-        ctx.fillText(y.toString(), 0, 0);
-        ctx.restore();
-      }
-
-
-      ctx.strokeStyle = '#c0c0c0'
-      ctx.lineWidth = 0.5 / 100;
-
-      ctx.beginPath();
-      for (let x=-10;x<=50;x++) {
-        ctx.moveTo(x, -10);
-        ctx.lineTo(x, 10);
-      }
-      ctx.closePath();
-      ctx.stroke();
-
-      ctx.beginPath();
-      for (let y=-10;y<=10;y++) {
-        ctx.moveTo(-10, y);
-        ctx.lineTo(10, y);
-      }
-      ctx.closePath();
-      ctx.stroke();
-      
-
-      ctx.fillStyle = '#00000'
-      const points = [
-        [0,0], [3,0], [3,3], [0,3], [1,0], [1,1.5], [2,1.5], [2,0], [1.5,4]
-      ];
-      for (let point of points) {
+      function filledCircle(ctx,x,y,radius=0.1) {
         ctx.beginPath();
-        ctx.arc(point[0], point[1], 0.1, 0, 2*Math.PI);
+        ctx.arc(x, y, radius, 0, 2*Math.PI);
         ctx.closePath();
         ctx.fill();
       }
 
-      ctx.strokeStyle = '#000000'
-      ctx.lineWidth = 3 / 100.0;
+      function arrow(ctx,x0, y0, x1, y1, headLength) {
+        const dx = x1 - x0;
+        const dy = y1 - y0;
+        const theta = Math.atan2(dy, dx);
+        const length = Math.sqrt(dx*dx + dy*dy)
 
-      ctx.beginPath();
-      ctx.moveTo(0,0);
-      ctx.lineTo(3,0);
-      ctx.lineTo(3,3);
-      ctx.lineTo(0,3);
-      ctx.lineTo(0,0);
-      ctx.closePath();
-      ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        ctx.closePath();
+        ctx.stroke();
 
-      ctx.beginPath();
-      ctx.moveTo(1,0);
-      ctx.lineTo(1,1.5);
-      ctx.lineTo(2,1.5);
-      ctx.lineTo(2,0);
-      ctx.closePath();
-      ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x1,y1);
+        ctx.lineTo(x1+headLength*Math.cos(theta+Math.PI-Math.PI/6),y1+headLength*Math.sin(theta+Math.PI-Math.PI/6));
+        ctx.closePath();
+        ctx.stroke();
 
-      ctx.beginPath();
-      ctx.moveTo(0,3);
-      ctx.lineTo(1.5,4);
-      ctx.lineTo(3,3);
-      ctx.closePath();
-      ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x1+headLength*Math.cos(theta+Math.PI+Math.PI/6),y1+headLength*Math.sin(theta+Math.PI+Math.PI/6));
+        ctx.closePath();
+        ctx.stroke();
+      }
 
-      ctx.restore();
+      function drawStandardAffineCoordinateSystem() {
+        let canvas = document.getElementById("standard-affine-coordinate-system");
 
+        let ctx = canvas.getContext('2d');
+
+        ctx.save();
+        ctx.scale(60.0, 60.0);
+        ctx.translate(0.2, 1)
+        ctx.scale(1, -1)
+
+        ctx.lineWidth = 1.0 / 100;
+        ctx.strokeStyle = '#ff0000';
+        arrow(ctx, 0,0, 1,0, 0.2);
+        ctx.strokeStyle = '#00ff00';
+        arrow(ctx, 0, 0, 0, 1, 0.2);
+        
+        ctx.fillStyle = '#00000'  
+        filledCircle(ctx, 0, 0);
+
+        ctx.restore();
+      }
       
+      drawStandardAffineCoordinateSystem();
     </script>
+
+    <p>The coordinate system allows us to create a grid on the plane.</p>
+
+    <canvas width="600" height="600" id="standard-affine-coordinate-system-grid"></canvas>
+
+    <script>
+      function drawCoordinateSystem(ctx) {
+        ctx.strokeStyle = '#ff0000';
+        ctx.lineWidth = 1.0 / 100;
+        ctx.beginPath();
+        ctx.moveTo(-10,0);
+        ctx.lineTo(10,0);
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.strokeStyle = '#00ff00';
+        ctx.lineWidth = 1.0 / 100;
+        ctx.beginPath();
+        ctx.moveTo(0,-10);
+        ctx.lineTo(0,10);
+        ctx.closePath();
+        ctx.stroke();
+
+        for (let x=-10;x<7;x++) {
+          ctx.save();
+          ctx.translate(x, 0);
+          ctx.translate(-0.3, -0.3);
+          ctx.scale(1, -1);
+          ctx.font = '0.25px sans-serif';
+          ctx.fillStyle = '#808080';
+          ctx.fillText(x.toString(), 0, 0);
+          ctx.restore();
+        }
+
+        for (let y=-10;y<10;y++) {
+          ctx.save();
+          ctx.translate(0, y);
+          ctx.translate(-0.3, -0.3);
+          ctx.scale(1, -1);
+          ctx.font = '0.25px sans-serif';
+          ctx.fillStyle = '#808080';
+          ctx.fillText(y.toString(), 0, 0);
+          ctx.restore();
+        }
+
+
+        ctx.strokeStyle = '#c0c0c0'
+        ctx.lineWidth = 0.5 / 100;
+
+        ctx.beginPath();
+        for (let x=-10;x<=50;x++) {
+          ctx.moveTo(x, -10);
+          ctx.lineTo(x, 10);
+        }
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        for (let y=-10;y<=10;y++) {
+          ctx.moveTo(-10, y);
+          ctx.lineTo(10, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      function drawStandardAffineCoorindateSystemGrid() {
+        const canvas = document.getElementById("standard-affine-coordinate-system-grid");
+
+        const ctx = canvas.getContext('2d');
+
+        ctx.save();
+        ctx.scale(60.0, 60.0);
+        ctx.translate(3.5, 8.1)
+        ctx.scale(1, -1)
+        
+        drawCoordinateSystem(ctx);
+
+        ctx.lineWidth = 1.0 / 100;
+        ctx.strokeStyle = '#ff0000';
+        arrow(ctx, 0,0, 1,0, 0.2);
+        ctx.strokeStyle = '#00ff00';
+        arrow(ctx, 0, 0, 0, 1, 0.2);
+        
+        ctx.fillStyle = '#00000'  
+        filledCircle(ctx, 0, 0);
+
+        ctx.restore();
+      }
+
+      drawStandardAffineCoorindateSystemGrid();
+    </script>
+
+    <p>Once we have this grid, we can plot the points and connect them with lines to see that our mesh makes a picture of a house.</p>
+
+    <canvas width="600" height="600" id="world-space-mesh-canvas"></canvas>
+
+    <script>
+      function drawMesh(ctx, points, edges) {
+        for (let point of points) {
+          ctx.beginPath();
+          ctx.arc(point[0], point[1], 0.1, 0, 2*Math.PI);
+          ctx.closePath();
+          ctx.fill();
+        }
+        for (let edge of edges) {
+          const i0 = edge[0];
+          const i1 = edge[1];
+          const p0 = points[i0];
+          const p1 = points[i1];
+          ctx.beginPath();
+          ctx.moveTo(p0[0], p0[1]);
+          ctx.lineTo(p1[0], p1[1]);
+          ctx.closePath();
+          ctx.stroke();
+        }
+      }
+
+      function drawWorldSpaceMeshCanvas() {
+        const canvas = document.getElementById("world-space-mesh-canvas");
+
+        const ctx = canvas.getContext('2d');
+
+        ctx.save();
+        ctx.scale(60.0, 60.0);
+        ctx.translate(3.5, 8.1)
+        ctx.scale(1, -1)
+        
+        drawCoordinateSystem(ctx);
+        
+        ctx.fillStyle = '#00000'
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = 3 / 100.0;
+
+        const points = [
+          [0,0], [3,0], [3,3], [0,3], [1,0], [1,1.5], [2,1.5], [2,0], [1.5,4]
+        ];
+        const edges = [
+          [0,1], [1,2], [2,3], [3,0], [4,5], [5,6], [6,7], [3,8], [8,2]
+        ];
+        drawMesh(ctx, points, edges);
+
+        ctx.restore();
+      }
+      
+      drawWorldSpaceMeshCanvas();
+    </script>
+
+    <p>In the process of drawing the above picture, we implicitly perform a dot product between the coordinates of the point and the affine coordinate system. We know that the point $(1.5,4,1)$ is located at the apex of the roof top because we know that it represents the point
+    \begin{align*}
+      \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}
+      \begin{bmatrix} 1.5 \\ 4 \\ 1 \end{bmatrix}
+      &= 1.5\hat{\ve{x}} + 4\hat{\ve{y}} + \ve{o},
+    \end{align*}
+    which is the point 1.5 unit to the east of $\ve{o}$ and 4 unit to the north of $\ve{o}$. We perform this dot product every time we plot a point on the grid above.
+    </p>
+
+    <p>Now, let us apply a transformation to the mesh above. Say, the transformation is
+    \begin{align*}
+      A = T_{2,0} R_{90^\circ} S_{1.5,1.5}
+      &= \begin{bmatrix}
+        1 & 0 & 2 \\
+        0 & 1 & 0 \\
+        0 & 0 & 1 
+      \end{bmatrix}
+      \begin{bmatrix}
+        0 & -1 & 0 \\
+        1 & 0 & 0 \\
+        0 & 0 & 1 
+      \end{bmatrix}
+      \begin{bmatrix}
+        1.5 & 0  & 0 \\
+        0 & 1.5 & 0 \\
+        0 & 0 & 1 
+      \end{bmatrix} \\
+      &= \begin{bmatrix}
+        0 & -1.5 & 2 \\
+        1.5 & 0 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}
+    \end{align*}
+    </p>
+
+    <p>When we view the affine transformation as a change to homogeneous coordinates, we apply the matrix above to all the 9 points above. This gives us:
+    \begin{align*}
+      \begin{bmatrix} 2 \\ 0 \\ 1 \end{bmatrix}, 
+      \begin{bmatrix} 2 \\ 4.5 \\ 1 \end{bmatrix},
+      \begin{bmatrix} -2.5 \\ 4.5 \\ 1 \end{bmatrix},
+      \begin{bmatrix} -2.5 \\ 0 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 2 \\ 1.5 \\ 1 \end{bmatrix},
+      \begin{bmatrix} -0.25 \\ 1.5 \\ 1 \end{bmatrix},
+      \begin{bmatrix} -0.25 \\ 3  \\ 1 \end{bmatrix},
+      \begin{bmatrix} 2 \\ 3 \\ 1 \end{bmatrix},
+      \begin{bmatrix} -4 \\ 2.25 \\ 1 \end{bmatrix}.        
+    \end{align*}
+    When we plot these points on the standard affine coordiate system, we get the following picture.
+    </p>
+    
+    <canvas width="600" height="600" id="transformed-mesh-coordinates"></canvas>
+
+    <script>
+      function drawTransformedMeshCoordinates() {
+        const canvas = document.getElementById("transformed-mesh-coordinates");
+
+        const ctx = canvas.getContext('2d');
+
+        ctx.save();
+        ctx.scale(60.0, 60.0);
+        ctx.translate(5.5, 8.1)
+        ctx.scale(1, -1)
+        
+        drawCoordinateSystem(ctx);
+        
+        ctx.fillStyle = '#00000'
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = 3 / 100.0;
+
+        const points = [
+          [2,0], [2,4.5], [-2.5,4.5], [-2.5,0], [2,1.5], [-0.25,1.5], [-0.25,3], [2,3], [-4,2.25]
+        ];
+        const edges = [
+          [0,1], [1,2], [2,3], [3,0], [4,5], [5,6], [6,7], [3,8], [8,2]
+        ];
+        drawMesh(ctx, points, edges);
+
+        ctx.restore();
+      }
+      
+      drawTransformedMeshCoordinates();
+    </script>
+
+    <p>What is going on in the above picture is that, for each point $\ve{p}$ in the mesh, we perform the following calculation:
+    \begin{align*}
+      \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}
+      (A \ve{p})
+    \end{align*}
+    where $A$ is the matrix of the affine transformation. That is, we multiply the matrix $A$ with the coordinates of point $\ve{p}$ first to get another set of coordinates $A\ve{p}$. Then, we plot it on the plane through the dot product $\begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}(A \ve{p})$.    
+    </p>
 
     <h3>15.8.2 &nbsp; Affine transformation as a change to affine coordinate systems</h3>
 
