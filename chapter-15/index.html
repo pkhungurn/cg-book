@@ -3064,8 +3064,8 @@
     <canvas width="600" height="600" id="standard-affine-coordinate-system-grid"></canvas>
 
     <script>
-      function drawCoordinateSystem(ctx) {
-        ctx.strokeStyle = '#ff0000';
+      function drawCoordinateSystem(ctx, xAxisColor='#ff0000', yAxisColor='#00ff00', gridColor='#808080') {
+        ctx.strokeStyle = xAxisColor;
         ctx.lineWidth = 1.0 / 100;
         ctx.beginPath();
         ctx.moveTo(-10,0);
@@ -3073,7 +3073,7 @@
         ctx.closePath();
         ctx.stroke();
 
-        ctx.strokeStyle = '#00ff00';
+        ctx.strokeStyle = yAxisColor;
         ctx.lineWidth = 1.0 / 100;
         ctx.beginPath();
         ctx.moveTo(0,-10);
@@ -3087,7 +3087,7 @@
           ctx.translate(-0.3, -0.3);
           ctx.scale(1, -1);
           ctx.font = '0.25px sans-serif';
-          ctx.fillStyle = '#808080';
+          ctx.fillStyle = gridColor;
           ctx.fillText(x.toString(), 0, 0);
           ctx.restore();
         }
@@ -3156,10 +3156,10 @@
     <canvas width="600" height="600" id="world-space-mesh-canvas"></canvas>
 
     <script>
-      function drawMesh(ctx, points, edges) {
+      function drawMesh(ctx, points, edges, pointRadius=0.1) {
         for (let point of points) {
           ctx.beginPath();
-          ctx.arc(point[0], point[1], 0.1, 0, 2*Math.PI);
+          ctx.arc(point[0], point[1], pointRadius, 0, 2*Math.PI);
           ctx.closePath();
           ctx.fill();
         }
@@ -3299,7 +3299,264 @@
 
     <h3>15.8.2 &nbsp; Affine transformation as a change to affine coordinate systems</h3>
 
+    <p>There is another way to look at the equation
+    \begin{align*}
+      \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix} (A \ve{p}).
+    \end{align*}
+    Because matrix multiplication is associative, it should be equivalent to
+    \begin{align*}
+      (\begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix} A) \ve{p}.
+    \end{align*}
+    That is, instead of applying the transformation matrix $A$ to a point $\ve{p}$ first, we apply the transformation matrix to the <i>coordinate system</i> $\begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}$ first. </p>
 
+    <p>An observant reader might doubt whether this can be done at all. However, it is possible because $\hat{\ve{x}}$, $\hat{\ve{y}}$, $\ve{o}$ are vectors and points, and we know that the following three operations are allowed:</p>
+
+    <ul>
+      <li>adding two vectors together,</li>
+      <li>multipying a vector with a scalar,</li> 
+      <li>adding a point to a vector, and</li>
+      <li>multiplying a point with $0$ (which turns the point into a zero vector) or with $1$ (which results in the same point).</li>
+    </ul>
+
+    <p>As an example, let us apply the transformation $A = T_{2,0} R_{90^\circ} S_{1.5,1.5}$ to the coordinate system. We have that
+    \begin{align*}
+      \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix} A
+      &= \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}
+      \begin{bmatrix}
+        0 & -1.5 & 2 \\
+        1.5 & 0 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}
+    \end{align*}
+    First, note that $\begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}$ is a $1 \times 3$ matrix, and $A$ is a $3 \times 3$ matrix. So, the result, is a $1 \times 3$ matrix, which has the same shape as $\begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}$. The $(1,1)$-entry of the result is given by the dot product of $\begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}$ with the first column of $A$:
+    \begin{align*}
+      \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix} \begin{bmatrix}
+        0 \\
+        1.5 \\
+        0
+      \end{bmatrix}
+      = 1.5 \hat{\ve{y}}.
+    \end{align*}
+    Similarly, the $(1,2)$-entry and the $(1,3)$-entry are given by:
+    \begin{align*}
+      \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix} \begin{bmatrix}
+        -1.5 \\
+        0 \\
+        0
+      \end{bmatrix}
+      &= -1.5 \hat{\ve{x}}, \\
+      \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix} \begin{bmatrix}
+        2 \\
+        0 \\
+        1
+      \end{bmatrix}
+      &= 2\hat{\ve{x}} + \mathbf{o}.
+    \end{align*}
+    Putting all these calculations into one equation, we have
+    \begin{align*}
+      \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}
+      \begin{bmatrix}
+        0 & -1.5 & 2 \\
+        1.5 & 0 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}
+      &= \begin{bmatrix} 1.5 \hat{\ve{y}} & -1.5 \hat{\ve{x}} &  2\hat{\ve{x}} + \mathbf{o} \end{bmatrix}
+    \end{align*}
+    So, we start with a matrix $\begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}$, whose $(1,1)$-entry and $(1,2)$-entry are vectors, and whose $(1,3)$-entry is a point. We end up with another matrix of the same shape. Moreover,
+    <ul>
+      <li>Its $(1,1)$-entry, $1.5 \hat{\ve{y}}$, is a vector.</li>
+      <li>Its $(1,2)$-entry, $-1.5 \hat{\ve{x}}$, is a vector.</li>
+      <li>Its $(1,3)$-entry, $2\hat{\ve{x}} + \mathbf{o}$, is a point.</li>
+    </ul>
+    Let us visualize the entries on the grid defined by the original coordinate system.
+    </p>
+
+    <canvas width="600" height="600" id="members-of-transformed-coordinate-systems"></canvas>
+
+    <script>
+      function drawMembersOfTransformedCoordinateSystems() {
+        const canvas = document.getElementById("members-of-transformed-coordinate-systems");
+
+        const ctx = canvas.getContext('2d');
+
+        ctx.save();
+        ctx.scale(60.0, 60.0);
+        ctx.translate(5.5, 8.1)
+        ctx.scale(1, -1)
+        
+        drawCoordinateSystem(ctx);
+        
+        ctx.fillStyle = '#00000'
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = 6 / 100.0;
+
+        arrow(ctx, 0, 0, -1.5, 0, 0.2);
+        arrow(ctx, 0, 0, 0, 1.5, 0.2);
+        filledCircle(ctx, 2, 0);
+
+        ctx.font = '0.3px georgia';
+        
+        ctx.save();
+        ctx.translate(2.2, 0.1)
+        ctx.scale(1,-1)
+        ctx.fillText('2x+o', 0, 0)
+        ctx.restore();
+        ctx.save();
+        ctx.translate(2.2 + ctx.measureText('2').width - 0.01, 0.2)
+        ctx.scale(1,-1)
+        ctx.fillText('^', 0, 0)
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(-1.7, 0.25)
+        ctx.scale(1,-1)
+        ctx.fillText('-1.5x', 0, 0)
+        ctx.restore();
+        ctx.save();
+        ctx.translate(-1.7 + ctx.measureText('-1.5').width - 0.02, 0.35)
+        ctx.scale(1,-1)
+        ctx.fillText('^', 0, 0)
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(0.2, 1.45)
+        ctx.scale(1,-1)
+        ctx.fillText('1.5y', 0, 0)
+        ctx.restore();
+        ctx.save();
+        ctx.translate(0.2 + ctx.measureText('1.5').width - 0.02, 1.55)
+        ctx.scale(1,-1)
+        ctx.fillText('^', 0, 0)
+        ctx.restore();
+
+        ctx.restore();
+      }
+      
+      drawMembersOfTransformedCoordinateSystems();
+    </script>
+
+    <p>Now, recall that an affine coordinate system consists of 2 vectors and a point. So, the transformed coordinate system above can still serve as affine coordinate system. It is just that the origin is at a different place ($2\hat{\ve{x}} + \ve{o}$ instead of $\ve{o}$), the $x$-axis now points to the north and is stretched by a factor of $1.5$, and the $y$-axis points to west and is scaled up also by a factor of $1.5$. If we relocate the vectors' tails to the new origins and recolor them, the whole thing starts to look at an affine coordinate system.</p>
+
+    <canvas width="600" height="600" id="transformed-affine-coordinate-system"></canvas>
+
+    <script>
+      function drawTransformedAffineCoordinateSystem() {
+        const canvas = document.getElementById("transformed-affine-coordinate-system");
+
+        const ctx = canvas.getContext('2d');
+
+        ctx.save();
+        ctx.scale(60.0, 60.0);
+        ctx.translate(5.5, 8.1)
+        ctx.scale(1, -1)
+        
+        drawCoordinateSystem(ctx, '#808080', '#808080');
+        
+        ctx.fillStyle = '#00000'
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = 6 / 100.0;
+
+        ctx.strokeStyle = '#ff0000'
+        arrow(ctx, 2, 0, 2, 1.5, 0.2);
+        ctx.strokeStyle = '#00ff00'
+        arrow(ctx, 2, 0, 0.5, 0, 0.2);
+        filledCircle(ctx, 2, 0);
+        
+        ctx.restore();
+      }
+      
+      drawTransformedAffineCoordinateSystem();
+    </script>
+
+    <p>From this, we can draw a grid.</p>
+
+    <canvas width="600" height="600" id="transformed-affine-coordinate-system-grid"></canvas>
+
+    <script>
+      function drawTransformedAffineCoordinateSystemGrid() {
+        const canvas = document.getElementById("transformed-affine-coordinate-system-grid");
+
+        const ctx = canvas.getContext('2d');
+
+        ctx.save();
+        ctx.scale(60.0, 60.0);
+        ctx.translate(5.5, 8.1)
+        ctx.scale(1, -1)
+        ctx.translate(2,0);
+        ctx.rotate(Math.PI / 2);
+        ctx.scale(1.5, 1.5)
+        
+        drawCoordinateSystem(ctx);
+        
+        ctx.restore();
+      }
+      
+      drawTransformedAffineCoordinateSystemGrid();
+    </script>
+
+    <p>We can plot <i>the original coordinates,</i>
+    \begin{align*}
+      \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}, 
+      \begin{bmatrix} 3 \\ 0 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 3 \\ 3 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 0 \\ 3 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 1 \\ 1.5 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 2 \\ 1.5 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 2 \\ 0 \\ 1 \end{bmatrix},
+      \begin{bmatrix} 1.5 \\ 4 \\ 1 \end{bmatrix},       
+    \end{align*}
+    and connect them with edges, and we get the following image.</p>
+
+    <canvas width="600" height="600" id="mesh-on-transform-affine-coordinate-system"></canvas>
+
+    <script>
+      function drawMeshOnTransformedAffineCoordinateSystem() {
+        const canvas = document.getElementById("mesh-on-transform-affine-coordinate-system");
+
+        const ctx = canvas.getContext('2d');
+
+        ctx.save();
+        ctx.scale(60.0, 60.0);
+        ctx.translate(5.5, 8.1)
+        ctx.scale(1, -1)
+        ctx.translate(2,0);
+        ctx.rotate(Math.PI / 2);
+        ctx.scale(1.5, 1.5)
+        
+        drawCoordinateSystem(ctx);
+       
+        ctx.fillStyle = '#00000'
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = 2 / 100.0;
+
+        const points = [
+          [0,0], [3,0], [3,3], [0,3], [1,0], [1,1.5], [2,1.5], [2,0], [1.5,4]
+        ];
+        const edges = [
+          [0,1], [1,2], [2,3], [3,0], [4,5], [5,6], [6,7], [3,8], [8,2]
+        ];
+        drawMesh(ctx, points, edges, 0.1/1.5);
+
+        ctx.restore();
+      }
+      
+      drawMeshOnTransformedAffineCoordinateSystem();
+    </script>
+
+    <p>Notice that, ignoring the coordinate systems beneath the black points and lines, we get the exact same house as what we got in the last section. If you take the two image and put one on top of the other, the lines and the points would line up perfectly.</p>
+
+    <p>What we did when we plot the original coordinates on the new coordinate system is computing the dot product 
+    \begin{align*}
+      \begin{bmatrix} 1.5 \hat{\ve{y}} & -1.5 \hat{\ve{x}} &  2\hat{\ve{x}} + \mathbf{o} \end{bmatrix} \ve{p}
+      = (\begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} &  \mathbf{o} \end{bmatrix} A)\ve{p}
+    \end{align*}
+    between the transformed affine coordinate system and the original, untransformed coordinates. This gives the same result as what we did in the last section, because matrix multiplication is associative and
+    \begin{align*}
+      (\begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} &  \mathbf{o} \end{bmatrix} A)\ve{p}
+      &= \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} &  \mathbf{o} \end{bmatrix} (A\ve{p}).
+    \end{align*}
+    </p>
 
     <h2>15.11 &nbsp; Summary</h2>
 
