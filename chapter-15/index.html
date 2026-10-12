@@ -3558,6 +3558,16 @@
     \end{align*}
     </p>
 
+    <p>To recap, when we render a mesh, we need to things: the mesh itself, and an affine coordinate system that is used to translate the mesh's vertex coordinates to positions on the plane. When we use an affine transformation, we can interpret the transformation in two ways.
+    <ol>
+      <li>The transformation acts on the vertex coordinates, changing their numerical values to other values before the mesh is being drawn to the coordinate system that remained unchanged.</li>
+      <li>The transformation acts on the coordinate system, changing its origin and basis vectors. The mesh's vertex coordinates remain the same, but they will land on different positions because the grid they are being drawn on has changed.</li>
+    </ol>
+    The pictures that result from these two interpretations are exactly the same. This is because the picture is a result of a calculation that involves three matrices (the coordinate system, the matrix of the affine transformation, and the vertex position), and the interpretations are just two ways of parenthesizing the matrices. Because matrix multiplication is associative, the results are always the same.
+    </p>
+
+    <p>While this chapter starts with interpreting affine transformations as being applied to vertex coordinates, the new interpretation we introduce in this section is, in many cases, a more convenient way to think about transformations. This is especially true when we try to construct an affine transformation of have a certain effect on all meshes or meshes that we have not constructed yet. Here, a good way to think about the transformation is how the coordinate would change instead of imagining what would happen to an imaginary mesh that we do not have a concrete idea of.</p>
+
     <h2>15.11 &nbsp; Summary</h2>
 
     <hr>
