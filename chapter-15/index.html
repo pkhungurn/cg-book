@@ -3570,6 +3570,88 @@
 
     <h2>15.11 &nbsp; Summary</h2>
 
+    <ul>
+      <li>A <b>2D transformation</b> is a function from the set of 2D points ($\Real^2$) to itself. A 3D transformation can be define in a similar way.</li>
+      <li>2D and 3D transformations are important in computer graphics because, for one thing, we can apply them to vertices of a mesh. By doing so, we can move meshes around a scene, rotating them, scaling them so they have the appropriate sizes, and many other things.</li>
+      <li>We encounter the following transformations very often in computer graphics.
+        <ul>
+          <li>The identity transformation.</li>
+          <li>Translations.</li>
+          <li>Scalings.</li>
+          <li>Rotations.</li>
+        </ul>
+      </li>
+      <li>One can create new transformations from existing ones by performing the following operations on them.
+        <ul>
+          <li>Composition.</li>
+          <li>Addition.</li>
+          <li>Multiplication by scalar.</li>
+        </ul>
+      </li>
+      <li>Some transformations are <b>linear</b>, meaning that they satisfy two crucial properties that make them act in a way similar to scalars when applied to vectors.
+        <ul>The identity transformation, scalings, and rotations are linear, but translations are not.</ul>
+      </li>
+      <li>An <b>affine transformation</b> is a transformation that can be written as a composition of a linear transformation and a translation (in that order).
+        <ul>
+          <li>With this definition, we can treat put all four important types of transformations in the same group.</li>
+          <li>A nice property is that, if you use any of the above 3 operations on affine transformations, you will always get another affine transformation as a result.</li>
+        </ul>
+      </li>
+      <li>A <b>matrix</b> is an 2D array of numbers. Matrices are important because we can use them to represent linear an affine transformations.
+        <ul>
+          <li>A 2D linear transformation can be represented by a $2 \times 2$ matrix.</li>
+          <li>A 2D affine transformation can be represented by a $3 \times 3$ matrix.</li>
+          <li>In later chapters, we will encounter matrix representation of 3D linear and affine transformations.</li>
+        </uL>
+      </li>
+      <li>Matrices also have operations, and their operations correspond to operations on the linear transformations they represent.
+        <ul>
+          <li>Matrix multiplication corresponds to transformation composition.
+            <ul>
+              <li>This applies to affine transformations as well.</li>
+            </ul>
+          </li>
+          <li>Addition of $2 \times 2$ matrices correspond to addition of 2D linear transformations.</li>
+          <li>Multiplying of $2 \times 2$ matrices by a scalar corresponds to multiplying a linear transformation by a scalar.</li>
+        </ul>
+      </li>
+      <li>When representing an affine transformation with a $3 \times 3$ matrix, it is important to remember that these matrices act on <b>homogeneous coordinates</b> (which was covered back in Chapter 4).</li>
+      <li>The act of plotting 2D homogeneous coordinates on a plane is equivalent to multiplying a $1 \times 3$ matrix of the coordinate system with the $3 \times 1$ matrix of the homogeneous coordinates:
+      \begin{align*}
+        \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}
+        \begin{bmatrix} x \\ y \\ w \end{bmatrix}.
+      \end{align*}
+      </li>
+      <li>Applying an affine transformation before plotting is equivalent to inserting a $3 \times 3$ matrix $A$ in the middle of the above expression:
+      \begin{align*}
+        \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}
+        A
+        \begin{bmatrix} x \\ y \\ w \end{bmatrix}.
+      \end{align*}
+      </li>
+      <li>We can interpret the expression in two ways.
+      <ol>
+        <li>If we do the multiplication with the homogeneous coordinates first
+        \begin{align*}
+          \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}
+          \left( A
+          \begin{bmatrix} x \\ y \\ w \end{bmatrix} \right),
+        \end{align*}
+        the affine transformation changes the coordinates before they are plotted into a fixed coordinate system.
+        </li>
+        <li>If we do the multiplication with the coordinate system first,
+        \begin{align*}
+          \bigg( \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}
+          A \bigg)
+          \begin{bmatrix} x \\ y \\ w \end{bmatrix},
+        \end{align*}
+        the affine transformation changes the coordinate system first. After that, we plot the unchanged homogenoues coordinates to the changed coordinate system.
+        </li>
+      </ol>
+      The two interpretations will always result in the same plot on the plane because matrix multiplication is associative.
+      </li>
+    </ul>
+
     <hr>
     <p>
       <a href="../chapter-14/index.html">&lt;&lt;</a>
