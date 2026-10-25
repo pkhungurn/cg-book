@@ -687,7 +687,7 @@
 
     <p>From the examples we have seen so far, we can see why transformations are useful to computer graphics. Using translation, we can move a mesh around the scene. Using scaling, we can make a mesh larger or smaller to our liking. Using these two transformations togeter allows us to resize a mesh and place it to where we like in a scene.</p>
 
-    <h2>15.3 &nbsp; Transformation arithematic</h2>
+    <h2>15.3 &nbsp; Transformation arithmetic</h2>
 
     <p>Like many other mathematical objects, we can perform operations such as addition, subtraction, and multiplication on transformations to another transformation. This allows us to build more complex transformations from simpler transformations, and it makes transformation another kind of "numbers," much like vectors. In this section, we will learn about three operations on transformations that are used widely in computer graphics: composition, addition, and scalar multiplication.</p>
 
@@ -927,6 +927,28 @@
     \end{align*}
     which meanes that $f(0,0) = (0,0)$. This is one of the reason why, if $(a,b) \neq (0,0)$, then $\mathtt{C}_{a,b}$ and $\mathtt{T}_{a,b}$ are not linear.
     </p>
+
+    <h3>15.4.1 &nbsp; Operations on Linear Transformations</h3>
+
+    <p>One important property of linear transformation is that they are <i>closed</i> under the three arithmetic opeartions we discussed in the last section. This means that, if you make a new transformations from linear transformations with one of the operations, then the result would still be a linear transformation. In other words, you cannot escape being a linear transformation with these operations. With regards to them, the set of linear operations is clsed; there are no open doors.</p>
+
+    <p>Let's see for ourselves whether this is true for the composition operator. Let $f_1$ and $f_2$ be two linear transformations. Let $\ve{x}$ and $\ve{y}$ be any vector, and let $c$ be a real number. Then, we have that
+    \begin{align*}
+      (f_2 \circ f_1)(\ve{x} + \ve{y})
+      &= f_2\big(f_1(\ve{x} + \ve{y})\big) \\
+      &= f_2\big(f_1(\ve{x}) + f_1(\ve{y})\big) \\
+      &= f_2\big(f_1(\ve{x})\big) + f_2\big(f_1(\ve{y})\big) \\
+      &= (f_2 \circ f_2)(\ve{x}) + (f_2 \circ f_2)(\ve{x}). \\
+      (f_2 \circ f_1)(c\ve{x}) 
+      &= f_2\big( f_1 (c\ve{x}) \big) \\
+      &= f_2\big( c f_1 (\ve{x}) \big) \\ 
+      &= c f_2\big(f_1 (\ve{x}) \big) \\
+      &= c (f_2 \circ f_1)(\ve{x}).
+    \end{align*}
+    As a result, the function $f_2 \circ f_1$ satisfies the two conditions that are required for it to be a linear transformation and therefore is a linear transformation.
+    </p>
+
+    <p>We also easily show that $f_1 + f_2$ and $a f_1$, for any $a \in \Real$, are also linear tranformations. The proofs are quite similar to the one we just wrote down for the composition operations, and so we omit them for brevity.</p>
 
     <h2>15.5 &nbsp; 2D rotation</h2>
 
@@ -2571,7 +2593,13 @@
       (A +B)\ve{x} &= A\ve{x} + B\ve{x}, \\
       (cA)\ve{x} &= c(A\ve{x}) = A(c\ve{x}) = (Ac)\ve{x}.
     \end{align*}
-    So, if $A$ and $B$ represent linear transformations $f$ and $g$, respectively, then $A+B$ represents $f+g$, and $cA$ represents $cf$.
+    So, if $A$ and $B$ represent linear transformations $f$ and $g$, respectively, then $A+B$ represents $f+g$, and $cA$ represents $cf$. In other words, <b>operations on matrices are equalivalent to the operations on the linear transformations they represent.</b>
+    <ul>
+      <li>Matrix multiplication is equivalent to composition of linear transformations.</li>
+      <li>Matrix addition is equivalent to addition of linear transformations.</li>
+      <li>Matrix-scalar multiplication is equivalent to multiplying a scalar to a linear transformation.</li>
+    </ul>
+    Note, though, that we cannot generalize the properties to all transformations because there are transformations that cannot be represented by matrices. We will also see later that, while there are transformations other than linear transformations that can be represented by matrices, not all of the properties are true.
     </p>
 
     <p>Using the above properties, we can show that matrix multiplication and addition satisfy the <b>distributive laws</b>. In other words,
@@ -2697,16 +2725,26 @@
     where $\ves{0}$ denote the vector in $\Real^n$ whose entries are all zero.
     </p>
 
-    <p>A remarkable property of affine transformations is that, a composition of two affine transformations (or any number of affine transformations) is also affine. We can see this by letting $g_1(\ve{x}) = f_1(\ve{x}) + \ve{b}_1$ and $g_2(\ve{x}) = f_2(\ve{x}) + \ve{b}_2$ be two affine transformations. Then,
+    <p>A remarkable property of affine transformations is that, much like linear transformations, they are closed under composition, addition, and scalar multiplication. We can see this by letting $g_1(\ve{x}) = f_1(\ve{x}) + \ve{b}_1$ and $g_2(\ve{x}) = f_2(\ve{x}) + \ve{b}_2$ be two affine transformations and $c$ be a real number. Then,
     \begin{align*}
       (g_2 \circ g_1)(\ve{x}) 
       &= g_2(g_1(\ve{x})) \\ 
       &= g_2\big(f_1(\ve{x}) + \ve{b}_1\big) \\
       &= f_2\big(f_1(\ve{x}) + \ve{b}_1\big) + \ve{b}_2 \\
       &= f_2\big(f_1(\ve{x})) + f_2(\ve{b}_1) + \ve{b}_2 \\
-      &= (f_2 \circ f_1)(\ve{x}) + \big( f_2(\ve{b}_1) + \ve{b}_2 \big).
+      &= (f_2 \circ f_1)(\ve{x}) + \big( f_2(\ve{b}_1) + \ve{b}_2 \big), \\
+      (g_2 + g_1)(\ve{x}) 
+      &= g_2(\ve{x}) + g_1(\ve{x}) \\
+      &= f_2(\ve{x}) + \ve{b}_2 + f_1(\ve{x}) + \ve{b}_1 \\
+      &= (f_2(\ve{x}) + f_1(\ve{x})) + (\ve{b}_2 + \ve{b}_1) \\
+      &= (f_2 + f_1)(\ve{x}) + (\ve{b}_2 + \ve{b}_1), \\
+      (cg_1)(\ve{x}) 
+      &= c g_1(\ve{x}) \\
+      &= c(f_1(\ve{x}) + \ve{b}_1 ) \\
+      &= c f_1(\ve{x}) + c \ve{b}_1 \\
+      &= (c f_1)(\ve{x}) + (c \ve{b}_1). 
     \end{align*}
-    Because $f_1$ and $f_2$ are linear transformations, it follows that $f_2 \circ f_1$ is a linear transformation. We also know that $f_2(\ve{b}_1) + \ve{b}_1$ is a constant (in other words, it has not change when $\ve{x}$ changes). As a result, $g_2 \circ g_1$ is an affine transformation.</p>
+    Because $f_1$ and $f_2$ are linear transformations, it follows that $f_2 \circ f_1$, $f_2 + f_1$, and $c f_1$ are linear transformations as well according to Section 15.4.1. We also know that $f_2(\ve{b}_1) + \ve{b}_1$, $\ve{b}_2 + \ve{b}_1$, and $c\ve{b_1}$ are constants (in other words, they do not change when $\ve{x}$ changes). As a result, $g_2 \circ g_1$, $g_2 + g_1$, and $c g_1$ are all affine transformation.</p>
 
     <p>So, the class of affine transformations, it seems, is tailor made to combine linear transformations with translations. The grouping is also useful because, like linear transformations, we can also represent affine transformations with matrices.</p>
 
@@ -2800,7 +2838,7 @@
         1
       \end{bmatrix},
     \end{align*}
-    which is the homogeneous coordinates of $g(x,y)$ that we just derived above. As a result, we can treat the $3 \times 3$ matrix $M$ as a representation of the affine transformation $g$.
+    which is the homogeneous coordinates of $g(x,y)$ that we just derived above. As a result, we can treat the $3 \times 3$ matrix $M$ as a representation of the affine transformation $g$. Indeed, we call a square matrix $M$ where the last row is of the form $(0, 0, \cdots, 1)$ an <b>affine matrix</b>. As a resulit, <b>an affine matrix of size $(n+1) \times (n+1)$ is a representation of an affine transformation in the $n$-dimensional Eucliean space $\Real^n$.</b>
     </p>
 
     <p>According to what we just derived, a linear transformation $f$ can be represent by <i>both</i> a $2 \times 2$ matrix and a $3 \times 3$ matrix. More specifically, if $$\begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix}$$ is the $2 \times 2$ matrix representation of $f$, then the $3\times 3$ matrix representation of $f$ is
@@ -2936,6 +2974,197 @@
     </p>
 
     <p>So, when we talk about applying an affine transformation, we need to be clear what the input type is. In this chapter and the next chapter, we focus on transformation points. However, later on, we will talk about transformating vectors (especially normal vectors) as well.</p>
+
+    <h3>15.7.4 &nbsp; Operations on Matrix Representations of Affine Transformations</h3>
+
+    <p>In Section 15.6.7, we learned that operations on matrix representations of linear transformations are equivalent to operations on the transformations themselves. We also learn in Section 15.7.2 that affine transformations can also be represented by matrices. Are operations on these matrices equivalent to operations on the affine transformations they represented?</p>
+
+    <p>The answer is that it depends on the operations we talk about. <b>Multiplication of affine matrices are equivalent to composition of the affine transformations they represent.</b> On the other hand, <b>addition and scalar-multiplication of affine matrices are not equivalent to addition and scalar-multilication of the transformations.</b></p>
+
+    <p>Let us see the cases where the equivalence fails to hold first. We know that the translations $\mathtt{T}_{1,0}$ and $\mathtt{T}_{0,1}$ are affine transformations. We also know that
+    \begin{align*}
+      (\mathtt{T}_{1,0} + \mathtt{T}_{0,1})(\ve{x}) 
+      &= \mathtt{T}_{1,0}(\ve{x}) + \mathtt{T}_{0,1}(\ve{x}) \\
+      &= (\ve{x} + (1,0)) + (\ve{x} + (0,1)) \\
+      &= 2\ve{x} + (1,1) \\
+      &= \mathtt{S}_{2,2}(\ve{x}) + (1,1),
+    \end{align*}
+    which is an affine transformation. The matrix representation of $\mathtt{T}_{1,0} + \mathtt{T}_{0,1}$ is thus
+    \begin{align*}
+      \begin{bmatrix}
+        2 & 0 & 1 \\
+        0 & 2 & 1 \\
+        0 & 0 & 1
+      \end{bmatrix}.
+    \end{align*} 
+    However, the matrix representations of $\mathtt{T}_{1,0}$ and  $\mathtt{T}_{0,1}$ are
+    \begin{align*}
+      \begin{bmatrix}
+        1 & 0 & 1 \\
+        0 & 1 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}
+      \mbox{ and }
+      \begin{bmatrix}
+        1 & 0 & 0 \\
+        0 & 1 & 1 \\
+        0 & 0 & 1
+      \end{bmatrix},
+    \end{align*}
+    respectively. If we add them together, we get
+    \begin{align*}
+      \begin{bmatrix}
+        1 & 0 & 1 \\
+        0 & 1 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}
+      + 
+      \begin{bmatrix}
+        1 & 0 & 1 \\
+        0 & 1 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}
+      =
+      \begin{bmatrix}
+        2 & 0 & 1 \\
+        0 & 2 & 1 \\
+        0 & 0 & 2
+      \end{bmatrix}
+      \neq 
+      \begin{bmatrix}
+        2 & 0 & 1 \\
+        0 & 2 & 1 \\
+        0 & 0 & 1
+      \end{bmatrix}.
+    \end{align*}
+    So, adding two matrix representations together does not result in the matrix that represent the addition of two affine transformations. In fact, the result of adding two affine matrices together are not even an affine matrix, so it does not even a representation of an affine transformation to begin with.
+    </p>
+
+    <p>A similar phenomenon can be observed when we multiply a translation with a scalar. We have that
+    \begin{align*}
+      (3 \mcal{T}_{1,0})(\ve{x}) = 3(\ve{x} + (1,0)) = 3\ve{x} + (3,0) = S_{3,3}(\ve{x}) + (3,0),
+    \end{align*}
+    so $3 \mathtt{T}_{1,0}$ is an affine transformation whose matrix representation is
+    \begin{align*}
+      \begin{bmatrix}
+        3 & 0 & 3 \\
+        0 & 3 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}.
+    \end{align*}
+    However, if we just multiply the matrix represeentation of $\mathtt{T}_{1,0}$ with $3$, we get
+    \begin{align*}
+      3 \begin{bmatrix}
+        1 & 0 & 1 \\
+        0 & 1 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}
+      &= \begin{bmatrix}
+        3 & 0 & 3 \\
+        0 & 3 & 0 \\
+        0 & 0 & 3
+      \end{bmatrix}
+      \neq \begin{bmatrix}
+        3 & 0 & 3 \\
+        0 & 3 & 0 \\
+        0 & 0 & 1
+      \end{bmatrix}.
+    \end{align*}
+    Again, the result of multplying an affine matrix with a scalar is not an affine matrix unless the scalar is 1.
+    </p>
+
+    <p>We have demonstrated that adding affine matrices and multiplying them with scalars are not equivalent to doing the same with the affine transformations that they represent. What about multiplying affine matrices together then? As it turns out, the operation does corresponds to composition of affine transformations. To see this, let $g_1$ and $g_2$ be affine transformations whose matrix representations are
+    \begin{align*}
+      M_1 &= \begin{bmatrix}
+        a_{11} & a_{12} & c_1 \\ 
+        a_{21} & a_{22} & c_2 \\ 
+        0 & 0 & 1 
+      \end{bmatrix}
+      & \mbox{ and } & &
+      M_2 &= \begin{bmatrix}
+        b_{11} & b_{12} & d_1 \\ 
+        b_{21} & b_{22} & d_2 \\ 
+        0 & 0 & 1 
+      \end{bmatrix},
+    \end{align*}
+    respectively. For convenience, let
+    \begin{align*}
+      A &= \begin{bmatrix}
+        a_{11} & a_{12} \\
+        a_{21} & a_{22} 
+      \end{bmatrix}, &
+      \ve{b} &= \begin{bmatrix}
+        b_1 \\ b_2 
+      \end{bmatrix}, &
+      C &= \begin{bmatrix}
+        c_{11} & c_{12} \\
+        c_{21} & c_{22} 
+      \end{bmatrix}, &
+      \ve{d} &= \begin{bmatrix}
+        d_1 \\ d_2 
+      \end{bmatrix}, 
+    \end{align*}
+    so that we may write
+    \begin{align*}
+      g_1(\ve{x}) &= A\ve{x} + \ve{b}, \\
+      g_2(\ve{x}) &= C\ve{x} + \ve{d}. 
+    \end{align*}
+    Now,
+    \begin{align*}
+      (g_2 \circ g_1)(\ve{x})
+      &= g_2\big( g_1(\ve{x}) \big)
+      = C(A\ve{x} + \ve{b}) + \ve{d}
+      = CA\ve{x} + C\ve{b} + \ve{d} \\
+      &= (CA)\ve{x} + (C\ve{b} + \ve{d}).
+    \end{align*}
+    Carrying out the calculation, we have
+    \begin{align*}
+      CA = 
+      \begin{bmatrix}
+        c_{11} & c_{12} \\
+        c_{21} & c_{22} 
+      \end{bmatrix}
+      \begin{bmatrix}
+        a_{11} & a_{12} \\
+        a_{21} & a_{22} 
+      \end{bmatrix}
+      &= \begin{bmatrix}
+        c_{11}a_{11} + c_{12}a_{21} & c_{11}a_{12} + c_{12}a_{21} \\
+        c_{21}a_{11} + c_{22}a_{21} & c_{21}a_{12} + c_{22}a_{22}   
+      \end{bmatrix},
+    \end{align*}
+    and
+    \begin{align*}
+      C\ve{b} + \ve{d}
+      &= \begin{bmatrix}
+        c_{11} & c_{12} \\
+        c_{21} & c_{22} 
+      \end{bmatrix}
+      \begin{bmatrix}
+        b_1 \\
+        b_2 
+      \end{bmatrix}
+      + \begin{bmatrix}
+        d_1 \\
+        d_2 
+      \end{bmatrix}
+      = \begin{bmatrix}
+        c_{11} b_1 + c_{12} b_2 + d_1 \\
+        c_{21} b_1 + c_{22} b_2 + d_1
+      \end{bmatrix}.
+    \end{align*}
+    So, the matrix representation for $g_2 \circ g_1$ is
+    \begin{align*}
+      \begin{bmatrix}
+        c_{11}a_{11} + c_{12}a_{21} & c_{11}a_{12} + c_{12}a_{21} & c_{11} b_1 + c_{12} b_2 + d_1 \\ 
+        c_{21}a_{11} + c_{22}a_{21} & c_{21}a_{12} + c_{22}a_{22} & c_{21} b_1 + c_{22} b_2 + d_1 \\
+        0 & 0 & 1
+      \end{bmatrix}.
+    \end{align*}
+    We claim that the above matrix is exactly equal to $M_2 M_1$. The reader can check this by multiplying out the two matrices manually. So, affine matrix multiplication is the only operation among the three that is equivalent to an operation on the transformations that the matrices represent.
+    </p>
+
+    <p>So, while affine transformations are not as clean in terms of equivalence between matrix operations and transformation operations, the good news is that compositions of affine transformations can be calculated through multiplications of affine matrices. This allows us to compress a long train of affine transformations, applied after one another, to a single affine matrix through matrix multiplication. Other operations, though, need special handling.</p>
 
     <h2>15.8 &nbsp; Two equivalent views of affine transformations</h2>
 
@@ -3600,28 +3829,25 @@
       <li>A <b>matrix</b> is an 2D array of numbers. Matrices are important because we can use them to represent linear an affine transformations.
         <ul>
           <li>A 2D linear transformation can be represented by a $2 \times 2$ matrix.</li>
-          <li>A 2D affine transformation can be represented by a $3 \times 3$ matrix.</li>
+          <li>A 2D affine transformation can be represented by a $3 \times 3$ matrix (called an <b>affine matrix</b>).</li>
           <li>In later chapters, we will encounter matrix representation of 3D linear and affine transformations.</li>
         </uL>
       </li>
       <li>Matrices also have operations, and their operations correspond to operations on the linear transformations they represent.
         <ul>
-          <li>Matrix multiplication corresponds to transformation composition.
-            <ul>
-              <li>This applies to affine transformations as well.</li>
-            </ul>
-          </li>
+          <li>Matrix multiplication corresponds to transformation composition.</li>
           <li>Addition of $2 \times 2$ matrices correspond to addition of 2D linear transformations.</li>
           <li>Multiplying of $2 \times 2$ matrices by a scalar corresponds to multiplying a linear transformation by a scalar.</li>
         </ul>
       </li>
-      <li>When representing an affine transformation with a $3 \times 3$ matrix, it is important to remember that these matrices act on <b>homogeneous coordinates</b> (which was covered back in Chapter 4).</li>
+      <li>When representing an affine transformation with a $3 \times 3$ affine matrix, it is important to remember that these matrices act on <b>homogeneous coordinates</b> (which was covered back in Chapter 4).</li>
       <li>The act of plotting 2D homogeneous coordinates on a plane is equivalent to multiplying a $1 \times 3$ matrix of the coordinate system with the $3 \times 1$ matrix of the homogeneous coordinates:
       \begin{align*}
         \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}
         \begin{bmatrix} x \\ y \\ w \end{bmatrix}.
       \end{align*}
       </li>
+      <li>Mutliplication of two affine matrices is equivalent to composing the two affine transformations that the matrices represent. However, adding affine two matrices and multiplying one with a scalar are not equivalent to doing the same operations on the transformations. In fact, the results of these matrix operations are often not affine matrices to begin with.</li>
       <li>Applying an affine transformation before plotting is equivalent to inserting a $3 \times 3$ matrix $A$ in the middle of the above expression:
       \begin{align*}
         \begin{bmatrix} \hat{\ve{x}} & \hat{\ve{y}} & \ve{o} \end{bmatrix}
