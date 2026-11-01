@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script type="text/javascript">
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        tags: "ams",
+      },
+      svg: {
+        fontCache: 'global'
+      },
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" src="../mathjax/tex-mml-chtml.js"></script>
+  <link rel="stylesheet"
+      href="../highlight/styles/default.min.css">
+  <script src="../highlight/highlight.min.js"></script>
+  <script src="../js/highlightjs-line-numbers.min.js"></script>
+  <script>
+  hljs.highlightAll();
+  hljs.initLineNumbersOnLoad();
+  </script>
+    
+  <title>Chapter 15</title>
+</head>
+
+<body>
+  <div class="container" style="max-width: 640px;">
+    <span style="visibility: hidden;">
+      \(
+      \def\sc#1{\dosc#1\csod}
+      \def\dosc#1#2\csod{{\rm #1{\small #2}}}
+
+      \newcommand{\dee}{\mathrm{d}}
+      \newcommand{\Dee}{\mathrm{D}}
+      \newcommand{\In}{\mathrm{in}}
+      \newcommand{\Out}{\mathrm{out}}
+      \newcommand{\pdf}{\mathrm{pdf}}
+      \newcommand{\Cov}{\mathrm{Cov}}
+      \newcommand{\Var}{\mathrm{Var}}
+
+      \newcommand{\ve}[1]{\mathbf{#1}}
+      \newcommand{\mrm}[1]{\mathrm{#1}}
+      \newcommand{\ves}[1]{\boldsymbol{#1}}
+      \newcommand{\etal}{{et~al.}}
+      \newcommand{\sphere}{\mathbb{S}^2}
+      \newcommand{\modeint}{\mathcal{M}}
+      \newcommand{\azimint}{\mathcal{N}}
+      \newcommand{\ra}{\rightarrow}
+      \newcommand{\mcal}[1]{\mathcal{#1}}
+      \newcommand{\X}{\mathcal{X}}
+      \newcommand{\Y}{\mathcal{Y}}
+      \newcommand{\Z}{\mathcal{Z}}
+      \newcommand{\x}{\mathbf{x}}
+      \newcommand{\y}{\mathbf{y}}
+      \newcommand{\z}{\mathbf{z}}
+      \newcommand{\tr}{\mathrm{tr}}
+      \newcommand{\sgn}{\mathrm{sgn}}
+      \newcommand{\diag}{\mathrm{diag}}
+      \newcommand{\Real}{\mathbb{R}}
+      \newcommand{\sseq}{\subseteq}
+      \newcommand{\ov}[1]{\overline{#1}}
+      \DeclareMathOperator*{\argmax}{arg\,max}
+      \DeclareMathOperator*{\argmin}{arg\,min}
+      \)
+    </span>
+
+    <h1>16 &nbsp; Programming with matrices</h1>
+    <hr>
+
+    <p>In the last chapter, we learned about 2D transformations and why they matter in computer graphics. HOwever, we only learned the theory and yet do not know how to use transformations and matrices in our programs. This chapter will fill in the missing practical aspect.</p>
+
+    <p>Because matrices are so frequenly used in computer graphics applications, there are support for them at multiple levels in the WebGL programming tool chain. First, GLSL has native data types for matrices up to the size of $4 \times 4$. It also have built-in functions for common matrix operations such as transposition, computing invereses, and computing determinants. Second, there are open-source Javascript libraries for "3D math," which generally have support for up to 4D vectors (which can represent 3D points) and matrices that can act on these vectors. For this book, we will use a well-known library called <a href="https://glmatrix.net">glMatrix</a>.</p>
+
+    <h2>16.1 &nbsp; Matrices in GLSL</h2>
+
+    <p>The GLSL programming language comes packed with language-level features for maniputing small matrices up to size $4 \times 4$. This means that we can easily represent and manipulate 3D affine transformations with the language.</p>
+    
+    <h2>16.1.1 &nbsp; Data types</h2>
+
+    <p>GLSL has the following built-in data types for matrices:</p>
+    
+    <blockquote>
+        <center>
+        <tt>mat2x2</tt>, <tt>mat2x3</tt>, <tt>mat2x4</tt>, <br>
+        <tt>mat3x2</tt>, <tt>mat3x3</tt>, <tt>mat4x4</tt>, <br>
+        <tt>mat4x2</tt>, <tt>mat4x3</tt>, and <tt>mat4x4</tt>.
+        </center>
+    </blockquote>
+    
+    <p>Obviously, we can read the size of the matrices each data type represents from its name. However, unlike the convention we used in the last chapter, the first number is the number of <i>column</i>, and the second number is the number of <i>rows</i>. So, <tt>mat3x4</tt> represents matrices with 3 columns and 4 rows, which is written as $4 \times 3$ according Chapter 15's convention. The author admits that this can be confusing.</p>
+    
+    <p>Nevertheless, we will use square matrices almost all the times, so the types that matter to us are <tt>mat2x2</tt>, <tt>mat3x3</tt>, and <tt>mat4x4</tt>. We can refer to these types by their shorter names:</p>
+    
+    <blockquote>
+        <center>
+        <tt>mat2</tt>, <tt>mat3</tt>, and <tt>mat4</tt>.
+        </center>
+    </blockquote>
+    
+    <p>Matrix entries are single-precision floating point numbers; i.e., the <tt>float</tt> data type in GLSL. While other versions of GLSL have support for matrices whose entries are double-precision floating point nubmers, the GLSL we can use with WebGL does not have this feature.</p>
+
+    <h2>16.1.2 &nbsp; Constructors</h2>
+    
+    <h2>16.1.3 &nbsp; Operators</h2>
+    
+    <h2>16.1.4 &nbsp; Built-in functions</h2>
+
+
+    <hr>
+    <p>
+      <a href="../chapter-15/index.html">&lt;&lt;</a>
+      <a href="../index.html">Contents</a>      
+    </p>
+  </div>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/littlefoot.js" type="application/javascript"></script>
+  <script type="application/javascript">
+    const { littlefoot } = require('littlefoot')
+    const lf = littlefoot({
+      activateOnHover: true,
+      hoverDelay: 250,
+    });
+  </script>
+</body>
+
+</html>
